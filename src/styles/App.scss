@@ -1,0 +1,556 @@
+$background-color: #3c3c3b;
+$dark: #343a40;
+$white: #ebebd3;
+$secondaryWhite: #cacabf;
+$yellow: #ffe066;
+$red: #f24643;
+$blue: #1688b9;
+$text-font: "Roboto", sans-serif;
+$title-font: "Rubick", sans-serif;
+$radius: 0.25rem;
+$shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
+  0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+
+@mixin defineTransition($transitionTime) {
+  transition: all $transitionTime;
+  -webkit-transition: all $transitionTime;
+  -moz-transition: all $transitionTime;
+}
+
+@mixin defineColorFontWeightHeader($color, $font, $weight) {
+  color: $color;
+  font-family: $font;
+  font-weight: $weight;
+}
+
+@mixin setMediaBreakpoint($widthValue) {
+  @media (min-width: $widthValue) {
+    @content;
+  }
+}
+
+body {
+  background-color: $background-color;
+  font-size: 16px;
+  font-family: $text-font;
+  color: $white;
+  margin: 0;
+  overflow-x: hidden;
+
+  @include setMediaBreakpoint(1024px) {
+    font-size: 18px;
+  }
+}
+
+h1 {
+  @include defineColorFontWeightHeader($yellow, $title-font, bold);
+  padding-bottom: 1.10rem;
+}
+
+h3 {
+  @include defineColorFontWeightHeader($blue, $title-font, bold);
+  padding-bottom: 1.25rem;
+}
+
+h4 {
+  @include defineColorFontWeightHeader($red, $title-font, normal);
+  padding-bottom: 1rem;
+}
+
+h5 {
+  @include defineColorFontWeightHeader($red, $title-font, normal);
+}
+
+h6 {
+  @include defineColorFontWeightHeader($yellow, $title-font, normal);
+}
+
+hr {
+  color: $yellow;
+  background-color: $yellow;
+  opacity: 0.5;
+}
+
+footer,
+.secondaryNames {
+  color: $secondaryWhite;
+}
+//------------------//
+
+// Links
+a.basicLink {
+  color: $white;
+  border-bottom: $red solid 2px !important;
+  @include defineTransition(0.5s);
+
+  &:hover,
+  &:active {
+    text-decoration: none;
+    border-bottom: $blue solid 2px !important;
+    color: $red;
+  }
+}
+
+a.containerLink {
+  color: $red;
+  display: block;
+  text-decoration: none;
+  @include defineTransition(0.5s);
+
+  &:hover,
+  &:active {
+    text-decoration: none;
+    background-color: $blue;
+    border-radius: $radius;
+    & > p,
+    & > div > p,
+    & > div > div > p,
+    & > h5 {
+      color: $yellow;
+    }
+  }
+}
+//------------------//
+
+// Buttons/Icon Buttons
+.btn-warning {
+  font-family: $text-font !important;
+  background-color: $yellow !important;
+  padding: 8px 15px 8px 15px !important;
+  color: $dark !important;
+  box-shadow: $shadow;
+
+  &:hover,
+  &:active {
+    background-color: #f5cf35 !important;
+  }
+
+  &.btn-video {
+    color: $red !important;
+  }
+}
+
+.btn-danger {
+  background-color: $red !important;
+  padding: 8px 15px 8px 15px !important;
+  color: $dark !important;
+  box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+
+  &:hover,
+  &:active {
+    background-color: #f0312e !important;
+  }
+
+  &.btn-video {
+    color: $yellow !important;
+    font-weight: bold !important;
+  }
+}
+
+.moveButton {
+  cursor: pointer;
+  margin: 0;
+  padding: 5px;
+  transition: 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+
+  &:hover,
+  &:active {
+    background-color: $blue;
+    color: $yellow;
+    border-radius: $radius;
+  }
+
+  & > div > p {
+    margin: 0;
+    padding: 5px;
+  }
+}
+
+//------------------//
+
+// Forms
+.form-group {
+  input {
+    background-color: $blue;
+    border: 1px solid $yellow;
+    color: $white;
+    @include defineTransition(0.5s);
+    box-shadow: $shadow;
+
+    &:focus {
+      background-color: $red;
+      color: $yellow;
+      border: 1px solid $yellow;
+
+      &::placeholder{
+        color: $yellow;
+      }
+    }
+
+    &::placeholder{
+      color: $white !important;
+    }
+  }
+}
+
+.avatar {
+  border: solid 1px $yellow;
+  border-radius: $radius;
+  box-shadow: $shadow;
+
+  &.active-avatar {
+    background-color: $blue;
+  }
+}
+//------------------//
+
+div.modal-content {
+  background-color: $dark;
+  border: 1px solid $yellow;
+}
+
+div.typeIcon {
+  cursor: pointer;
+  display: inline-block;
+  width: 80px;
+  font-size: 0.75rem;
+  border-radius: $radius;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  line-height: 1.5rem;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  text-transform: uppercase;
+  transition: opacity 0.4s;
+  margin-bottom: 1rem;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  &.type-electric {
+    background-color: #fc3;
+  }
+  &.type-fairy {
+    background-color: #e9e;
+  }
+  &.type-water {
+    background-color: #39f;
+  }
+  &.type-grass {
+    background-color: #7c5;
+  }
+  &.type-dragon {
+    background-color: #76e;
+  }
+  &.type-rock {
+    background-color: #ba6;
+  }
+  &.type-ground {
+    background-color: #db5;
+  }
+  &.type-flying {
+    background-color: #89f;
+  }
+  &.type-poison {
+    background-color: #a59;
+  }
+  &.type-dark {
+    background-color: #754;
+  }
+  &.type-steel {
+    background-color: #aab;
+  }
+  &.type-fire {
+    background-color: #f42;
+  }
+  &.type-normal {
+    background-color: #aa9;
+  }
+  &.type-fighting {
+    background-color: #b54;
+  }
+  &.type-ghost {
+    background-color: #66b;
+  }
+  &.type-ice {
+    background-color: #6cf;
+  }
+  &.type-psychic {
+    background-color: #f59;
+  }
+  &.type-bug {
+    background-color: #ab2;
+  }
+}
+
+.reactionBtnActive{
+  background-color: $red !important;
+  & > span > span{
+    font-weight: bold !important;
+    color: $yellow !important;
+  }
+}
+
+.reactionBtnDisabled{
+  background-color: transparent;
+}
+
+//Navigation
+nav {
+  background-color: transparent;
+
+  .navbar-toggler {
+    color: none;
+    border: none;
+  }
+
+  .navBrandLink {
+    @include defineTransition(0.6s);
+
+    .navBrandSecondTitle,
+    .navBrandTitle {
+      font-size: 2em;
+      @include setMediaBreakpoint(1024px) {
+        font-size: 2.5em;
+      }
+    }
+
+    &:hover,
+    &:active {
+      .navBrandTitle {
+        color: $red;
+      }
+
+      .navBrandSecondTitle {
+        color: $blue;
+      }
+    }
+  }
+
+  .nav-item {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  ul li {
+    a {
+      color: $red;
+      padding: 8px;
+      font-weight: bold;
+      text-decoration: none;
+      position: relative;
+      margin: 0 0.325rem 0 0.325rem;
+      @include defineTransition(0.5s);
+
+      &.navbar__link-active {
+        color: $yellow;
+        background-color: $red;
+        font-weight: bold;
+        border-radius: $radius;
+        box-shadow: $shadow;
+      }
+
+      @include setMediaBreakpoint(1024px) {
+        margin: 0 0.425rem 0 0.425rem;
+        padding: 10px;
+      }
+
+      &:focus,
+      &::-moz-focus-inner {
+        border: 0;
+        outline: none;
+      }
+
+      &:after,
+      &:before {
+        @include defineTransition(0.5s);
+      }
+
+      &:hover,
+      &:active {
+        text-decoration: none;
+        color: $blue;
+      }
+
+      &:after {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        margin: auto;
+        width: 100%;
+        height: 1px;
+        content: ".";
+        color: transparent;
+        background-color: $yellow;
+        border-radius: $radius;
+        visibility: none;
+        opacity: 0;
+        z-index: -1;
+        box-shadow: $shadow;
+      }
+
+      &:hover:after,
+      &:active:after {
+        opacity: 1;
+        visibility: visible;
+        height: 100%;
+      }
+    }
+  }
+}
+//------------------//
+
+// Material UI Changes
+.MuiTabs-indicator {
+  display: none !important;
+}
+
+.MuiButton-root {
+  min-width: 10px !important;
+}
+
+.Mui-selected {
+  background-color: $red !important;
+  color: $yellow !important;
+  font-weight: bold !important;
+  border-radius: $radius !important;
+}
+
+.MuiTabs-root {
+  color: $red;
+  background-color: $yellow;
+  border-top-left-radius: $radius;
+  border-top-right-radius: $radius;
+}
+//------------------//
+
+// Pokeball Animation
+.pokeball {
+  background-color: #f5f5f5;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+  float: left;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  margin: 30px;
+  border: 8px solid #333;
+}
+.pokeball.fixed {
+  overflow: visible;
+}
+.pokeball .pokeball-btn {
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  background-color: white;
+  border: 5px solid #333;
+  position: absolute;
+  margin: 44px;
+}
+.pokeball .pokeball-btn::after {
+  content: "";
+  position: absolute;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  background-color: #a2a2a2;
+  border: 3px solid #333;
+  margin: 4px;
+}
+.pokeball.poke::before {
+  content: "";
+  position: absolute;
+  width: 280px;
+  height: 70px;
+  background-color: #e62327;
+  border-bottom: 10px solid #333;
+}
+
+.animated {
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+.animated.infinite {
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+}
+
+@-webkit-keyframes swing {
+  20% {
+    -webkit-transform: rotate3d(0, 0, 1, 15deg);
+    transform: rotate3d(0, 0, 1, 15deg);
+  }
+
+  40% {
+    -webkit-transform: rotate3d(0, 0, 1, -10deg);
+    transform: rotate3d(0, 0, 1, -10deg);
+  }
+
+  60% {
+    -webkit-transform: rotate3d(0, 0, 1, 5deg);
+    transform: rotate3d(0, 0, 1, 5deg);
+  }
+
+  80% {
+    -webkit-transform: rotate3d(0, 0, 1, -5deg);
+    transform: rotate3d(0, 0, 1, -5deg);
+  }
+
+  to {
+    -webkit-transform: rotate3d(0, 0, 1, 0deg);
+    transform: rotate3d(0, 0, 1, 0deg);
+  }
+}
+
+@keyframes swing {
+  20% {
+    -webkit-transform: rotate3d(0, 0, 1, 15deg);
+    transform: rotate3d(0, 0, 1, 15deg);
+  }
+
+  40% {
+    -webkit-transform: rotate3d(0, 0, 1, -10deg);
+    transform: rotate3d(0, 0, 1, -10deg);
+  }
+
+  60% {
+    -webkit-transform: rotate3d(0, 0, 1, 5deg);
+    transform: rotate3d(0, 0, 1, 5deg);
+  }
+
+  80% {
+    -webkit-transform: rotate3d(0, 0, 1, -5deg);
+    transform: rotate3d(0, 0, 1, -5deg);
+  }
+
+  to {
+    -webkit-transform: rotate3d(0, 0, 1, 0deg);
+    transform: rotate3d(0, 0, 1, 0deg);
+  }
+}
+
+.swing {
+  -webkit-transform-origin: bottom center;
+  transform-origin: bottom center;
+  -webkit-animation-name: swing;
+  animation-name: swing;
+}
