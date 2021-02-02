@@ -1,17 +1,11 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import StaticHome from './StaticHome';
-import UserHome from './UserHome';
+import React from 'react'
+import { useSelector } from 'react-redux'
+import StaticHome from './components/StaticHome'
+import UserHome from './components/UserHome'
 
-const Home = (props) => {
-    let { auth } = props
-    return !auth.uid ? (<StaticHome />) : (<UserHome />)
+const Home = () => {
+  const auth = useSelector(state => state.firebase.auth)
+  return !auth.uid ? <StaticHome /> : <UserHome />
 }
 
-const mapStateToProps = (state) => {
-    return {
-        auth: state.firebase.auth,
-    }
-}
-
-export default connect(mapStateToProps)(Home)
+export default Home

@@ -1,318 +1,507 @@
-import React, { Component } from 'react';
-import { Row, Col, TabContent } from 'reactstrap';
-import { connect } from 'react-redux';
-import PokemonPageMoves from './pokemonPageMoves';
-import PokemonPageGenericInfo from './pokemonPageGenericInfo';
-import PokemonPageEvChain from './pokemonPageEvChain';
-import PokemonPageNextPrevious from './pokemonPageNextPrevious';
-import { addFavoritePokemon, removeFavoritePokemon, addPokemonToTeam, removePokemonFromTeam } from '../../store/actions/favoriteActions';
-import Paper from '@material-ui/core/Paper';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import NotInterestedIcon from '@material-ui/icons/NotInterested';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import DeleteIcon from '@material-ui/icons/Delete';
-import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
-import string from 'lodash/string';
-import pokemon from 'pokemon';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import {
+  addFavoritePokemon,
+  removeFavoritePokemon,
+  addPokemonToTeam,
+  removePokemonFromTeam
+} from 'redux/actions/favoriteActions'
+
+import PokemonPageMoves from './components/pokemonPageMoves'
+import PokemonPageGenericInfo from './components/pokemonPageGenericInfo'
+import PokemonPageEvChain from './components/pokemonPageEvChain'
+import PokemonPageNextPrevious from './components/pokemonPageNextPrevious'
+import PokemonPageAlternateForms from './components/pokemonPageAlternateForms'
+import Button from 'components/layout/Button'
+
+import pokemon from 'pokemon'
+import _ from 'lodash'
+
+import {
+  Text,
+  Heading,
+  Box,
+  Flex,
+  ButtonGroup,
+  SimpleGrid,
+  Image,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
+  Icon,
+  Divider
+} from '@chakra-ui/react'
+import {
+  FaCompactDisc,
+  FaEgg,
+  FaPlus,
+  FaPlusCircle,
+  FaStar,
+  FaStopCircle,
+  FaTrashAlt
+} from 'react-icons/fa'
 
 class PokePage extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            activeTab: 0,
-            activeVideo: 0,
-            moveMethod: 'level-up'
-        }
+  constructor(props) {
+    super(props)
+    this.state = {
+      activeTab: 0,
+      moveMethod: 'level-up',
+      cards: [],
+      cardsShown: 6
+    }
+  }
+
+  _toggleTab = tab => {
+    this.state.activeTab !== tab[0] &&
+      this.setState({ activeTab: tab[0], moveMethod: tab[1] })
+  }
+
+  _getPokemonTeamUserButton = (name, pokeStats, pokeId) => {
+    const {
+      profilePokemonTeam,
+      addPokemonToTeam,
+      removePokemonFromTeam
+    } = this.props
+
+    const foundPokemonTeam = profilePokemonTeam.find(
+      pokemon => pokemon.name === name
+    )
+
+    if (foundPokemonTeam) {
+      return (
+        <Button
+          colorScheme="red"
+          isLoading={false}
+          leftIcon={<FaTrashAlt />}
+          onClick={() => removePokemonFromTeam(name)}
+        >
+          Remove From Team
+        </Button>
+      )
+    } else if (profilePokemonTeam.length === 6) {
+      return (
+        <Button
+          colorScheme="yellow"
+          isDisabled={true}
+          leftIcon={<FaStopCircle />}
+        >
+          Team is Full
+        </Button>
+      )
+    } else {
+      return (
+        <Button
+          colorScheme="green"
+          isLoading={false}
+          leftIcon={<FaPlusCircle />}
+          onClick={() =>
+            addPokemonToTeam([name, name.toLowerCase(), pokeStats, pokeId])
+          }
+        >
+          Add to Team
+        </Button>
+      )
+    }
+  }
+
+  _getPokemonFavoritesUserButton = (name, pokeStats, pokeId) => {
+    const {
+      profilePokemonFavorites,
+      addFavoritePokemon,
+      removeFavoritePokemon
+    } = this.props
+    const foundPokemonFavorites = profilePokemonFavorites.find(
+      pokemon => pokemon.name === name
+    )
+
+    if (foundPokemonFavorites) {
+      return (
+        <Button
+          colorScheme="red"
+          isLoading={false}
+          leftIcon={<FaTrashAlt />}
+          onClick={() => removeFavoritePokemon(name)}
+        >
+          Remove from Favorites List
+        </Button>
+      )
+    } else if (profilePokemonFavorites.length === 15) {
+      return (
+        <Button
+          colorScheme="yellow"
+          isDisabled={true}
+          leftIcon={<FaStopCircle />}
+        >
+          Favorites List is full
+        </Button>
+      )
+    } else {
+      return (
+        <Button
+          colorScheme="green"
+          isLoading={false}
+          leftIcon={<FaPlusCircle />}
+          onClick={() =>
+            addFavoritePokemon([name, name.toLowerCase(), pokeStats, pokeId])
+          }
+        >
+          Add to Favorites List
+        </Button>
+      )
+    }
+  }
+
+  componentDidMount() {
+    const { pokemonCards } = this.props
+
+    this.setState({ cards: pokemonCards.slice(0, 6) })
+  }
+
+  render() {
+    const { cards, cardsShown } = this.state
+    const {
+      auth,
+      pokemonInfo,
+      pokemonEvChainInfo,
+      pokemonAlternateFormInfo,
+      pokemonCards
+    } = this.props
+    const { moves, stats, id, sprites } = pokemonInfo[0]
+    const { names, forms_switchable, flavor_text_entries } = pokemonInfo[1]
+    console.log(pokemonInfo[0], pokemonInfo[1])
+    const pokemonName = pokemon.getName(id)
+    var uniqueNames = new Set()
+
+    for (let item of names) {
+      item.language.name !== 'en' &&
+        item.name !== pokemonName &&
+        uniqueNames.add(item.name)
     }
 
-    toggleTab = (tab) => {
-        this.state.activeTab !== tab[0] && this.setState({ activeTab: tab[0], moveMethod: tab[1] });
-    }
+    const movesArray = [
+      {
+        value: 'level-up',
+        name: 'Level-Up Moves',
+        icon: FaStar
+      },
+      {
+        value: 'machine',
+        name: 'TMs/HMs Moves',
+        icon: FaCompactDisc
+      },
+      {
+        value: 'egg',
+        name: 'Egg Moves',
+        icon: FaEgg
+      }
+    ]
 
-    changeVideo = (video) => {
-        if (isNaN(video)) {
-            let videoIndex = this.state.activeVideo;
-            video === 'next' ? videoIndex++ : videoIndex--;
-            if (videoIndex >= 0 && videoIndex <= 2) {
-                this.state.activeVideo !== videoIndex && this.setState({ activeVideo: videoIndex });
-            }
-        } else {
-            this.state.activeVideo !== video && this.setState({ activeVideo: video });
-        }
-    }
-
-    render() {
-        const { auth, removePokemonFromTeam, addPokemonToTeam, removeFavoritePokemon, addFavoritePokemon, pokemonInfo, pokemonEvChainInfo, pokemonAlternateFormInfo, pokemonVideos, errorPokemonVideos } = this.props;
-        const { moves, stats, id, name, sprites } = pokemonInfo[0];
-        const { genera, names, flavor_text_entries, forms_switchable } = pokemonInfo[1];
-        const { activeVideo } = this.state;
-        let pokemonName = pokemon.getName(id)
-        var uniqueNames = new Set();
-
-        for (let item of names) {
-            (item.language.name !== "en" && item.name !== pokemonName) && uniqueNames.add(item.name);
-        }
-
-        if (auth.uid) {
-            var { profilePokemonTeam, profilePokemonFavorites } = this.props;
-            var foundPokemonTeam = profilePokemonTeam.find(pokemon => pokemon.name === name);
-            var foundPokemonFavorites = profilePokemonFavorites.find(pokemon => pokemon.name === name);
-        }
-
-        const movesArray = [
-            ['level-up', 'Level-Up Moves', 0],
-            ['machine', 'TMs/HMs Moves', 1],
-            ['egg', 'Egg Moves', 2]
-        ]
-
-        const description = flavor_text_entries.find((item) => {
-            return item.language.name === 'en' && item
-        })
-
+    const getEngDescriptions = _.shuffle(
+      flavor_text_entries.filter((thing, index, self) => {
         return (
-            <Col xs='12'>
-                <Row className="justify-content-center">
-                    <Col xs='12' lg={auth.uid ? ('6') : ('12')}>
-                        <h1 style={{ paddingBottom: '0.80rem' }} className={auth.uid ? ('text-lg-left text-center') : ('text-center')}>
-                            <img alt={`${pokemonName}Miniature`} src={`http://www.pokestadium.com/assets/img/sprites/misc/icons/${this.props.match.params.pokemon}.png`} />
-                            {pokemonName}
-                            <span style={{ fontSize: '55%', color: '#1688b9' }}> {genera[2].genus}</span>
-                        </h1>
-                    </Col>
-                    {auth.uid &&
-                        <Col xs='12' lg='6'>
-                            <Row className='justify-content-lg-end align-items-md-center justify-content-center h-100'>
-                                {foundPokemonTeam !== undefined ?
-                                    (<Button className='btn-danger my-2 my-lg-0 mx-3' startIcon={<DeleteIcon />}
-                                        onClick={() => removePokemonFromTeam(pokemonName)}>Remove From Favorite Team</Button>) :
-                                    profilePokemonTeam.length === 6 ?
-                                        (<Button className='btn-warning my-2 my-lg-0 mx-3' startIcon={<NotInterestedIcon />} disabled>
-                                            Your Favorite Team is Full
-                                        </Button>) :
-                                        (<Button className='btn-warning my-2 my-lg-0 mx-3' startIcon={<AddCircleOutlineIcon />}
-                                            onClick={() => addPokemonToTeam([name, pokemonName, stats, id])}>
-                                            Add to Favorite Team
-                                        </Button>)
-                                }
-                                {foundPokemonFavorites !== undefined ?
-                                    (<Button className='btn-danger my-2 my-lg-0 mx-3' startIcon={<DeleteIcon />}
-                                        onClick={() => removeFavoritePokemon(pokemonName)}>Remove From Favorites</Button>) : profilePokemonFavorites.length === 50 ?
-                                        (<Button className='btn-warning my-2 my-lg-0 mx-3' startIcon={<NotInterestedIcon />} disabled>
-                                            Your Favorites are Full
-                                        </Button>) :
-                                        (<Button className='btn-warning my-2 my-lg-0 mx-3' startIcon={<AddCircleOutlineIcon />}
-                                            onClick={() => addFavoritePokemon([name, pokemonName, stats, id])}>
-                                            Add to Favorites
-                                        </Button>)
-                                }
-                            </Row>
-                        </Col>}
-                    <Col xs='12 pb-4'>
-                        <h6 className={auth.uid ? ('col-12 text-center text-lg-left pt-3 p-lg-0') : ('col-12 text-center p-0')}>
-                            {Array.from(uniqueNames).map((uniqueNameItem, key) => <span key={key} className='p-2 secondaryNames'>{uniqueNameItem}</span>)}
-                        </h6>
-                    </Col>
-
-                    <Col xs='12' className='py-4'>
-                        <Row className='justify-content-center text-center'>
-                            <Col xs='6' lg='3' className='py-1'>
-                                <img alt={pokemonName} src={sprites.front_default} />
-                            </Col>
-                            <Col xs='6' lg='3' className='py-1'>
-                                <img alt={pokemonName} src={sprites.back_default} />
-                            </Col>
-                            <Col xs='6' lg='3' className='py-1'>
-                                <img alt={pokemonName} src={sprites.front_shiny} />
-                            </Col>
-                            <Col xs='6' lg='3' className='py-1'>
-                                <img alt={pokemonName} src={sprites.back_shiny} />
-                            </Col>
-                        </Row>
-                    </Col>
-
-                    <PokemonPageGenericInfo info={pokemonInfo} />
-
-                    <Col xs='12' md='6' lg='5' className='py-4 pb-5 mx-lg-auto'>
-                        <Row>
-                            <h3 className='col-12 text-center'>Value Stat Points</h3>
-                            {stats.map((statsItem, key) =>
-                                <Col key={key} xs='6' sm='6' md='4' lg='2'>
-                                    <Row className='d-flex text-center align-items-center justify-content-center h-100'>
-                                        <h6 className='col-12'>{string.startCase(statsItem.stat.name)}</h6>
-                                        <p className='col-12'>{string.startCase(statsItem.base_stat)}</p>
-                                    </Row>
-                                </Col>
-                            )}
-                        </Row>
-                    </Col>
-                    <Col xs='12' md='6' lg='5' className='py-4 pb-5 mx-lg-auto'>
-                        <h3 className='col-12 text-center'>Description</h3>
-                        <Col xs='12'>
-                            {description.flavor_text}
-                        </Col>
-                    </Col>
-
-                    <PokemonPageEvChain evChainData={pokemonEvChainInfo} />
-
-                    {forms_switchable &&
-                        <Col xs='12' className='py-5'>
-                            <h3 className='col-12 text-center'>Mega Evolution/Alternate Forms</h3>
-                            <Row className='justify-content-center'>
-                                {pokemonAlternateFormInfo.map((item, key) =>
-                                    <Col xs='12' md='6' lg='4' className='text-center' key={key}>
-                                        <Row className='justify-content-center'>
-                                            <h1 style={{ fontSize: '22px' }} className='col-12'>{string.startCase(item.name)}</h1>
-                                            <div className='col-12 py-2'>
-                                                <img alt={item.name} src={item.sprites.front_default} />
-                                            </div>
-                                            <Col xs='12'>
-                                                <Row className='justify-content-center align-items-center'>
-                                                    <Col xs='6'>
-                                                        <h4>Type(s)</h4>
-                                                        {item.types.map((typeItem, key) =>
-                                                            <Col xs='12' key={key}>
-                                                                <Col xs='12' className={`text-center typeIcon type-${typeItem.type.name}`}>
-                                                                    {typeItem.type.name}
-                                                                </Col>
-                                                            </Col>
-                                                        )}
-                                                    </Col>
-                                                    <Col xs='6'>
-                                                        <h4>Abilities</h4>
-                                                        {item.abilities.map((abilityItem, key) =>
-                                                            <p key={key}>
-                                                                {string.startCase(abilityItem.ability.name)}
-                                                            </p>
-                                                        )}
-                                                    </Col>
-                                                </Row>
-                                            </Col>
-                                            <Row className='col-12 pt-4'>
-                                                {item.stats.map((statsItem, key) =>
-                                                    <Col key={key} xs='6'>
-                                                        <Row className='d-flex text-center align-items-center justify-content-center h-100'>
-                                                            <h6 className='col-12'>{string.startCase(statsItem.stat.name)}</h6>
-                                                            <p className='col-12'>{string.startCase(statsItem.base_stat)}</p>
-                                                        </Row>
-                                                    </Col>
-                                                )}
-                                            </Row>
-                                        </Row>
-                                    </Col>
-                                )}
-                            </Row>
-                        </Col>
-                    }
-
-                    <Col xs='12' md='11' lg='8' className='py-5 mx-md-auto'>
-                        <h3 className='col-12 text-center'>Moves</h3>
-                        <Paper style={{ color: '#ebebd3' }}>
-                            <Tabs
-                                value={this.state.activeTab}
-                                scrollButtons="on"
-                                variant="scrollable"
-                            >
-                                {movesArray.map((item, key) =>
-                                    <Tab style={{ cursor: 'pointer' }} key={key}
-                                        className='mx-auto'
-                                        onClick={() => { this.toggleTab([item[2], item[0]]); }}
-                                        label={item[1]}
-                                        value={item[2]}
-                                    />
-                                )}
-                            </Tabs>
-                            <TabContent className='py-4 px-md-2' style={{ backgroundColor: '#343a40' }} activeTab={this.state.activeTab}>
-                                <PokemonPageMoves pokemonMoves={moves} method={this.state.moveMethod} />
-                            </TabContent>
-                        </Paper>
-                    </Col>
-
-                    <Col xs="12" className='py-5'>
-                        <h3 className='col-12 text-center'>Videos</h3>
-                        {errorPokemonVideos &&
-                            <div className='col-12 text-center'>
-                                <p className='col-12 text-center'>Ops! Something went wrong!</p>
-                                <p>{errorPokemonVideos === 'Daily Limit Exceeded. The quota will be reset at midnight Pacific Time (PT). You may monitor your quota usage and adjust limits in the API Console: https://console.developers.google.com/apis/api/youtube.googleapis.com/quotas?project=788452447704' || errorPokemonVideos === 'The request cannot be completed because you have exceeded your <a href="/youtube/v3/getting-started#quota">quota</a>.' ?
-                                    ('Daily Youtube API Requests Limit Exceeded') :
-                                    (errorPokemonVideos)}</p>
-                            </div>
-                        }
-                        {pokemonVideos &&
-                            <Col xs="10" md='6' className='mx-auto'>
-                                <div
-                                    className="video"
-                                    style={{
-                                        position: "relative",
-                                        paddingBottom: "56.25%",
-                                        paddingTop: 25,
-                                    }}
-                                >
-                                    <iframe
-                                        style={{
-                                            position: "absolute",
-                                            top: 0,
-                                            left: 0,
-                                            width: "100%",
-                                            height: "100%"
-                                        }}
-                                        src={`https://www.youtube.com/embed/${pokemonVideos[activeVideo].id.videoId}`}
-                                        frameBorder="0"
-                                        title={pokemonVideos[0].snippet.title}
-                                    />
-                                </div>
-                                <div className='d-flex justify-content-center pt-4'>
-                                    <IconButton disabled={activeVideo <= 0 && true}
-                                        onClick={() => this.changeVideo('previous')} >
-                                        <NavigateBeforeIcon />
-                                    </IconButton>
-                                    {[...Array(4).keys()].slice(1).map((item, key) =>
-                                        <Button
-                                            style={{ minWidth: '10px !important' }} key={key}
-                                            onClick={() => this.changeVideo(item)}
-                                            className={`mx-2 pt-1 ${activeVideo === key ? `btn-danger btn-video` : `btn-warning btn-video`}`}
-                                        >
-                                            {item}
-                                        </Button>
-                                    )}
-                                    <IconButton disabled={activeVideo >= 2 && true}
-                                        onClick={() => this.changeVideo('next')}>
-                                        <NavigateNextIcon />
-                                    </IconButton>
-                                </div>
-                            </Col>
-                        }
-                    </Col>
-                    <PokemonPageNextPrevious pokemonId={pokemonInfo[0].id} pokemonName={pokemonName} />
-                </Row>
-            </Col >
+          index ===
+          self.findIndex(
+            t => t.flavor_text === thing.flavor_text && t.language.name === 'en'
+          )
         )
-    }
+      })
+    )
+
+    const descriptions =
+      getEngDescriptions.length > 3
+        ? getEngDescriptions.slice(0, 3)
+        : getEngDescriptions
+
+    getEngDescriptions.length !== 1 &&
+      descriptions.sort((a, b) => a.flavor_text.length < b.flavor_text.length)
+
+    const avaibleSprites = sprites.versions
+
+    const getSprites = [
+      avaibleSprites['generation-i'].yellow,
+      avaibleSprites['generation-ii'].crystal,
+      avaibleSprites['generation-iii']['firered-leafgreen'],
+      avaibleSprites['generation-iv']['heartgold-soulsilver'],
+      avaibleSprites['generation-v']['black-white'],
+      avaibleSprites['generation-vi']['x-y'],
+      avaibleSprites['generation-vii']['ultra-sun-ultra-moon']
+    ]
+
+    console.log(pokemonAlternateFormInfo)
+
+    return (
+      <>
+        {auth.uid && (
+          <Flex
+            w="100%"
+            pb={10}
+            align="center"
+            justify={['center', null, null, 'end']}
+          >
+            <ButtonGroup
+              spacing={4}
+              direction={['column', 'row']}
+              justify={['center', 'end']}
+              align="center"
+            >
+              {this._getPokemonTeamUserButton(pokemonName, stats, id)}
+              {this._getPokemonFavoritesUserButton(pokemonName, stats, id)}
+            </ButtonGroup>
+          </Flex>
+        )}
+
+        <Flex flexDir="column" justify="center" align="center">
+          <Flex flexDir="row" pb={4} justify="center" align="center">
+            <Image
+              mr={4}
+              w={12}
+              h={12}
+              objectFit="contain"
+              alt={`${pokemonName} Miniature`}
+              src={sprites.versions['generation-vii'].icons.front_default}
+            />
+            <Heading as="h1">{pokemonName}</Heading>
+          </Flex>
+          <Flex flexWrap="wrap" justify="center" gridGap={4} fontSize={12}>
+            {Array.from(uniqueNames).map((uniqueNameItem, key) => (
+              <Text key={key}>{uniqueNameItem}</Text>
+            ))}
+          </Flex>
+        </Flex>
+
+        <Box pt={20} pb={8}>
+          <SimpleGrid
+            columns={[1, null, null, 2]}
+            gridGap={8}
+            alignItems="center"
+          >
+            <Image
+              mx="auto"
+              objectFit="contain"
+              w="80%"
+              h="auto"
+              fallback={true}
+              alt={pokemonName}
+              src={sprites.other['official-artwork'].front_default}
+            />
+            <Box py={8}>
+              <Heading as="h4" pb={8} textAlign="center">
+                {getEngDescriptions.length === 1
+                  ? 'Description'
+                  : getEngDescriptions.length === 2 ||
+                    getEngDescriptions.length === 3
+                  ? 'Descriptions'
+                  : 'Random Descriptions'}
+              </Heading>
+              <SimpleGrid columns={1} gridGap={8}>
+                {descriptions.map((item, index) => (
+                  <Box key={index}>
+                    <Text>{item.flavor_text}</Text>
+                    <Text fontStyle="italic" mt={3} fontSize={12}>
+                      Pokémon {_.startCase(item.version.name)}
+                    </Text>
+                  </Box>
+                ))}
+              </SimpleGrid>
+            </Box>
+          </SimpleGrid>
+        </Box>
+
+        <Box py={10}>
+          <Heading as="h3" pb={10} textAlign="center">
+            Game Sprites
+          </Heading>
+          <Flex
+            bg="#fff"
+            borderRadius="6px"
+            flexWrap="wrap"
+            gridGap={8}
+            boxShadow="md"
+            justify="center"
+            p={8}
+          >
+            {getSprites.map((sprite, index) => {
+              const url = new URL(sprite.front_default)
+              const getInstancesOfUrl = url.pathname.split('/')
+              const getGeneration = getInstancesOfUrl[7]
+
+              return sprite.front_default ? (
+                <React.Fragment key={index}>
+                  <Image
+                    w="100px"
+                    h="100px"
+                    objectFit={
+                      getGeneration === 'generation-vii' ? 'none' : 'contain'
+                    }
+                    alt={`${pokemonName} sprite generation - ${getGeneration}`}
+                    src={sprite.front_default}
+                  />
+                  {sprite.front_shiny && (
+                    <Image
+                      w="100px"
+                      h="100px"
+                      objectFit={
+                        getGeneration === 'generation-vii' ? 'none' : 'contain'
+                      }
+                      alt={`${pokemonName} sprite - generation ${getGeneration}`}
+                      src={sprite.front_shiny}
+                    />
+                  )}
+                </React.Fragment>
+              ) : null
+            })}
+          </Flex>
+        </Box>
+
+        <Box py={10}>
+          <Heading as="h3" textAlign="center">
+            General Info
+          </Heading>
+          <PokemonPageGenericInfo pokemonInfo={pokemonInfo} />
+        </Box>
+
+        <Box py={10} w="100%">
+          <Heading as="h3" pb={14} textAlign="center">
+            Evolution Chain
+          </Heading>
+          <PokemonPageEvChain
+            evChainData={pokemonEvChainInfo}
+            hasFormsOrMegaEv={forms_switchable}
+            formInfo={pokemonAlternateFormInfo}
+          />
+        </Box>
+
+        {pokemonAlternateFormInfo && (
+          <Box py={10} w="100%">
+            <Box pb={14}>
+              <Heading as="h3" pb={2} textAlign="center">
+                Alternative Forms*
+              </Heading>
+              <Text fontStyle="italic" fontSize={12} textAlign="center">
+                *can contain special forms, mega evolutions and/or dynamax forms
+              </Text>
+            </Box>
+
+            {pokemonAlternateFormInfo.map((pokemon, index) => (
+              <React.Fragment key={index}>
+                <PokemonPageAlternateForms pokemonInfo={pokemon} key={index} />
+                {_.add(index, 1) !== pokemonAlternateFormInfo.length && (
+                  <Divider my={12} orientation="horizontal" />
+                )}
+              </React.Fragment>
+            ))}
+          </Box>
+        )}
+
+        <Box py={10} w="100%">
+          <Heading as="h3" pb={14} textAlign="center">
+            Moves
+          </Heading>
+
+          <Box bg="primary" p={3} borderRadius={4}>
+            <Tabs
+              isLazy
+              variant="soft-rounded"
+              colorScheme="yellow"
+              index={this.state.activeTab}
+              defaultIndex={0}
+            >
+              <TabList
+                w="100%"
+                display="flex"
+                justifyContent="center"
+                flexWrap="wrap"
+                gridGap={8}
+              >
+                {movesArray.map((item, key) => (
+                  <Tab
+                    key={key}
+                    onClick={() => this._toggleTab([key, item.value])}
+                  >
+                    <Icon mr={2} as={item.icon} />
+                    <Text fontSize={20}>{item.name}</Text>
+                  </Tab>
+                ))}
+              </TabList>
+              <TabPanels>
+                {movesArray.map((item, key) => (
+                  <TabPanel key={key}>
+                    <PokemonPageMoves
+                      pokemonMoves={moves}
+                      method={item.value}
+                    />
+                  </TabPanel>
+                ))}
+              </TabPanels>
+            </Tabs>
+          </Box>
+        </Box>
+
+        <Box pt={10} pb={16}>
+          <Heading pb={14} as="h3" textAlign="center">
+            Cards
+          </Heading>
+
+          <Flex flexWrap="wrap" gridGap={8} justify="center">
+            {cards.map((item, index) => (
+              <Flex align="center" justify="center" key={index}>
+                <Image w="70%" h="auto" src={item.imageUrl} />
+              </Flex>
+            ))}
+          </Flex>
+          <Flex justify="center" pt={10}>
+            {cards.length !== pokemonCards.length && (
+              <Button
+                onClick={() =>
+                  this.setState({
+                    cards: cards.concat(
+                      pokemonCards.slice(
+                        cards.length,
+                        cards.length + cardsShown
+                      )
+                    )
+                  })
+                }
+                leftIcon={<FaPlus />}
+                colorScheme="blue"
+              >
+                Show more
+              </Button>
+            )}
+          </Flex>
+        </Box>
+
+        <PokemonPageNextPrevious
+          pokemonId={pokemonInfo[0].id}
+          pokemonName={pokemonName}
+        />
+      </>
+    )
+  }
 }
 
-const mapStateToProps = (state) => {
-    return {
-        auth: state.firebase.auth,
-        pokemonInfo: state.apiCalls.apiData.getPokemon,
-        pokemonVideos: state.apiCalls.apiData.getPokemonVideos,
-        errorPokemonVideos: state.apiCalls.apiData.errorYtData,
-        pokemonEvChainInfo: state.apiCalls.apiData.getEvChain,
-        pokemonAlternateFormInfo: state.apiCalls.apiData.getAlternateForms,
-        profilePokemonTeam: state.firebase.profile.favoriteTeam,
-        profilePokemonFavorites: state.firebase.profile.favoritePokemons
-    }
+const mapStateToProps = state => {
+  return {
+    auth: state.firebase.auth,
+    pokemonInfo: state.apiCalls.apiData.getPokemon,
+    pokemonEvChainInfo: state.apiCalls.apiData.getEvChain,
+    pokemonCards: state.apiCalls.apiData.getPokemonCards,
+    pokemonAlternateFormInfo: state.apiCalls.apiData.getAlternateForms,
+    profilePokemonTeam: state.firebase.profile.favoriteTeam,
+    profilePokemonFavorites: state.firebase.profile.favoritePokemons
+  }
 }
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        addFavoritePokemon: (pokemon) => dispatch(addFavoritePokemon(pokemon)),
-        removeFavoritePokemon: (pokemon) => dispatch(removeFavoritePokemon(pokemon)),
-        addPokemonToTeam: (pokemon) => dispatch(addPokemonToTeam(pokemon)),
-        removePokemonFromTeam: (pokemon) => dispatch(removePokemonFromTeam(pokemon))
-    }
+const mapDispatchToProps = dispatch => {
+  return {
+    addFavoritePokemon: pokemon => dispatch(addFavoritePokemon(pokemon)),
+    removeFavoritePokemon: pokemon => dispatch(removeFavoritePokemon(pokemon)),
+    addPokemonToTeam: pokemon => dispatch(addPokemonToTeam(pokemon)),
+    removePokemonFromTeam: pokemon => dispatch(removePokemonFromTeam(pokemon))
+  }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PokePage);
+export default connect(mapStateToProps, mapDispatchToProps)(PokePage)

@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "redux/*": ["./src/redux/*"],
+      "components/*": ["./src/components/*"],
+      "scripts/*": ["./src/scripts/*"],
+      "pages/*": ["./src/pages/*"],
+      "routes/*": ["./src/routes/*"],
+      "styles/*": ["./src/styles/*"],
+      "assets/*": ["./src/assets/*"],
+      "config/*": ["./src/config/*"]
+    }
+  },
+  "include": ["./src/**/*.js"],
+  "exclude": ["node_modules", "dist", ".firebase"]
+}

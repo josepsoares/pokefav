@@ -1,29 +1,22 @@
-import './styles/App.scss';
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { Transition, animated } from 'react-spring/renderprops';
-// Pages
-import Home from './pages/home/Home'
-import PokemonList from "./pages/PokemonList";
-import PokemonPage from "./pages/pokemonPage/PokemonPage";
-import PokemonTrainers from './pages/PokemonTrainers';
-import PokemonTrivia from "./pages/pokemonTrivia/PokemonTrivia";
-import Profile from './pages/profile/Profile';
-import EditProfile from './pages/profile/EditProfile';
-import SignUp from './pages/auth/SignUp';
-import SignIn from './pages/auth/SignIn';
-import RecoverPassword from './pages/auth/RecoverPassword';
+import React from 'react'
+import { Route, Switch, useLocation } from 'react-router-dom'
+import { Container, Grid } from '@chakra-ui/react'
+import { useSelector } from 'react-redux'
+import { config } from 'react-spring'
+import { animated, Transition } from 'react-spring/renderprops'
+
 // Components
-import Layout from "./components/Layout";
-import ScrollingWrapper from './components/ScrollingWrapper';
-import NavigationBar from "./components/navbar/Navbar";
-import Loading from './components/Loading';
-import Error from './components/Error';
-import Notification from './components/Notification';
-import NoMatch from './components/NoMatch';
-import Footer from './components/Footer';
-import ScrollToTop from './components/ScrollToTop';
+import ScrollingWrapper from './components/scroll/ScrollingWrapper'
+import NavigationBar from './components/layout/navbar/Navbar'
+import Loading from './components/feedback/Loading'
+import Error from './components/feedback/Error'
+import NoMatch from './pages/NoMatch'
+import Footer from './components/layout/Footer'
+import ScrollToTop from './components/scroll/ScrollToTop'
+import PrivateRoute from 'routes/PrivateRoute'
+import routes from 'routes/AllRoutes'
+
+const MainContainer = animated(Container)
 
 const AnimatedRoute = ({ children }) => (
   <Route
@@ -32,80 +25,83 @@ const AnimatedRoute = ({ children }) => (
         native
         items={location}
         keys={location => location.pathname}
-        from={{ position: 'absolute', opacity: 0, minHeight: "65vh" }}
-        enter={{ position: 'static', opacity: 1, minHeight: "65vh", display: 'block' }}
-        leave={{ position: 'absolute', opacity: 0, minHeight: "0", display: 'none' }}>
-        {location => style => <animated.div style={style}>{children(location)}</animated.div>}
+        from={{ position: 'absolute', opacity: 0, display: 'none' }}
+        enter={{ position: 'static', opacity: 1, display: 'block' }}
+        leave={{ position: 'absolute', opacity: 0, display: 'none' }}
+        config={{ ...config.default, duration: 800 }}
+      >
+        {location => style => (
+          <animated.div style={style}>{children(location)}</animated.div>
+        )}
       </Transition>
     )}
   />
 )
 
-class App extends Component {
-  render() {
-    const { errorApi, isLoading, profile, authNotifications, favoritesNotifications, friendsNotifications, reactionsNotifications } = this.props;
+const App = () => {
+  const errorApi = useSelector(state => state.apiCalls.error)
+  const isLoading = useSelector(state => state.apiCalls.isLoading)
+  const auth = useSelector(state => state.firebase.auth.uid)
+  const userProfile = useSelector(state => state.firebase.profile)
+  console.log(userProfile)
 
-    if (!profile) {
-      return (
-        <Router>
-          <Loading height={'100vh'} />
-        </Router>
-      )
-    } else {
-      return (
-        <Router>
-          <ScrollToTop />
-          <NavigationBar />
-          <Layout>
-            <ScrollingWrapper>
-              {authNotifications &&
-                <Notification message={authNotifications[0]} typeAlert={authNotifications[1]} />}
-              {favoritesNotifications &&
-                <Notification message={favoritesNotifications[0]} typeAlert={favoritesNotifications[1]} />}
-              {friendsNotifications &&
-                <Notification message={friendsNotifications[0]} typeAlert={friendsNotifications[1]} />}
-              {reactionsNotifications &&
-                <Notification message={reactionsNotifications[0]} typeAlert={reactionsNotifications[1]} />}
-              {isLoading ? (<Loading height={'60vh'} />) : errorApi ? (<Error error={errorApi} />) : (
-                <AnimatedRoute>
-                  {location => (
-                    <Switch location={location}>
-                      <Route exact path="/" component={Home} />
-                      <Route exact path="/pokemon-list/:search" component={PokemonList} />
-                      <Route exact path="/pokemon-list/:search/pokemon-page/:pokemon" component={PokemonPage} />
-                      <Route exact path="/pokemon-trivia" component={PokemonTrivia} />
-                      <Route exact path="/pokemon-trainers" component={PokemonTrainers} />
-                      <Route exact path="/pokemon-trainers/profile/:username" component={Profile} />
-                      <Route exact path="/profile/:username" component={Profile} />
-                      <Route exact path="/profile/edit/:username" component={EditProfile} />
-                      <Route exact path="/sign-up" component={SignUp} />
-                      <Route exact path="/sign-in" component={SignIn} />
-                      <Route exact path="/sign-in/recover-password" component={RecoverPassword} />
-                      <Route component={NoMatch} />
-                    </Switch>
+  /*   const location = useLocation()
+  const transitions = useTransition(location, location => location.pathname, {
+    from: { position: 'absolute', opacity: 0, display: 'none' },
+    enter: { position: 'static', opacity: 1, display: 'block' },
+    leave: { position: 'absolute', opacity: 0, display: 'none' }
+  })
+ */
+  return (
+    <>
+      <ScrollToTop />
+      <ScrollingWrapper />
+      <Grid
+        minHeight="100vh"
+        gridTemplateRows={auth ? 'auto 1fr auto' : 'auto 1fr'}
+      >
+        {auth && <NavigationBar />}
+        {isLoading ? (
+          <Loading />
+        ) : errorApi ? (
+          <Error error={errorApi} />
+        ) : (
+          <MainContainer
+            maxW={auth ? ['95%', '90%', '80%'] : '100%'}
+            py={auth ? 12 : 0}
+            px={auth ? 10 : 0}
+          >
+            <AnimatedRoute>
+              {location => (
+                <Switch location={location}>
+                  {routes.map(({ path, name, isPrivate, Component }) =>
+                    isPrivate ? (
+                      <PrivateRoute
+                        exact
+                        key={name}
+                        path={path}
+                        location={location}
+                        component={Component}
+                      />
+                    ) : (
+                      <Route
+                        exact
+                        key={name}
+                        path={path}
+                        component={Component}
+                      />
+                    )
                   )}
-                </AnimatedRoute>)}
-              <Footer />
-            </ScrollingWrapper>
-          </Layout>
-        </Router>
-      );
-    }
-  }
+                  <Route component={NoMatch} />
+                </Switch>
+              )}
+            </AnimatedRoute>
+          </MainContainer>
+        )}
+        <Footer />
+      </Grid>
+    </>
+  )
 }
 
-const mapStateToProps = (state) => {
-  return {
-    errorApi: state.apiCalls.error,
-    isLoading: state.apiCalls.isLoading,
-    auth: state.firebase.auth,
-    authNotifications: state.auth.actionAuthFeedback,
-    favoritesNotifications: state.favorite.actionFavoritesFeedback,
-    friendsNotifications: state.friends.actionFriendsFeedback,
-    reactionsNotifications: state.notifications.actionReactionFeedback,
-    profile: state.firebase.profile.isLoaded,
-    profileContent: state.firebase.profile
-  }
-}
-
-export default connect(mapStateToProps)(App)
+export default App
