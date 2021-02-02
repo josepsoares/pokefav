@@ -8,7 +8,8 @@ const NavbarButton = props => {
   return (
     <ChakraButton
       {...propsForButton}
-      className="btn"
+      className="nav-btn"
+      boxShadow="none"
       position="relative"
       _hover={{
         bg: props.bg

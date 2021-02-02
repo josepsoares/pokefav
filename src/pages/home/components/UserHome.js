@@ -11,7 +11,6 @@ import {
   Heading,
   Text,
   Image,
-  HStack,
   VStack,
   Avatar
 } from '@chakra-ui/react'

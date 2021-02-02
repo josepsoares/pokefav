@@ -26,6 +26,8 @@ import Loading from 'components/feedback/Loading'
 import PokemonTriviaStatic from './components/PokemonTriviaStatic'
 import PokemonTriviaResults from './components/PokemonTriviaResults'
 import ConfirmationLeave from 'components/feedback/ConfirmationLeave'
+import SEO from 'components/Seo'
+import Error from 'components/feedback/Error'
 
 const PokemonTrivia = () => {
   const initState = {
@@ -52,7 +54,9 @@ const PokemonTrivia = () => {
 
   const dispatch = useDispatch()
   const profileContent = useSelector(state => state.firebase.profile)
-  const updateTrivia = useSelector(state => state.trivia.updateTriviaResult)
+  const updateTriviaResultError = useSelector(
+    state => state.trivia.updateTriviaResultError
+  )
 
   const startTrivia = () => {
     const startInitState = initState
@@ -222,8 +226,11 @@ const PokemonTrivia = () => {
   const disabledBtn = showAnswersFeedback
 
   console.log(state)
-
-  if (!isOnGame) {
+  if (updateTriviaResultError) {
+    return (
+      <Error error="An error occurred while updating your trivia stats. Please try playing again PokéTrivia later." />
+    )
+  } else if (!isOnGame) {
     return <PokemonTriviaStatic startTrivia={() => startTrivia()} />
   } else {
     if (!isGameReadyToStart) {
@@ -233,145 +240,151 @@ const PokemonTrivia = () => {
         const answerLetters = ['a)', 'b)', 'c)', 'd)']
 
         return (
-          <Flex
-            textAlign="center"
-            flexDir="column"
-            align="center"
-            justify="center"
-          >
-            <Flex gridGap={4} pb={14} flexDir="row" align="center">
-              {allGameQuestions.map((item, index) => {
-                const iconColor =
-                  item.didAnswerCorrect === null
-                    ? '#ebebd3'
-                    : item.didAnswerCorrect
-                    ? '#38a169'
-                    : '#f24643'
-
-                return (
-                  <React.Fragment key={index}>
-                    <Icon
-                      transition="all 0.5s ease-in-out"
-                      boxSize={questionNumber === index ? 8 : 4}
-                      color={iconColor}
-                      as={CgPokemon}
-                    />
-                    <Divider />
-                  </React.Fragment>
-                )
-              })}
-            </Flex>
-
-            <Heading as="h1" pb={4}>
-              Question nr. {_.add(questionNumber, 1)}
-            </Heading>
-            <Heading as="h2" pb={10}>
-              {currentQuestion}
-            </Heading>
-            <SimpleGrid
-              w={['100%', null, null, '90%']}
-              justifyItems="center"
-              gridGap={8}
-              columns={[1, null, 2]}
-            >
-              {currentAnswers.map((item, key) => {
-                return item.res === 'correct' ? (
-                  <Button
-                    p={6}
-                    h="auto"
-                    minH={4}
-                    w="100%"
-                    key={key}
-                    whiteSpace="wrap"
-                    fontWeight={disabledBtn ? 'bold' : 'normal'}
-                    variant={disabledBtn ? 'solid' : 'outline'}
-                    borderColor="blue.500"
-                    isDisabled={disabledBtn}
-                    colorScheme={changeColorCorrect}
-                    onClick={() => handleAnswer(true)}
-                  >
-                    <b>{answerLetters[key]}</b> {item.answer}
-                  </Button>
-                ) : (
-                  <Button
-                    p={6}
-                    h="auto"
-                    minH={4}
-                    w="100%"
-                    key={key}
-                    whiteSpace="wrap"
-                    fontWeight="normal"
-                    variant={disabledBtn ? 'solid' : 'outline'}
-                    borderColor="blue.500"
-                    isDisabled={disabledBtn}
-                    colorScheme={changeColorWrong}
-                    onClick={() => handleAnswer(false)}
-                  >
-                    <b>{answerLetters[key]}</b> {item.answer}
-                  </Button>
-                )
-              })}
-            </SimpleGrid>
-            <Flex
-              pt={16}
-              w="100%"
-              gridGap={6}
-              justify="flex-start"
-              align="center"
-              flexWrap="wrap"
-            >
-              <Button
-                p={3}
-                minH={4}
-                variant="ghost"
-                onClick={onOpen}
-                fontWeight="normal"
-                leftIcon={<Icon as={FaQuestion} />}
-              >
-                Help
-              </Button>
-              <Button
-                p={3}
-                minH={4}
-                variant="ghost"
-                fontWeight="normal"
-                onClick={() => setConfirmModal(true)}
-                rightIcon={<Icon as={FaSignInAlt} />}
-              >
-                Give up
-              </Button>
-            </Flex>
-
-            <Modal isOpen={isOpen} onClose={onClose}>
-              <ModalOverlay />
-              <ModalContent>
-                <ModalHeader>Help</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody></ModalBody>
-
-                <ModalFooter>
-                  <Button colorScheme="blue" mr={3} onClick={onClose}>
-                    Close
-                  </Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
-
-            <ConfirmationLeave
-              didOpen={confirmModal}
-              closeFunc={() => {
-                setConfirmModal(false)
-              }}
-              proceedFunc={() => {
-                setConfirmModal(false)
-                restartTrivia()
-              }}
-              title="Abandon PokéTrivia?"
-              description="Are you sure you want to abandon your session of PokéTrivia? You'll lose all the progress you made in this session"
-              when={isOnGame && !didFinishGame}
-              shouldBlockNavigation={isOnGame && !didFinishGame}
+          <>
+            <SEO
+              title={`PokéTrivia Q${_.add(questionNumber, 1)}`}
+              description="Play a fun trivia filled with challeging questions about facts and mechanics about Pokémon Franchise"
             />
-          </Flex>
+            <Flex
+              textAlign="center"
+              flexDir="column"
+              align="center"
+              justify="center"
+            >
+              <Flex gridGap={4} pb={14} flexDir="row" align="center">
+                {allGameQuestions.map((item, index) => {
+                  const iconColor =
+                    item.didAnswerCorrect === null
+                      ? '#ebebd3'
+                      : item.didAnswerCorrect
+                      ? '#38a169'
+                      : '#f24643'
+
+                  return (
+                    <React.Fragment key={index}>
+                      <Icon
+                        transition="all 0.5s ease-in-out"
+                        boxSize={questionNumber === index ? 8 : 4}
+                        color={iconColor}
+                        as={CgPokemon}
+                      />
+                      <Divider />
+                    </React.Fragment>
+                  )
+                })}
+              </Flex>
+
+              <Heading as="h1" pb={4}>
+                Question nr. {_.add(questionNumber, 1)}
+              </Heading>
+              <Heading as="h2" pb={10}>
+                {currentQuestion}
+              </Heading>
+              <SimpleGrid
+                w={['100%', null, null, '90%']}
+                justifyItems="center"
+                gridGap={8}
+                columns={[1, null, 2]}
+              >
+                {currentAnswers.map((item, key) => {
+                  return item.res === 'correct' ? (
+                    <Button
+                      p={6}
+                      h="auto"
+                      minH={4}
+                      w="100%"
+                      key={key}
+                      whiteSpace="wrap"
+                      fontWeight={disabledBtn ? 'bold' : 'normal'}
+                      variant={disabledBtn ? 'solid' : 'outline'}
+                      borderColor="blue.500"
+                      isDisabled={disabledBtn}
+                      colorScheme={changeColorCorrect}
+                      onClick={() => handleAnswer(true)}
+                    >
+                      <b>{answerLetters[key]}</b> {item.answer}
+                    </Button>
+                  ) : (
+                    <Button
+                      p={6}
+                      h="auto"
+                      minH={4}
+                      w="100%"
+                      key={key}
+                      whiteSpace="wrap"
+                      fontWeight="normal"
+                      variant={disabledBtn ? 'solid' : 'outline'}
+                      borderColor="blue.500"
+                      isDisabled={disabledBtn}
+                      colorScheme={changeColorWrong}
+                      onClick={() => handleAnswer(false)}
+                    >
+                      <b>{answerLetters[key]}</b> {item.answer}
+                    </Button>
+                  )
+                })}
+              </SimpleGrid>
+              <Flex
+                pt={16}
+                w="100%"
+                gridGap={6}
+                justify="flex-start"
+                align="center"
+                flexWrap="wrap"
+              >
+                <Button
+                  p={3}
+                  minH={4}
+                  variant="ghost"
+                  onClick={onOpen}
+                  fontWeight="normal"
+                  leftIcon={<Icon as={FaQuestion} />}
+                >
+                  Help
+                </Button>
+                <Button
+                  p={3}
+                  minH={4}
+                  variant="ghost"
+                  fontWeight="normal"
+                  onClick={() => setConfirmModal(true)}
+                  rightIcon={<Icon as={FaSignInAlt} />}
+                >
+                  Give up
+                </Button>
+              </Flex>
+
+              <Modal isOpen={isOpen} onClose={onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>Help</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody></ModalBody>
+
+                  <ModalFooter>
+                    <Button colorScheme="blue" mr={3} onClick={onClose}>
+                      Close
+                    </Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
+
+              <ConfirmationLeave
+                didOpen={confirmModal}
+                closeFunc={() => {
+                  setConfirmModal(false)
+                }}
+                proceedFunc={() => {
+                  setConfirmModal(false)
+                  restartTrivia()
+                }}
+                title="Abandon PokéTrivia?"
+                description="Are you sure you want to abandon your session of PokéTrivia? You'll lose all the progress you made in this session"
+                when={isOnGame && !didFinishGame}
+                shouldBlockNavigation={isOnGame && !didFinishGame}
+              />
+            </Flex>
+          </>
         )
       } else {
         return (

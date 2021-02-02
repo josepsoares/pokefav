@@ -70,7 +70,7 @@ const NavbarLinks = ({ profile }) => {
         <Menu>
           <MenuButton>
             <Avatar
-              size="sm"
+              boxSize={14}
               src={`https://www.serebii.net/diamondpearl/avatar/${avatar}.png`}
             />
           </MenuButton>

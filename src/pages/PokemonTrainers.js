@@ -17,6 +17,7 @@ import Select from 'react-select'
 import Error from 'components/feedback/Error'
 import { getFirestore } from 'redux-firestore'
 import Loading from 'components/feedback/Loading'
+import SEO from 'components/Seo'
 
 const PokemonTrainers = props => {
   const [state, setState] = useState({
@@ -199,6 +200,11 @@ const PokemonTrainers = props => {
 
   return (
     <>
+      <SEO
+        title="PokéTrainers"
+        description="Explore all the users of the PokéFav website"
+      />
+
       <Flex
         flexDir={['column', null, 'row']}
         justify={['center', null, 'space-between']}

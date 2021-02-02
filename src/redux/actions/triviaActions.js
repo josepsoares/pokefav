@@ -1,5 +1,5 @@
 export const addTriviaResult = currentResult => {
-  return (dispatch, getState, { getFirebase, getFirestore }) => {
+  return async (dispatch, getState, { getFirebase, getFirestore }) => {
     const firestore = getFirestore()
     const uid = getState().firebase.auth.uid
     const triviaObject = getState().firebase.profile.triviaRecord
@@ -36,29 +36,22 @@ export const addTriviaResult = currentResult => {
       pokemonNumber = '129'
     }
 
-    firestore
-      .collection('users')
-      .where('uid', '==', uid)
-      .get()
-      .then(() => {
-        return firestore
-          .collection('users')
-          .doc(uid)
-          .update({
-            triviaRecord: {
-              pokemonIQ: pokemon,
-              pokemonIQNumber: pokemonNumber,
-              realizedTrivias: triviaObject.realizedTrivias,
-              correctAnswers: triviaObject.correctAnswers,
-              wrongAnswers: triviaObject.wrongAnswers
-            }
-          })
-      })
-      .then(() => {
-        dispatch({ type: 'ADD_TRIVIA_SUCCESS' })
-      })
-      .catch(() => {
-        dispatch({ type: 'ADD_TRIVIA_ERROR' })
-      })
+    try {
+      await firestore
+        .collection('users')
+        .doc(uid)
+        .update({
+          triviaRecord: {
+            pokemonIQ: pokemon,
+            pokemonIQNumber: pokemonNumber,
+            realizedTrivias: triviaObject.realizedTrivias,
+            correctAnswers: triviaObject.correctAnswers,
+            wrongAnswers: triviaObject.wrongAnswers
+          }
+        })
+      dispatch({ type: 'ADD_TRIVIA_SUCCESS' })
+    } catch (err) {
+      dispatch({ type: 'ADD_TRIVIA_ERROR', error: err.message })
+    }
   }
 }

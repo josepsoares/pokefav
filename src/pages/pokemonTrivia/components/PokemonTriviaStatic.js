@@ -21,6 +21,7 @@ import { useSelector } from 'react-redux'
 import { FaArrowRight, FaGraduationCap } from 'react-icons/fa'
 
 import Button from 'components/layout/Button'
+import SEO from 'components/Seo'
 
 const PokemonTriviaStatic = ({ startTrivia }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -34,6 +35,11 @@ const PokemonTriviaStatic = ({ startTrivia }) => {
 
   return (
     <>
+      <SEO
+        title="PokéTrivia"
+        description="Play a fun trivia filled with challeging questions about facts and mechanics about Pokémon Franchise"
+      />
+
       <Heading as="h1" pb={8}>
         PokéTrivia
       </Heading>

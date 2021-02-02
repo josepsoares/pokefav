@@ -1,22 +1,23 @@
 const initState = {
-    updateTriviaResult: null
+  updateTriviaResult: null,
+  updateTriviaResultError: null
 }
 
 const triviaReducer = (state = initState, action) => {
-    switch (action.type) {
-        case 'ADD_TRIVIA_SUCCESS':
-            return {
-                ...state,
-                updateTriviaResult: 'Trivia Results Updated'
-            }
-        case 'ADD_TRIVIA_ERROR':
-            return {
-                ...state,
-                updateTriviaResult: action.error.message
-            }
-        default:
-            return state
-    }
+  switch (action.type) {
+    case 'ADD_TRIVIA_SUCCESS':
+      return {
+        ...state,
+        updateTriviaResult: 'Trivia Results Updated'
+      }
+    case 'ADD_TRIVIA_ERROR':
+      return {
+        ...state,
+        updateTriviaResultError: action.error
+      }
+    default:
+      return state
+  }
 }
 
-export default triviaReducer;
+export default triviaReducer

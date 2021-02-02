@@ -30,6 +30,7 @@ import { FaSearch } from 'react-icons/fa'
 // import Button from 'components/layout/Button'
 import { useWindowSize } from 'react-use'
 import { getDataPokeListPage } from 'redux/actions/apiActions'
+import SEO from 'components/Seo'
 
 const PokemonList = () => {
   // const { getInfoPokemonPage, match } = this.props
@@ -252,6 +253,11 @@ const PokemonList = () => {
 
   return (
     <>
+      <SEO
+        title="Pokémon List"
+        description="Search for your favorite pokémons in a vast list of Pokémons"
+      />
+
       <Flex
         flexDir={['column', null, 'row']}
         justify={['center', null, 'space-between']}

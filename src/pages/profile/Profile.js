@@ -23,6 +23,7 @@ import {
   StackDivider
 } from '@chakra-ui/react'
 import Button from 'components/layout/Button'
+import SEO from 'components/Seo'
 
 const Profile = props => {
   // fazer uma modal para editar o perfil
@@ -80,6 +81,10 @@ const Profile = props => {
 
   return (
     <>
+      <SEO
+        title={username}
+        description={'Explore the profiles of specifics users from Pokéfav'}
+      />
       <Flex
         align="center"
         flexDir={['column', null, 'row']}

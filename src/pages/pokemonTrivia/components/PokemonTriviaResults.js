@@ -2,6 +2,7 @@ import React from 'react'
 import { Box, SimpleGrid, Image, Text, Heading, Flex } from '@chakra-ui/react'
 import { FaArrowLeft, FaRedoAlt } from 'react-icons/fa'
 import Button from 'components/layout/Button'
+import SEO from 'components/Seo'
 
 const PokemonTriviaResults = props => {
   const {
@@ -28,6 +29,10 @@ const PokemonTriviaResults = props => {
 
   return (
     <>
+      <SEO
+        title="PokéTrivia Results"
+        description="Play a fun trivia filled with challeging questions about facts and mechanics about Pokémon Franchise"
+      />
       <Heading as="h1" pb={8}>
         PokéTrivia Results
       </Heading>

@@ -8,7 +8,7 @@ import { store, persistor } from 'redux/store'
 
 import firebase from 'firebase/app'
 import { BrowserRouter } from 'react-router-dom'
-import { ChakraProvider, Flex } from '@chakra-ui/react'
+import { ChakraProvider, ColorModeScript, Flex } from '@chakra-ui/react'
 import rrfConfig from 'config/rrfConfig'
 import pokeFavTheme from 'styles/theme'
 import App from './App'
@@ -36,18 +36,22 @@ const rrfProps = {
 }
 
 ReactDOM.render(
-  <BrowserRouter>
-    <Provider store={store}>
-      <PersistGate loading={true} persistor={persistor}>
-        <ReactReduxFirebaseProvider {...rrfProps}>
-          <AuthIsLoaded>
-            <ChakraProvider theme={pokeFavTheme}>
-              <App />
-            </ChakraProvider>
-          </AuthIsLoaded>
-        </ReactReduxFirebaseProvider>
-      </PersistGate>
-    </Provider>
-  </BrowserRouter>,
+  <>
+    <ColorModeScript initialColorMode={pokeFavTheme.config.initialColorMode} />
+
+    <BrowserRouter>
+      <Provider store={store}>
+        <PersistGate loading={true} persistor={persistor}>
+          <ReactReduxFirebaseProvider {...rrfProps}>
+            <AuthIsLoaded>
+              <ChakraProvider theme={pokeFavTheme}>
+                <App />
+              </ChakraProvider>
+            </AuthIsLoaded>
+          </ReactReduxFirebaseProvider>
+        </PersistGate>
+      </Provider>
+    </BrowserRouter>
+  </>,
   document.getElementById('root')
 )

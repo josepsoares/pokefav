@@ -11,6 +11,10 @@ const breakpoints = createBreakpoints({
 })
 
 const themeProps = {
+  config: {
+    initialColorMode: 'dark',
+    useSystemColorMode: false
+  },
   breakpoints,
   colors: {
     red: {

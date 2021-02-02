@@ -42,6 +42,7 @@ import {
   FaStopCircle,
   FaTrashAlt
 } from 'react-icons/fa'
+import SEO from 'components/Seo'
 
 class PokePage extends Component {
   constructor(props) {
@@ -234,6 +235,10 @@ class PokePage extends Component {
 
     return (
       <>
+        <SEO
+          title={pokemonName}
+          description={`Explore all the details about ${pokemonName}, like moves, stats, evolution and more, and also check ${pokemonName} cards`}
+        />
         {auth.uid && (
           <Flex
             w="100%"
