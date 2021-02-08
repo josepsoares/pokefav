@@ -65,6 +65,8 @@ const PokemonPageMoves = props => {
         ]
       })
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.move])
 
   const _getSpecificMove = async move => {
@@ -101,7 +103,7 @@ const PokemonPageMoves = props => {
 
     return (
       <Modal
-        size="lg"
+        size="xl"
         isCentered
         isOpen={isOpen}
         onClose={onClose}
@@ -109,7 +111,7 @@ const PokemonPageMoves = props => {
         scrollBehavior="inside"
       >
         <ModalOverlay>
-          <ModalContent color="#3c3c3b" bgColor="#ebebd3">
+          <ModalContent p={6} color="#3c3c3b" bgColor="#ebebd3">
             {isLoading ? (
               <Loading />
             ) : error ? (
@@ -192,7 +194,7 @@ const PokemonPageMoves = props => {
                 </>
               )
             )}
-            <ModalFooter w="100%" justifyContent="center">
+            <ModalFooter mt={4} w="100%" justifyContent="center">
               <Button colorScheme="blue" onClick={onClose}>
                 Close
               </Button>
@@ -207,13 +209,17 @@ const PokemonPageMoves = props => {
     return (
       <>
         {method === 'level-up' ? (
-          <SimpleGrid p={3} columns={[1, 2]}>
+          <SimpleGrid gridGap={4} columns={[1, 2]}>
             {orderedMovesArray.map((moveItem, key) => (
-              <Flex p={3} flexDir="column" key={key}>
+              <Flex flexDir="column" key={key}>
                 <Button
                   variant="ghost"
                   display="flex"
                   flexDir="row"
+                  fontWeight="medium"
+                  sx={{
+                    boxShadow: 'none'
+                  }}
                   onClick={() => {
                     _getSpecificMove(moveItem.name)
                     onOpen()
@@ -221,12 +227,13 @@ const PokemonPageMoves = props => {
                 >
                   {moveItem.level_learned_at === 0 ? (
                     <Text>
-                      Starts with {_.startCase(moveItem.name)} at base lvl
+                      Starts with <b>{_.startCase(moveItem.name)}</b> at base
+                      lvl
                     </Text>
                   ) : (
                     <Text>
-                      Learns {_.startCase(moveItem.name)} at lvl{' '}
-                      {moveItem.level_learned_at}
+                      Learns <b>{_.startCase(moveItem.name)}</b> at lvl{' '}
+                      <b>{moveItem.level_learned_at}</b>
                     </Text>
                   )}
                 </Button>
@@ -234,12 +241,11 @@ const PokemonPageMoves = props => {
             ))}
           </SimpleGrid>
         ) : (
-          <SimpleGrid p={3} columns={[1, 2, 3]}>
+          <SimpleGrid gridGap={4} columns={[1, 2, 3]}>
             {orderedMovesArray.map((moveItem, key) => (
               <Button
                 key={key}
                 variant="ghost"
-                boxShadow="none"
                 onClick={() => {
                   _getSpecificMove(moveItem.name)
                   onOpen()
@@ -252,6 +258,9 @@ const PokemonPageMoves = props => {
                   color: 'blue.500',
                   bgColor: 'yellow.300'
                 }}
+                sx={{
+                  boxShadow: 'none'
+                }}
               >
                 {_.startCase(moveItem.name)}
               </Button>
@@ -263,7 +272,7 @@ const PokemonPageMoves = props => {
     )
   } else {
     return (
-      <Text py={4}>
+      <Text textAlign="center" py={4}>
         There weren't found any moves that this pokémon can learn by this method
       </Text>
     )

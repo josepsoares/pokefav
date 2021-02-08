@@ -4,7 +4,7 @@ const initState = {
   actionError: null
 }
 
-const favoriteReducer = (state = initState, action) => {
+const userFavoritesReducer = (state = initState, action) => {
   switch (action.type) {
     case 'ADD_FAVORITE_SUCCESS':
       toast.success('Pokémon added successfully to your Favorite Pokémon List.')
@@ -67,4 +67,4 @@ const favoriteReducer = (state = initState, action) => {
   }
 }
 
-export default favoriteReducer
+export default userFavoritesReducer

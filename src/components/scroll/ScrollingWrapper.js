@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { IconButton } from '@chakra-ui/react'
-import { BiChevronUp } from 'react-icons/bi'
 import { motion } from 'framer-motion'
+import { FaArrowUp } from 'react-icons/fa'
 
 const ScrollingWrapper = () => {
   const [threshold, setThreshold] = useState(false)
@@ -44,11 +44,13 @@ const ScrollingWrapper = () => {
         position="fixed"
         left="90%"
         top="85%"
+        opacity="0.85"
         zIndex={3}
         isRound={true}
         onClick={scrollToTop}
         aria-label="Scroll Top"
-        icon={<BiChevronUp size={30} />}
+        boxShadow="md"
+        icon={<FaArrowUp size={16} />}
       />
     </motion.div>
   )

@@ -2,6 +2,9 @@ import React, { Component } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { firestoreConnect } from 'react-redux-firebase'
+import { getInfoPokemonPage } from 'redux/actions/apiActions'
+import { getUser } from 'redux/actions/userActions'
+
 import { Link } from 'react-router-dom'
 import moment from 'moment'
 import {
@@ -14,21 +17,17 @@ import {
   VStack,
   Avatar
 } from '@chakra-ui/react'
+import { FaRegClock } from 'react-icons/fa'
 
-import {
-  getUserAndPokemonForProfileIQ,
-  getInfoPokemonPage
-} from 'redux/actions/apiActions'
 import Loading from 'components/feedback/Loading'
 import ReactionIcons from 'components/layout/ReactionIcons'
-import { FaRegClock } from 'react-icons/fa'
 
 class UserHome extends Component {
   render() {
     const {
       profileContent,
       notifications,
-      getUserAndPokemonForProfileIQ,
+      getUser,
       reactionIsLoading
     } = this.props
     const { username } = profileContent
@@ -130,14 +129,15 @@ class UserHome extends Component {
                       align="center"
                       justify="center"
                       textAlign="center"
-                      onClick={() => getUserAndPokemonForProfileIQ(item.user)}
+                      onClick={() => getUser(item.user)}
                       to={`/pokemon-trainers/profile/${item.user}`}
                     >
                       <Avatar
                         size="lg"
+                        bg="#1688b9"
                         objectFit="contain"
                         objectPosition="center"
-                        src={`https://www.serebii.net/diamondpearl/avatar/${item.avatar}.png`}
+                        src={`img/avatars/avatar-${item.avatar}.png`}
                         alt={item.avatar}
                       />
                       <Text pt={2}>{item.user}</Text>
@@ -188,8 +188,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    getUserAndPokemonForProfileIQ: user =>
-      dispatch(getUserAndPokemonForProfileIQ(user)),
+    getUser: user => dispatch(getUser(user)),
     getInfoPokemonPage: pokemon => dispatch(getInfoPokemonPage(pokemon))
   }
 }

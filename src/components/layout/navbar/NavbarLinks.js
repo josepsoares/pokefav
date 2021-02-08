@@ -1,16 +1,19 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { NavLink } from 'react-router-dom'
-import { signOut } from 'redux/actions/authActions'
-import { getUserAndPokemonForProfileIQ } from 'redux/actions/apiActions'
-import useWindowSize from 'scripts/hooks/useWindowSize'
-import { getPokedex } from 'redux/actions/apiActions'
-import { getDataPokeListPage } from 'redux/actions/apiActions'
-import { FaGraduationCap, FaHome, FaSignOutAlt, FaUsers } from 'react-icons/fa'
-import { Avatar, Menu, MenuList, MenuButton, MenuItem } from '@chakra-ui/react'
+import { getUser, signOut } from 'redux/actions/userActions'
+import { getPokedex, getDataPokeListPage } from 'redux/actions/apiActions'
+import {
+  FaGraduationCap,
+  FaHome,
+  FaSignOutAlt,
+  FaUser,
+  FaUsers
+} from 'react-icons/fa'
+import { Avatar, Menu, MenuList, MenuButton, Box } from '@chakra-ui/react'
 import { CgPokemon } from 'react-icons/cg'
 
-import Button from '../Button'
+import useWindowSize from 'scripts/hooks/useWindowSize'
 
 const NavbarLinks = ({ profile }) => {
   const { username, avatar } = profile
@@ -21,19 +24,20 @@ const NavbarLinks = ({ profile }) => {
     <>
       <NavLink
         exact
-        activeClassName="navbar__link-active"
-        className="navbar__link"
         to="/"
+        className="nav-link"
+        activeClassName="nav-link-active"
       >
-        <Button leftIcon={<FaHome />} variant="ghost">
-          Home
-        </Button>
+        <Box>
+          <FaHome />
+        </Box>
+        <Box as="span">Home</Box>
       </NavLink>
       <NavLink
         exact
-        activeClassName="navbar__link-active"
-        className="navbar__link"
         to="/pokemon-list"
+        className="nav-link"
+        activeClassName="nav-link-active"
         isActive={(match, location) => {
           const string = '/pokemon-list'
           const searchPokemonListURL = location.pathname.match(string)
@@ -42,60 +46,63 @@ const NavbarLinks = ({ profile }) => {
           }
         }}
       >
-        <Button leftIcon={<CgPokemon />} variant="ghost">
-          PokéList
-        </Button>
+        <Box>
+          <CgPokemon />
+        </Box>
+        <Box as="span">PokéList</Box>
       </NavLink>
 
       <NavLink
         exact
         to="/pokemon-trivia"
-        className="navbar__link"
-        activeClassName="navbar__link-active"
+        className="nav-link"
+        activeClassName="nav-link-active"
       >
-        <Button leftIcon={<FaGraduationCap />} variant="ghost">
-          PokéTrivia
-        </Button>
+        <Box>
+          <FaGraduationCap />
+        </Box>
+        <Box as="span">PokéTrivia</Box>
       </NavLink>
       <NavLink
         to="/pokemon-trainers"
-        className="navbar__link"
-        activeClassName="navbar__link-active"
+        className="nav-link"
+        activeClassName="nav-link-active"
       >
-        <Button leftIcon={<FaUsers />} variant="ghost">
-          PokéTrainers
-        </Button>
+        <Box>
+          <FaUsers />
+        </Box>
+        <Box as="span">PokéTrainers</Box>
       </NavLink>
       {width > 1024 && (
         <Menu>
           <MenuButton>
             <Avatar
+              bg="#1688b9"
               boxSize={14}
-              src={`https://www.serebii.net/diamondpearl/avatar/${avatar}.png`}
+              src={`/img/avatars/avatar-${avatar}.png`}
             />
           </MenuButton>
-          <MenuList p={0}>
-            <MenuItem>
-              <NavLink
-                to={`/profile/${username}`}
-                className="navbar__link"
-                activeClassName="navbar__link-active"
-                onClick={() =>
-                  dispatch(getUserAndPokemonForProfileIQ(username))
-                }
-              >
-                Profile
-              </NavLink>
-            </MenuItem>
-            <MenuItem>
-              <NavLink
-                to="/"
-                onClick={() => dispatch(signOut())}
-                className="navbar__link"
-              >
+          <MenuList zIndex="5" color="#3c3c3b" bgColor="#ebebd3" p={0}>
+            <NavLink
+              to={`/profile/${username}`}
+              className="nav-link"
+              onClick={() => dispatch(getUser(username))}
+            >
+              <Box>
+                <FaUser />
+              </Box>
+              <Box as="span">Profile</Box>
+            </NavLink>
+            <NavLink
+              to="/"
+              onClick={() => dispatch(signOut())}
+              className="nav-link"
+            >
+              <Box>
                 <FaSignOutAlt />
-              </NavLink>
-            </MenuItem>
+              </Box>
+              <Box as="span">Logout</Box>
+            </NavLink>
           </MenuList>
         </Menu>
       )}

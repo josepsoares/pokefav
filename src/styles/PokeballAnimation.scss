@@ -1,0 +1,103 @@
+// Pokeball Animation
+$red: #f24643;
+$yellow: #ffe066;
+$blue: #1688b9;
+
+.pokeball {
+  border-radius: 46%;
+  background-color: $red;
+  width: 255px;
+  height: 285px;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pokeball .pokeball-btn {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  top: 51%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: $blue;
+  position: absolute;
+}
+
+.pokeball-inside {
+  border-radius: 46%;
+  background-image: linear-gradient($yellow 80px, #ebebd3 70px);
+  width: 140px;
+  height: 165px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.pokeball-inside::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  border-bottom: 14px solid $red;
+}
+
+.animated {
+  -webkit-animation-duration: 2.5s;
+  animation-duration: 2.5s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+.animated.infinite {
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+}
+
+@keyframes swing {
+  20% {
+    -webkit-transform: rotate3d(0, 0, 1, 15deg);
+    transform: rotate3d(0, 0, 1, 15deg);
+  }
+
+  40% {
+    -webkit-transform: rotate3d(0, 0, 1, -10deg);
+    transform: rotate3d(0, 0, 1, -10deg);
+  }
+
+  60% {
+    -webkit-transform: rotate3d(0, 0, 1, 5deg);
+    transform: rotate3d(0, 0, 1, 5deg);
+    .pokeball {
+      -webkit-transform: rotate3d(0, 0, 1, 5deg);
+      transform: rotate3d(0, 0, 1, 5deg);
+      background-color: red !important;
+    }
+  }
+
+  80% {
+    -webkit-transform: rotate3d(0, 0, 1, -5deg);
+    transform: rotate3d(0, 0, 1, -5deg);
+    .pokeball .pokeball-btn::after {
+      background-color: #a2a2a2 !important;
+    }
+  }
+
+  to {
+    -webkit-transform: rotate3d(0, 0, 1, 0deg);
+    transform: rotate3d(0, 0, 1, 0deg);
+  }
+}
+
+.swing {
+  -webkit-transform-origin: bottom center;
+  transform-origin: bottom center;
+  -webkit-animation-name: swing;
+  animation-name: swing;
+}

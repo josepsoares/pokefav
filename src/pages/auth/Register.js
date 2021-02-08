@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { connect, useDispatch } from 'react-redux'
-import { signUp } from 'redux/actions/authActions'
-import { getRegionsAndGames } from 'redux/actions/apiActions'
+import { useDispatch } from 'react-redux'
+import { signUp } from 'redux/actions/userActions'
 import {
   Text,
   Flex,
@@ -14,7 +13,7 @@ import {
   FormControl,
   FormErrorMessage,
   Select,
-  Image,
+  Avatar,
   CircularProgress,
   Box,
   IconButton
@@ -372,45 +371,38 @@ const Register = props => {
                           2. Chose your avatar*
                         </Heading>
                         <SimpleGrid
-                          columns={4}
+                          columns={[1, 2, 3, 4]}
                           justify="center"
                           align="center"
-                          spacing="24px"
+                          griGap={10}
                         >
                           {avatars.map((item, index) => {
                             const isAvatarSelected = field.value === item
 
                             return (
-                              <Image
-                                p={2}
-                                mx="auto"
-                                alt={item}
+                              <Avatar
                                 key={index}
-                                borderRadius={4}
-                                border="2px solid"
-                                transition="all ease-in-out 0.5s"
+                                boxSize={24}
+                                alt={item}
+                                boxShadow="md"
+                                transitionProperty="all"
+                                transition="ease-in-out"
+                                transitionDuration="0.5s"
                                 opacity={isAvatarSelected ? 1 : 0.65}
-                                bg={
-                                  isAvatarSelected ? 'secondary' : 'transparent'
-                                }
-                                borderColor={
-                                  isAvatarSelected ? 'tertiary' : 'secondary'
-                                }
+                                bg={isAvatarSelected ? '#ffe066' : '#1688b9'}
+                                src={`/img/avatars/avatar-${item}.png`}
+                                _active={{
+                                  opacity: 1
+                                }}
+                                _hover={{
+                                  opacity: 1
+                                }}
                                 onClick={() =>
                                   form.setValues({
                                     ...form.values,
                                     avatar: item
                                   })
                                 }
-                                src={`https://www.serebii.net/diamondpearl/avatar/${item}.png`}
-                                _active={{
-                                  opacity: 1,
-                                  borderColor: 'primary'
-                                }}
-                                _hover={{
-                                  opacity: 1,
-                                  borderColor: 'primary'
-                                }}
                               />
                             )
                           })}
@@ -441,17 +433,4 @@ const Register = props => {
   )
 }
 
-const mapDispatchToProps = dispatch => {
-  return {
-    signUp: newUser => dispatch(signUp(newUser)),
-    getRegionsAndGames: () => dispatch(getRegionsAndGames())
-  }
-}
-
-const mapStateToProps = state => {
-  return {
-    signUpData: state.apiCalls.apiData.signUpData
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Register)
+export default Register

@@ -7,7 +7,6 @@ $red: #f24643;
 $blue: #1688b9;
 $text-font: 'Roboto', sans-serif;
 $title-font: 'Rubick', sans-serif;
-$radius: 0.25rem;
 $shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
   0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
 
@@ -15,12 +14,6 @@ $shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
   transition: all $transitionTime;
   -webkit-transition: all $transitionTime;
   -moz-transition: all $transitionTime;
-}
-
-@mixin defineColorFontWeightHeader($color, $font, $weight) {
-  color: $color;
-  font-family: $font;
-  font-weight: $weight;
 }
 
 @mixin setMediaBreakpoint($widthValue) {
@@ -42,41 +35,33 @@ body {
   }
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 500 !important;
+}
+
 h1 {
   color: $yellow;
 }
 
+h2 {
+  color: $red;
+}
+
 h3 {
-  @include defineColorFontWeightHeader($blue, $title-font, bold);
+  color: $blue;
   padding-bottom: 1.25rem;
-  font-weight: 500 !important;
 }
 
-h4 {
-  @include defineColorFontWeightHeader($red, $title-font, normal);
-  padding-bottom: 1rem;
-  font-weight: 500 !important;
-}
-
+h4,
 h5 {
-  @include defineColorFontWeightHeader($red, $title-font, normal);
-  font-weight: 500 !important;
-}
-
-h6 {
-  @include defineColorFontWeightHeader($yellow, $title-font, normal);
-  font-weight: 500 !important;
-}
-
-hr {
-  color: $yellow;
-  background-color: $yellow;
-  opacity: 0.5;
-}
-
-button {
-  border: none;
-  outline: none;
+  color: $red;
+  padding-bottom: 1rem;
 }
 
 //------------------//
@@ -105,7 +90,7 @@ a.containerLink {
   &:active {
     text-decoration: none;
     background-color: $blue;
-    border-radius: $radius;
+    border-radius: 0.25rem;
     & > p,
     & > div > p,
     & > div > div > p,
@@ -116,63 +101,6 @@ a.containerLink {
 }
 //------------------//
 
-// Buttons/Icon Buttons
-.btn-warning {
-  font-family: $text-font !important;
-  background-color: $yellow !important;
-  padding: 8px 15px 8px 15px !important;
-  color: $dark !important;
-  box-shadow: $shadow;
-
-  &:hover,
-  &:active {
-    background-color: #f5cf35 !important;
-  }
-
-  &.btn-video {
-    color: $red !important;
-  }
-}
-
-.btn-danger {
-  background-color: $red !important;
-  padding: 8px 15px 8px 15px !important;
-  color: $dark !important;
-  box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
-    0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
-
-  &:hover,
-  &:active {
-    background-color: #f0312e !important;
-  }
-
-  &.btn-video {
-    color: $yellow !important;
-    font-weight: bold !important;
-  }
-}
-
-.moveButton {
-  cursor: pointer;
-  margin: 0;
-  padding: 5px;
-  transition: 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-    box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-    border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-
-  &:hover,
-  &:active {
-    background-color: $blue;
-    color: $yellow;
-    border-radius: $radius;
-  }
-
-  & > div > p {
-    margin: 0;
-    padding: 5px;
-  }
-}
-
 .btn {
   display: block;
   border: none;
@@ -181,68 +109,96 @@ a.containerLink {
   position: relative;
   z-index: 1;
   border-radius: 5px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    border-radius: 5px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: -1;
+    opacity: 0;
+    -webkit-transform: scale3d(0.7, 1, 1);
+    transform: scale3d(0.7, 1, 1);
+    -webkit-transition: -webkit-transform 0.4s, opacity 0.4s;
+    transition: transform 0.4s, opacity 0.4s;
+    transition-timing-function: ease, ease;
+    -webkit-transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
+    transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
+  }
+
+  &:hover::before,
+  &:active::before {
+    opacity: 0.2;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
 }
 
-.btn::before {
-  content: '';
-  position: absolute;
+.nav-link {
   border-radius: 5px;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: black;
-  z-index: -1;
-  opacity: 0;
-  -webkit-transform: scale3d(0.7, 1, 1);
-  transform: scale3d(0.7, 1, 1);
-  -webkit-transition: -webkit-transform 0.4s, opacity 0.4s;
-  transition: transform 0.4s, opacity 0.4s;
-  transition-timing-function: ease, ease;
-  -webkit-transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
-  transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
-}
-
-.btn:hover::before {
-  opacity: 0.2;
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-}
-
-.nav-btn {
-  display: block;
-  border: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.75rem;
+  font-family: 'Rubik', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   background: none;
   color: inherit;
   position: relative;
   z-index: 1;
-  border-radius: 5px;
-}
 
-.nav-btn::before {
-  content: '';
-  position: absolute;
-  border-radius: 5px;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: black;
-  z-index: -1;
-  opacity: 0;
-  -webkit-transform: scale3d(0.7, 1, 1);
-  transform: scale3d(0.7, 1, 1);
-  -webkit-transition: -webkit-transform 0.4s, opacity 0.4s;
-  transition: transform 0.4s, opacity 0.4s;
-  transition-timing-function: ease, ease;
-  -webkit-transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
-  transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
-}
+  &::before {
+    content: '';
+    position: absolute;
+    border-radius: 5px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: $blue;
+    z-index: -1;
+    opacity: 0;
+    -webkit-transform: scale3d(0.7, 1, 1);
+    transform: scale3d(0.7, 1, 1);
+    -webkit-transition: -webkit-transform 0.4s, opacity 0.4s;
+    transition: transform 0.4s, opacity 0.4s;
+    transition-timing-function: ease, ease;
+    -webkit-transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
+    transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1);
+  }
 
-.nav-btn:hover::before {
-  opacity: 0.2;
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
+  &:hover,
+  &:active {
+    color: $yellow;
+  }
+
+  &:hover::before,
+  &:active::before {
+    opacity: 0.5;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+
+  &.nav-link-active {
+    border-bottom: 1px solid $yellow;
+    border-radius: 0;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    font-weight: 600;
+
+    &:hover::before,
+    &:active::before {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
 }
 
 //------------------//
@@ -272,28 +228,13 @@ a.containerLink {
   }
 }
 
-.avatar {
-  border: solid 1px $yellow;
-  padding: 10px;
-  border-radius: $radius;
-
-  &.active-avatar {
-    background-color: $blue;
-  }
-}
 //------------------//
 
-div.modal-content {
-  background-color: $dark;
-  border: 1px solid $yellow;
-}
-
 div.typeIcon {
-  cursor: pointer;
   display: inline-block;
   width: 80px;
   font-size: 0.75rem;
-  border-radius: $radius;
+  border-radius: 0.25rem;
   border: 1px solid rgba(0, 0, 0, 0.2);
   line-height: 1.5rem;
   text-align: center;
@@ -374,115 +315,6 @@ div.typeIcon {
   background-color: transparent;
 }
 
-//Navigation
-nav {
-  background-color: transparent;
-
-  .navbar-toggler {
-    color: none;
-    border: none;
-  }
-
-  .navBrandLink {
-    @include defineTransition(0.6s);
-
-    .navBrandSecondTitle,
-    .navBrandTitle {
-      font-size: 2em;
-      @include setMediaBreakpoint(1024px) {
-        font-size: 2.5em;
-      }
-    }
-
-    &:hover,
-    &:active {
-      .navBrandTitle {
-        color: $red;
-      }
-
-      .navBrandSecondTitle {
-        color: $blue;
-      }
-    }
-  }
-
-  .nav-item {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-  }
-
-  ul li {
-    a {
-      color: $red;
-      padding: 8px;
-      font-weight: bold;
-      text-decoration: none;
-      position: relative;
-      margin: 0 0.325rem 0 0.325rem;
-      @include defineTransition(0.5s);
-
-      &.navbar__link-active {
-        color: $yellow;
-        background-color: $red;
-        font-weight: bold;
-        border-radius: $radius;
-        box-shadow: $shadow;
-      }
-
-      @include setMediaBreakpoint(1024px) {
-        margin: 0 0.425rem 0 0.425rem;
-        padding: 10px;
-      }
-
-      &:focus,
-      &::-moz-focus-inner {
-        border: 0;
-        outline: none;
-      }
-
-      &:after,
-      &:before {
-        @include defineTransition(0.5s);
-      }
-
-      &:hover,
-      &:active {
-        text-decoration: none;
-        color: $blue;
-      }
-
-      &:after {
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        margin: auto;
-        width: 100%;
-        height: 1px;
-        content: '.';
-        color: transparent;
-        background-color: $yellow;
-        border-radius: $radius;
-        visibility: none;
-        opacity: 0;
-        z-index: -1;
-        box-shadow: $shadow;
-      }
-
-      &:hover:after,
-      &:active:after {
-        opacity: 1;
-        visibility: visible;
-        height: 100%;
-      }
-    }
-  }
-}
-
 .pokemon-image {
   letter-spacing: 0.1em;
   font-family: "'Rubick', sans-serif";
@@ -496,12 +328,22 @@ nav {
     transition: 0.5s all ease-in-out;
   }
 
-  &:hover {
+  &:hover,
+  &:active {
     color: #ffe066;
 
     svg {
       opacity: 1;
       color: #f24643 !important;
+    }
+
+    &.ev-image {
+      color: #f24643;
+
+      svg {
+        opacity: 1;
+        color: #fdda50 !important;
+      }
     }
 
     @keyframes swing-p {
@@ -556,16 +398,6 @@ nav {
     }
   }
 
-  /*   img::before {
-    content: '';
-    position: absolute;
-    background-image: url('https://cdn.pixabay.com/photo/2016/07/23/13/18/pokemon-1536847_960_720.png');
-    top: 50%;
-    left: 50%;
-    width: 200px;
-    height: 200px;
-  } */
-
   .pokeball {
     border-radius: 46%;
     background-color: #e0e0e0;
@@ -610,107 +442,4 @@ nav {
     width: 250px;
     border-bottom: 14px solid #e0e0e0;
   }
-}
-
-//------------------//
-
-// Pokeball Animation
-
-.pokeball {
-  border-radius: 46%;
-  background-color: #f24643;
-  width: 255px;
-  height: 285px;
-  overflow: hidden;
-  position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.pokeball .pokeball-btn {
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  top: 51%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #1688b9;
-  position: absolute;
-}
-
-.pokeball-inside {
-  border-radius: 46%;
-  background-image: linear-gradient(#ffe066 80px, #ebebd3 70px);
-  width: 140px;
-  height: 165px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.pokeball-inside::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 250px;
-  border-bottom: 14px solid #f24643;
-}
-
-.animated {
-  -webkit-animation-duration: 2.5s;
-  animation-duration: 2.5s;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
-}
-
-.animated.infinite {
-  -webkit-animation-iteration-count: infinite;
-  animation-iteration-count: infinite;
-}
-
-@keyframes swing {
-  20% {
-    -webkit-transform: rotate3d(0, 0, 1, 15deg);
-    transform: rotate3d(0, 0, 1, 15deg);
-  }
-
-  40% {
-    -webkit-transform: rotate3d(0, 0, 1, -10deg);
-    transform: rotate3d(0, 0, 1, -10deg);
-  }
-
-  60% {
-    -webkit-transform: rotate3d(0, 0, 1, 5deg);
-    transform: rotate3d(0, 0, 1, 5deg);
-    .pokeball {
-      -webkit-transform: rotate3d(0, 0, 1, 5deg);
-      transform: rotate3d(0, 0, 1, 5deg);
-      background-color: red !important;
-    }
-  }
-
-  80% {
-    -webkit-transform: rotate3d(0, 0, 1, -5deg);
-    transform: rotate3d(0, 0, 1, -5deg);
-    .pokeball .pokeball-btn::after {
-      background-color: #a2a2a2 !important;
-    }
-  }
-
-  to {
-    -webkit-transform: rotate3d(0, 0, 1, 0deg);
-    transform: rotate3d(0, 0, 1, 0deg);
-  }
-}
-
-.swing {
-  -webkit-transform-origin: bottom center;
-  transform-origin: bottom center;
-  -webkit-animation-name: swing;
-  animation-name: swing;
 }

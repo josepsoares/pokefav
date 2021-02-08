@@ -4,6 +4,7 @@ import Button from 'components/layout/Button'
 import { FaRedoAlt } from 'react-icons/fa'
 
 const Error = props => {
+  console.log(props)
   return (
     <Flex justify="center" align="center" flexDir="column" pb={8}>
       <Image
@@ -11,13 +12,13 @@ const Error = props => {
         pb={6}
         objectFit="contain"
         objectPosition="center"
-        src="/img/Box_XD_054.png"
+        src="/img/psyduck.png"
       />
       <Heading pb={4} as="h2">
         An error occurred
       </Heading>
       <Heading as="h2" pb={8}>
-        {props.error}
+        {/* {props.error} */}
       </Heading>
 
       <Button

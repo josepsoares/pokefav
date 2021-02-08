@@ -9,11 +9,13 @@ import { store, persistor } from 'redux/store'
 import firebase from 'firebase/app'
 import { BrowserRouter } from 'react-router-dom'
 import { ChakraProvider, ColorModeScript, Flex } from '@chakra-ui/react'
+
+import App from './App'
+import Loading from 'components/feedback/Loading'
 import rrfConfig from 'config/rrfConfig'
 import pokeFavTheme from 'styles/theme'
-import App from './App'
+import './styles/PokeballAnimation.scss'
 import './styles/App.scss'
-import Loading from 'components/feedback/Loading'
 
 const AuthIsLoaded = ({ children }) => {
   const profile = useSelector(state => state.firebase.profile)

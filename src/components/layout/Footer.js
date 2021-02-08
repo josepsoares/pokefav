@@ -1,5 +1,5 @@
-import { Flex, Text } from '@chakra-ui/react'
 import React from 'react'
+import { Flex, Text } from '@chakra-ui/react'
 
 const Footer = () => {
   return (
@@ -8,11 +8,11 @@ const Footer = () => {
       flexDir="column"
       justify="center"
       align="center"
-      py={6}
+      px={10}
+      p={6}
     >
       <Text mb={1} fontSize="xxs">
-        Pokéfav © 2019-2020 -{' '}
-        <a href="https://josepsoares.now.sh/">josepsoares</a>
+        Pokéfav © 2021 - <a href="https://josepsoares.now.sh/">josepsoares</a>
       </Text>
       <Text mb={1} fontSize="xxs">
         Pokémon Reactions Icons made by{' '}
@@ -29,12 +29,12 @@ const Footer = () => {
           href="https://www.flaticon.com/"
           title="Flaticon"
         >
-          www.flaticon.com
+          Flat Icon
         </a>{' '}
       </Text>
       <Text mb={1} fontSize="xxs">
         Used content of the Pokémon Universe is used under a Fair Use Policy and
-        belongs to Nintendo/Game Freak © 1995-2020.
+        belongs to Nintendo/Game Freak © 1995-2021.
       </Text>
     </Flex>
   )

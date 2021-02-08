@@ -76,6 +76,7 @@ export const addPokemonToTeam = pokemon => {
 
 export const removePokemonFromTeam = pokemon => {
   return async (dispatch, getState, { getFirestore }) => {
+    console.log('olá?')
     const firestore = getFirestore()
     const uid = getState().firebase.auth.uid
     const profileTeamPokemons = getState().firebase.profile.favoriteTeam

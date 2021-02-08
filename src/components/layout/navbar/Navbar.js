@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getUserAndPokemonForProfileIQ } from 'redux/actions/apiActions'
+import { getUser, signOut } from 'redux/actions/userActions'
 
 import { Link, NavLink } from 'react-router-dom'
 import {
@@ -13,25 +13,21 @@ import {
   DrawerCloseButton,
   IconButton,
   Heading,
-  Text,
   Image,
-  Stack,
   Icon,
-  Avatar
+  Avatar,
+  Divider,
+  Box
 } from '@chakra-ui/react'
-import PokeFavLogo from 'assets/imgs/pokefav-full-title.svg'
+import { BiMenu } from 'react-icons/bi'
+import { FaSignOutAlt, FaUser } from 'react-icons/fa'
 
 import useWindowSize from 'scripts/hooks/useWindowSize'
 import NavbarLinks from 'components/layout/navbar/NavbarLinks'
-import { BiMenu } from 'react-icons/bi'
-import { FaSignOutAlt } from 'react-icons/fa'
-import { signOut } from 'redux/actions/authActions'
-import Button from '../Button'
 
 const NavBar = () => {
-  const [isOpen, setOpen] = useState(false)
   const dispatch = useDispatch()
-  const auth = useSelector(state => state.firebase.auth)
+  const [isOpen, setOpen] = useState(false)
   const profile = useSelector(state => state.firebase.profile)
   const { width } = useWindowSize()
 
@@ -42,6 +38,7 @@ const NavBar = () => {
   return width > 1024 ? (
     <Flex
       p={[8, 10]}
+      px={[8, null, 20]}
       w="100%"
       as="nav"
       flexDir="row"
@@ -49,7 +46,12 @@ const NavBar = () => {
       align="center"
     >
       <Link to="/">
-        <Image h={10} objectFit="contain" alt="Pokéfav" src={PokeFavLogo} />
+        <Image
+          h={10}
+          objectFit="contain"
+          alt="Pokéfav"
+          src="/img/logo/pokefav-full-title.svg"
+        />
       </Link>
       <Flex
         gridGap={4}
@@ -70,42 +72,62 @@ const NavBar = () => {
         mr={6}
       />
       <Link className="navBrandLink" to="/">
-        <Image h={10} objectFit="contain" alt="Pokéfav" src={PokeFavLogo} />
+        <Image
+          h={10}
+          objectFit="contain"
+          alt="Pokéfav"
+          src="/img/logo/pokefav-full-title.svg"
+        />
       </Link>
       <Drawer isOpen={isOpen} placement="left" onClose={() => toggleOpen()}>
         <DrawerOverlay />
-        <DrawerContent>
+        <DrawerContent color="#3c3c3b" bgColor="#ebebd3">
           <DrawerCloseButton />
-          <DrawerHeader>
+          <DrawerHeader
+            display="flex"
+            flexDir="column"
+            alignItems="center"
+            pt={8}
+          >
             <Avatar
-              size="sm"
-              src={`https://www.serebii.net/diamondpearl/avatar/${profile.avatar}.png`}
+              mb={4}
+              bg="#1688b9"
+              boxSize={14}
+              src={`/img/avatars/avatar-${profile.avatar}.png`}
             />
             <Heading as="h4">{profile?.username}</Heading>
 
-            <Button>
-              <NavLink
-                to={`/profile/${profile.username}`}
-                className="navbar__link"
-                activeClassName="navbar__link-active"
-                onClick={() =>
-                  dispatch(getUserAndPokemonForProfileIQ(profile.username))
-                }
-              >
-                <Text>Profile</Text>
-              </NavLink>
-            </Button>
-            <Button>
-              <NavLink
-                to="/"
-                onClick={() => dispatch(signOut())}
-                className="navbar__link"
-              >
-                <FaSignOutAlt />
-              </NavLink>
-            </Button>
+            <NavLink
+              to={`/profile/${profile.username}`}
+              className="nav-link"
+              onClick={() => dispatch(getUser(profile.username))}
+            >
+              <Box>
+                <FaUser size={16} />
+              </Box>
+              <Box fontSize={18} as="span">
+                Profile
+              </Box>
+            </NavLink>
+            <NavLink
+              to="/"
+              onClick={() => dispatch(signOut())}
+              className="nav-link"
+            >
+              <Box>
+                <FaSignOutAlt size={16} />
+              </Box>
+              <Box fontSize={18} as="span">
+                Logout
+              </Box>
+            </NavLink>
           </DrawerHeader>
-          <DrawerBody>
+
+          <Box p={6} pt={2}>
+            <Divider bgColor="#1688b9" h={1} />
+          </Box>
+
+          <DrawerBody textAlign="left">
             <NavbarLinks profile={profile} />
           </DrawerBody>
         </DrawerContent>

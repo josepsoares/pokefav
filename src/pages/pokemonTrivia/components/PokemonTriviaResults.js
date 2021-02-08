@@ -101,7 +101,7 @@ const PokemonTriviaResults = props => {
                 ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${userProfile.triviaRecord.pokemonIQNumber}.png`
                 : 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/065_f2.png'
             }
-            alt="Pikachu Test"
+            alt="Pokémon Trivia IQ"
             objectFit="contain"
             objectPosition="center"
           />

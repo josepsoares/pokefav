@@ -1,29 +1,15 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { getInfoPokemonPage } from 'redux/actions/apiActions'
 import pokemon from 'pokemon'
 import _ from 'lodash'
-import {
-  Tooltip,
-  Text,
-  Flex,
-  Grid,
-  Box,
-  Image,
-  Heading,
-  Icon
-} from '@chakra-ui/react'
-import { FaArrowDown, FaArrowRight } from 'react-icons/fa'
+import { Text, Flex, Box, Icon, Image } from '@chakra-ui/react'
+import { FaArrowDown } from 'react-icons/fa'
+
+import { CgPokemon } from 'react-icons/cg'
 
 class pokemonPageEvChain extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      width: window.innerWidth
-    }
-  }
-
   objectWithoutKey = (object, key) => {
     const { [key]: deletedKey, ...otherKeys } = object
     return otherKeys
@@ -72,52 +58,22 @@ class pokemonPageEvChain extends Component {
 
   conditionsEvolution = (item, index) => {
     if (typeof item === 'string' || typeof item === 'number') {
-      return (
-        <p className="m-0" key={index}>
-          {_.startCase(item)}
-        </p>
-      )
+      return <p key={index}>{_.startCase(item)}</p>
     } else if (Array.isArray(item)) {
       return item.map((secondItem, key) => {
         if (typeof secondItem === 'object') {
-          return (
-            <p className="m-0" key={key}>
-              {_.startCase(secondItem.name)}
-            </p>
-          )
+          return <p key={key}>{_.startCase(secondItem.name)}</p>
         } else {
-          return (
-            <p className="m-0" key={key}>
-              {_.startCase(secondItem)}
-            </p>
-          )
+          return <p key={key}>{_.startCase(secondItem)}</p>
         }
       })
     } else {
-      return (
-        <p className="m-0" key={index}>
-          {_.startCase(item.name)}
-        </p>
-      )
+      return <p key={index}>{_.startCase(item.name)}</p>
     }
-  }
-
-  componentDidMount() {
-    this.updateWindowDimensions()
-    window.addEventListener('resize', this.updateWindowDimensions)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.updateWindowDimensions)
-  }
-
-  updateWindowDimensions = () => {
-    this.setState({ width: window.innerWidth })
   }
 
   render() {
     const { getInfoPokemonPage, evChainData } = this.props
-    const { width } = this.state
     let evolutionMethod = ['']
     let evolutionMethodName = ['']
     let pokemonChainEvolutionNames = []
@@ -204,29 +160,72 @@ class pokemonPageEvChain extends Component {
             )
           }
         } else {
-          return 'This the first or the only pokémon in this evolution chain'
+          if (evolutionMethodName.length > 1) {
+            return 'This is the base Pokémon of this evolution chain'
+          } else {
+            return 'This is the only Pokémon in this evolution chain, meaning this Pokémon does not evolve'
+          }
         }
       }
 
-      const arrowRight = width >= 768 && key > 0 && (
-        <Icon mx={4} as={FaArrowRight} boxSize={30} />
-      )
-      const arrowDown = width < 768 &&
-        key < pokemonChainEvolutionNames.length - 1 && (
-          <Icon my={2} as={FaArrowDown} boxSize={30} />
-        )
-
       return (
         <>
-          {arrowRight}
-          <Tooltip
-            key={key}
-            arrow
-            label={
-              key >= 1 ? (
-                <Box textAlign="center" p={2}>
+          <Flex
+            p={6}
+            flexDir="row"
+            bgColor="#ebebd3"
+            borderRadius="6px"
+            wrap="wrap"
+            gridGap={[6, null, 8, 14]}
+            boxShadow="md"
+            justify="center"
+            align="center"
+            color="#3c3c3b"
+            w={['100%', null, null, '80%']}
+          >
+            <Box
+              as={Link}
+              to={`/pokemon-list/pokemon-page/${editedPokemonName}`}
+              onClick={() => {
+                getInfoPokemonPage(pokemonNumber)
+              }}
+            >
+              <Box
+                className="pokemon-image ev-image"
+                overflow="visible"
+                position="relative"
+              >
+                <Image
+                  zIndex="3"
+                  boxSize="100px"
+                  position="relative"
+                  objectFit="scale-down"
+                  src={`
+        https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-vi/x-y/${pokemonNumber}.png`}
+                  fallbackSrc={`
+        https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-vii/ultra-sun-ultra-moon/${pokemonNumber}.png`}
+                  alt={pokemonEvName}
+                />
+                <Icon
+                  as={CgPokemon}
+                  boxSize="8rem"
+                  position="absolute"
+                  top="39%"
+                  left="51%"
+                  opacity="0.5"
+                  transform="translate(-50%, -50%)"
+                  zIndex="2"
+                />
+                <Text textAlign="center" pt={2}>
+                  {pokemonEvName}
+                </Text>
+              </Box>
+            </Box>
+            {key >= 1 ? (
+              <>
+                <Box>
                   <Text m={0} fontWeight="bold">
-                    Trigger:
+                    Evolution Trigger(s):
                   </Text>
                   {Array.isArray(evolutionMethodName[key]) ? (
                     <Text my={2}>
@@ -235,76 +234,65 @@ class pokemonPageEvChain extends Component {
                   ) : (
                     <Text my={2}>{_.startCase(evolutionMethodName[key])}</Text>
                   )}
+                </Box>
+
+                <Box>
                   <Text m={0} fontWeight="bold">
-                    Requirement:
+                    Evolution Requirement(s):
                   </Text>
                   {getTooltipEvolutionMessage()}
                 </Box>
+              </>
+            ) : (
+              <>{getTooltipEvolutionMessage()}</>
+            )}
+          </Flex>
+          {key < pokemonChainEvolutionNames.length - 1 && (
+            <Flex flexDir="column" align="center">
+              {_.isArray(pokemonChainEvolutionNames[_.add(key, 1)][0]) ? (
+                <Text>
+                  Evolves into <b>one</b> of the following Pokémon:
+                </Text>
               ) : (
-                <Box textAlign="center" p={2}>
-                  {getTooltipEvolutionMessage()}
-                </Box>
-              )
-            }
-          >
-            <Link
-              to={`/pokemon-list/national/pokemon-page/${editedPokemonName}`}
-              onClick={() => {
-                getInfoPokemonPage(pokemonNumber)
-              }}
-            >
-              {Array.isArray(pokemonChainEvolutionNames[key][0]) ? (
-                <Image
-                  w="100px"
-                  h="100px"
-                  objectFit="none"
-                  alt={editedPokemonName}
-                  src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-vii/ultra-sun-ultra-moon/${pokemonChainEvolutionNames[key][secondKey][1]}.png`}
-                />
-              ) : (
-                <Image
-                  w="100px"
-                  h="100px"
-                  objectFit="none"
-                  alt={editedPokemonName}
-                  src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-vii/ultra-sun-ultra-moon/${pokemonChainEvolutionNames[key][1]}.png`}
-                />
+                <Text>Evolves into:</Text>
               )}
-            </Link>
-          </Tooltip>
-          {arrowDown}
+              <Icon my={2} as={FaArrowDown} boxSize={30} />
+            </Flex>
+          )}
         </>
       )
     }
 
     return (
       <>
-        <Flex justify="center" w="100%" flexWrap="wrap">
+        <Flex
+          gridGap={6}
+          flexDir="column"
+          align="center"
+          justify="center"
+          w="100%"
+        >
           {pokemonChainEvolutionNames.map((pokeEvName, key) => {
             if (typeof pokeEvName[0] !== 'string') {
               return (
-                <Box key={key}>
+                <Fragment key={key}>
                   {pokeEvName.map((alternativeEvName, index) => (
-                    <Box key={index}>
+                    <Fragment key={`poké ev - ${index}`}>
                       {printPokemonEvContent(
                         alternativeEvName[0],
                         alternativeEvName[1],
                         key,
                         index
                       )}
-                    </Box>
+                    </Fragment>
                   ))}
-                </Box>
+                </Fragment>
               )
             } else {
-              return (
-                <Flex flexWrap="wrap" justify="center" align="center" key={key}>
-                  {printPokemonEvContent(
-                    pokemonChainEvolutionNames[key][0],
-                    pokemonChainEvolutionNames[key][1],
-                    key
-                  )}
-                </Flex>
+              return printPokemonEvContent(
+                pokemonChainEvolutionNames[key][0],
+                pokemonChainEvolutionNames[key][1],
+                key
               )
             }
           })}

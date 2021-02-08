@@ -37,11 +37,7 @@ const ReactionIcons = props => {
               py={2}
               px={4}
               leftIcon={
-                <Image
-                  mr={2}
-                  alt={item}
-                  src={require(`assets/imgs/${item}.png`).default}
-                />
+                <Image mr={2} alt={item} src={`/img/reactions/${item}.png`} />
               }
               size="medium"
               variant="outline"

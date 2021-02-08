@@ -1,5 +1,5 @@
-import authReducer from './authReducer'
-import favoriteReducer from './favoriteReducer'
+import userReducer from './userReducer'
+import userFavoritesReducer from './userFavoritesReducer'
 import triviaReducer from './triviaReducer'
 import notificationsReducer from './notificationsReducer'
 import apiReducer from './apiReducer'
@@ -16,8 +16,8 @@ const apiPersistConfig = {
 }
 
 const rootReducer = combineReducers({
-  auth: authReducer,
-  favorite: favoriteReducer,
+  auth: userReducer,
+  favorite: userFavoritesReducer,
   trivia: triviaReducer,
   notifications: notificationsReducer,
   apiCalls: persistReducer(apiPersistConfig, apiReducer),

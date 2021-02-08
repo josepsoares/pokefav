@@ -14,7 +14,7 @@ const NoMatch = () => {
           pb={6}
           objectFit="contain"
           objectPosition="center"
-          src="/img/Box_XD_054.png"
+          src="/img/psyduck.png"
         />
         <Heading pb={4} as="h1">
           Error 404

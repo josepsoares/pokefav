@@ -164,7 +164,6 @@ const PokemonList = () => {
       isLoading: true
     })
 
-    console.log(value, action)
     if (action.name === 'typeSearch') {
       if (value.value === 'region') {
         const getPokedexByRegion = await getPokedex('national', 'region')
@@ -248,8 +247,6 @@ const PokemonList = () => {
       label: _.startCase(item.name)
     })
   }
-
-  console.log(state.allPokedexEntries)
 
   return (
     <>

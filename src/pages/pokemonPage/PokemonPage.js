@@ -5,7 +5,7 @@ import {
   removeFavoritePokemon,
   addPokemonToTeam,
   removePokemonFromTeam
-} from 'redux/actions/favoriteActions'
+} from 'redux/actions/userFavoritesActions'
 
 import PokemonPageMoves from './components/pokemonPageMoves'
 import PokemonPageGenericInfo from './components/pokemonPageGenericInfo'
@@ -231,7 +231,11 @@ class PokePage extends Component {
       avaibleSprites['generation-vii']['ultra-sun-ultra-moon']
     ]
 
-    console.log(pokemonAlternateFormInfo)
+    const filteredSprites = getSprites.filter(
+      item => item.front_default || false
+    )
+
+    console.log(filteredSprites)
 
     return (
       <>
@@ -272,7 +276,9 @@ class PokePage extends Component {
           </Flex>
           <Flex flexWrap="wrap" justify="center" gridGap={4} fontSize={12}>
             {Array.from(uniqueNames).map((uniqueNameItem, key) => (
-              <Text key={key}>{uniqueNameItem}</Text>
+              <Text fontStyle="italic" key={key}>
+                {uniqueNameItem}
+              </Text>
             ))}
           </Flex>
         </Flex>
@@ -328,7 +334,7 @@ class PokePage extends Component {
             justify="center"
             p={8}
           >
-            {getSprites.map((sprite, index) => {
+            {filteredSprites.map((sprite, index) => {
               const url = new URL(sprite.front_default)
               const getInstancesOfUrl = url.pathname.split('/')
               const getGeneration = getInstancesOfUrl[7]
@@ -406,11 +412,11 @@ class PokePage extends Component {
             Moves
           </Heading>
 
-          <Box bg="primary" p={3} borderRadius={4}>
+          <Box bgColor="#ebebd3" p={8} borderRadius={4}>
             <Tabs
               isLazy
               variant="soft-rounded"
-              colorScheme="yellow"
+              colorScheme="red"
               index={this.state.activeTab}
               defaultIndex={0}
             >
@@ -431,9 +437,9 @@ class PokePage extends Component {
                   </Tab>
                 ))}
               </TabList>
-              <TabPanels>
+              <TabPanels color="#3c3c3b">
                 {movesArray.map((item, key) => (
-                  <TabPanel key={key}>
+                  <TabPanel pt={9} key={key}>
                     <PokemonPageMoves
                       pokemonMoves={moves}
                       method={item.value}

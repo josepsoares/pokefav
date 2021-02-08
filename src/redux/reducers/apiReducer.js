@@ -152,23 +152,6 @@ const apiReducer = (state = initState, action) => {
         isLoading: false,
         error: action.error
       }
-    case 'POKE_PROFILE_IQ_DATA_SUCCESS':
-      return {
-        ...state,
-        isLoading: false,
-        error: null,
-        apiData: {
-          ...state.apiData,
-          getLinkUserInfo: action.payload.user,
-          getPokemonIQ: action.payload.pokemonIQ
-        }
-      }
-    case 'POKE_PROFILE_IQ_DATA_ERROR':
-      return {
-        ...state,
-        isLoading: false,
-        error: action.payload.pokemonIQ
-      }
     case 'GET_ALL_USERS_SUCCESS':
       return {
         ...state,
@@ -181,6 +164,18 @@ const apiReducer = (state = initState, action) => {
         ...state,
         isLoading: false,
         error: action.error
+      }
+    case 'GET_USER_SUCCESS':
+      return {
+        ...state,
+        isLoading: false,
+        apiData: { ...state.apiData, queryUser: action.payload }
+      }
+    case 'GET_USER_ERROR':
+      return {
+        ...state,
+        isLoading: false,
+        apiData: { ...state.apiData, queryUser: action.payload }
       }
     default:
       return state

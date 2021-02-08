@@ -93,9 +93,3 @@ export const dislikeNotification = (notificationID, reactionType) => {
       .catch(() => dispatch({ type: 'DISLIKE_NOTIFICATION_ERROR' }))
   }
 }
-
-export const removeReactionsNotification = () => {
-  return dispatch => {
-    dispatch({ type: 'REMOVE_REACTION_FEEDBACK' })
-  }
-}

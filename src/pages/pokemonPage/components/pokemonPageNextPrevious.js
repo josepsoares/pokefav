@@ -28,7 +28,7 @@ const PokemonPageNextPrevious = props => {
   const hasPreviousPokemonLink = props.pokemonId > 1 && props.pokemonId <= 808
   const hasNextPokemonLink = props.pokemonId >= 1 && props.pokemonId < 808
   const noPreviousPokemon = hasNextPokemonLink && !hasPreviousPokemonLink
-  const noNextPokemon = !hasNextPokemonLink && hasPreviousPokemonLink
+  // const noNextPokemon = !hasNextPokemonLink && hasPreviousPokemonLink
 
   return (
     <Flex
@@ -50,7 +50,7 @@ const PokemonPageNextPrevious = props => {
             onClick={ev => dispatch(getInfoPokemonPage(ev.currentTarget.id))}
           >
             <Flex flexDir="row" align="center" justify="flex-start">
-              <Icon as={IoIosArrowBack} />
+              <Icon as={IoIosArrowBack} mr={2} />
               <Image
                 objectPosition="0 -5px"
                 objectFit="contain"
@@ -71,12 +71,12 @@ const PokemonPageNextPrevious = props => {
           >
             <Flex flexDir="row" align="center" justify="flex-end">
               <Image
-                objectPosition="0 -5px"
+                mr={1}
                 objectFit="contain"
                 alt={pokemonNextName}
                 src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-vii/icons/${pokemonIds[1]}.png`}
               />
-              <Text py={2}>{pokemonNextName}</Text>
+              <Text>{pokemonNextName}</Text>
               <Icon ml="13px" as={IoIosArrowForward} />
             </Flex>
           </Link>
