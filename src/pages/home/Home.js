@@ -10,7 +10,7 @@ const Home = () => {
     <>
       <SEO
         title="Home"
-        description="PokéFav, a place to gather your favorite Pokémons, create a ideal Pokémon Team, play PokéTrivia, explore Pokémon Cards and more!"
+        description="PokéFav, a place to gather your favorite Pokémons, create a ideal Pokémon Team, play PokéMinigames, explore Pokémon Cards and more!"
       />
       {!auth.uid ? <StaticHome /> : <UserHome />}
     </>

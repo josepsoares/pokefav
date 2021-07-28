@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { trivia } from 'assets/content/quizz'
-import { addTriviaResult } from 'redux/actions/triviaActions'
+import { updatePokeTriviaResults } from 'redux/actions/minigamesActions'
 import {
   Flex,
   Heading,
@@ -180,7 +180,7 @@ const PokemonTrivia = () => {
         })
 
         dispatch(
-          addTriviaResult({
+          updatePokeTriviaResults({
             correctAnswers: state.totalCorrectAnswers,
             wrongAnswers: state.totalIncorrectAnswers
           })

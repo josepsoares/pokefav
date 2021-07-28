@@ -3,8 +3,9 @@
     "baseUrl": "src",
     "paths": {
       "redux/*": ["./src/redux/*"],
+      "services/*": ["src/services/*"],
       "components/*": ["./src/components/*"],
-      "scripts/*": ["./src/scripts/*"],
+      "utils/*": ["src/utils/*"],
       "pages/*": ["./src/pages/*"],
       "routes/*": ["./src/routes/*"],
       "styles/*": ["./src/styles/*"],

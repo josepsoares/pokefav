@@ -57,8 +57,8 @@ class UserHome extends Component {
         img: 'img/pokelist-smaller.jpg'
       },
       {
-        title: 'Play PokéTrivia',
-        link: '/pokemon-trivia',
+        title: 'Play PokéMinigames',
+        link: '/minigames',
         img: 'img/poketrivia.jpg'
       },
       {
@@ -73,8 +73,12 @@ class UserHome extends Component {
     } else {
       return (
         <>
-          <Heading as="h1" pb={8}>
+          <Heading as="h1" fontSize="5xl" pb={4}>
             Welcome {username}!
+          </Heading>
+          <Heading as="h2" pb={8}>
+            Let's get started with your PokéFav experience by exploring one of
+            the options bellow!
           </Heading>
 
           <SimpleGrid pt={10} pb={20} columns={[1, null, null, 3]} gridGap={8}>

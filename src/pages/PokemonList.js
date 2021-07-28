@@ -29,7 +29,7 @@ import { FaSearch } from 'react-icons/fa'
 
 // import Button from 'components/layout/Button'
 import { useWindowSize } from 'react-use'
-import { getDataPokeListPage } from 'redux/actions/apiActions'
+import { getDataPokeListPage, getPokedexAct } from 'redux/actions/apiActions'
 import SEO from 'components/Seo'
 
 const PokemonList = () => {
@@ -40,7 +40,7 @@ const PokemonList = () => {
   const { width } = useWindowSize()
 
   const pokedexEntries = useSelector(state => state.apiCalls.apiData.getPokedex)
-  const pokedexEntriesSlice = pokedexEntries.slice(0, 808)
+
   const regions = useSelector(
     state => state.apiCalls.apiData.getPokedexDropdowns.regions
   )
@@ -49,7 +49,7 @@ const PokemonList = () => {
   )
 
   const [state, setState] = useState({
-    allPokedexEntries: pokedexEntriesSlice,
+    allPokedexEntries: pokedexEntries,
     searchPokemon: '',
     currentIndex: 1,
     resultsPerPage: 24,
@@ -68,10 +68,15 @@ const PokemonList = () => {
   useEffect(() => {
     const { allPokedexEntries } = state
     if (!allPokedexEntries) {
-      dispatch(getPokedex('national'))
+      dispatch(getPokedexAct('national', 'region'))
       dispatch(getDataPokeListPage())
     } else {
-      setState({ ...state, items: calculatePage(allPokedexEntries, 1) })
+      const pokedexEntriesSlice = pokedexEntries.slice(0, 808)
+      setState({
+        ...state,
+        allPokedexEntries: pokedexEntriesSlice,
+        items: calculatePage(pokedexEntriesSlice, 1)
+      })
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -117,10 +122,7 @@ const PokemonList = () => {
 
       const setItems = calculatePage(pokemonsList, 1)
 
-      return {
-        items: setItems,
-        allPokedexEntries: pokemonsList
-      }
+      setState({ ...state, items: setItems, allPokedexEntries: pokemonsList })
     } catch (error) {
       setState({ ...state, error: error.message, isLoading: false })
     }

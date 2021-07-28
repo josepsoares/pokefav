@@ -47,6 +47,7 @@ h6 {
 
 h1 {
   color: $yellow;
+  font-size: 2.8rem;
 }
 
 h2 {
@@ -64,18 +65,25 @@ h5 {
   padding-bottom: 1rem;
 }
 
+.Toastify__toast {
+  border-radius: 14px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 1.25rem;
+}
+
 //------------------//
 
 // Links
 a.basicLink {
   color: $blue;
-  border-bottom: $red solid 2px !important;
+  border-bottom: $red solid 1.5px !important;
   @include defineTransition(0.5s);
 
   &:hover,
   &:active {
     text-decoration: none;
-    border-bottom: $blue solid 2px !important;
+    border-bottom: $blue solid 1.5px !important;
     color: $red;
   }
 }
@@ -315,9 +323,82 @@ div.typeIcon {
   background-color: transparent;
 }
 
+.user-avatar {
+  letter-spacing: 0.1em;
+  font-family: 'Rubick', sans-serif;
+  font-weight: 400;
+  border-radius: 10px;
+  padding: 1rem 0;
+  overflow-x: hidden;
+
+  p {
+    transition: 0.5s all ease-in-out;
+  }
+
+  &:hover,
+  &:active {
+    p {
+      color: #ffe066;
+    }
+
+    span {
+      background-color: #f24643;
+
+      transition: ease-in-out 0.3s all;
+      -webkit-transform-origin: bottom center;
+      transform-origin: bottom center;
+      -webkit-animation-name: swing-p;
+      animation-name: swing-p;
+      -webkit-animation-iteration-count: infinite;
+      animation-iteration-count: infinite;
+      -webkit-animation-duration: 3.5s;
+      animation-duration: 3.5s;
+      -webkit-animation-fill-mode: both;
+      animation-fill-mode: both;
+    }
+  }
+
+  @keyframes swing-p {
+    15% {
+      -webkit-transform: rotate3d(0, 0, 0, -25deg);
+      transform: rotate3d(1, 0, 0, -25deg);
+    }
+
+    20% {
+      -webkit-transform: rotate3d(0, 0, 0, 0deg);
+      transform: rotate3d(1, 0, 0, 0deg);
+    }
+
+    30% {
+      -webkit-transform: rotate3d(0, 0, 1, 15deg);
+      transform: rotate3d(0, 0, 1, 15deg);
+    }
+
+    40% {
+      -webkit-transform: rotate3d(0, 0, 1, -10deg);
+      transform: rotate3d(0, 0, 1, -10deg);
+    }
+
+    60% {
+      -webkit-transform: rotate3d(0, 0, 1, 2deg);
+      transform: rotate3d(0, 0, 1, 2deg);
+    }
+
+    80% {
+      -webkit-transform: rotate3d(0, 0, 1, -3deg);
+      transform: rotate3d(0, 0, 1, -3deg);
+    }
+
+    to {
+      -webkit-transform: rotate3d(0, 0, 1, 0deg);
+      transform: rotate3d(0, 0, 1, 0deg);
+    }
+  }
+}
+
 .pokemon-image {
   letter-spacing: 0.1em;
-  font-family: "'Rubick', sans-serif";
+  font-family: 'Rubick', sans-serif;
   font-weight: 400;
   border-radius: 10px;
   padding: 1rem 0;

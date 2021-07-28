@@ -14,6 +14,8 @@ import App from './App'
 import Loading from 'components/feedback/Loading'
 import rrfConfig from 'config/rrfConfig'
 import pokeFavTheme from 'styles/theme'
+
+import 'react-toastify/dist/ReactToastify.min.css'
 import './styles/PokeballAnimation.scss'
 import './styles/App.scss'
 

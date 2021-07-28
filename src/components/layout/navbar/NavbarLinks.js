@@ -2,18 +2,11 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import { getUser, signOut } from 'redux/actions/userActions'
-import { getPokedex, getDataPokeListPage } from 'redux/actions/apiActions'
-import {
-  FaGraduationCap,
-  FaHome,
-  FaSignOutAlt,
-  FaUser,
-  FaUsers
-} from 'react-icons/fa'
-import { Avatar, Menu, MenuList, MenuButton, Box } from '@chakra-ui/react'
+import { FaHome, FaSignOutAlt, FaUser, FaUsers, FaDice } from 'react-icons/fa'
 import { CgPokemon } from 'react-icons/cg'
+import { Avatar, Menu, MenuList, MenuButton, Box } from '@chakra-ui/react'
 
-import useWindowSize from 'scripts/hooks/useWindowSize'
+import useWindowSize from 'utils/hooks/useWindowSize'
 
 const NavbarLinks = ({ profile }) => {
   const { username, avatar } = profile
@@ -38,7 +31,7 @@ const NavbarLinks = ({ profile }) => {
         to="/pokemon-list"
         className="nav-link"
         activeClassName="nav-link-active"
-        isActive={(match, location) => {
+        isActive={(_, location) => {
           const string = '/pokemon-list'
           const searchPokemonListURL = location.pathname.match(string)
           if (searchPokemonListURL !== null) {
@@ -54,14 +47,21 @@ const NavbarLinks = ({ profile }) => {
 
       <NavLink
         exact
-        to="/pokemon-trivia"
+        to="/minigames"
         className="nav-link"
         activeClassName="nav-link-active"
+        isActive={(_, location) => {
+          const string = '/minigames'
+          const searchPokemonListURL = location.pathname.match(string)
+          if (searchPokemonListURL !== null) {
+            return true
+          }
+        }}
       >
         <Box>
-          <FaGraduationCap />
+          <FaDice />
         </Box>
-        <Box as="span">PokéTrivia</Box>
+        <Box as="span">PokéMinigames</Box>
       </NavLink>
       <NavLink
         to="/pokemon-trainers"

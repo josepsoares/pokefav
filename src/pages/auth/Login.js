@@ -161,7 +161,7 @@ const Login = props => {
                       {...field}
                       id="rememberMe"
                       label="Remember me"
-                      defaultIsChecked
+                      defaultChecked
                     >
                       Remember me
                     </Checkbox>

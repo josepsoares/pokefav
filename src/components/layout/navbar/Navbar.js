@@ -22,7 +22,7 @@ import {
 import { BiMenu } from 'react-icons/bi'
 import { FaSignOutAlt, FaUser } from 'react-icons/fa'
 
-import useWindowSize from 'scripts/hooks/useWindowSize'
+import useWindowSize from 'utils/hooks/useWindowSize'
 import NavbarLinks from 'components/layout/navbar/NavbarLinks'
 
 const NavBar = () => {
@@ -65,13 +65,14 @@ const NavBar = () => {
   ) : (
     <Flex p={[8, 10]} w="100%" as="nav" align="center" justify="flex-start">
       <IconButton
-        variant="ghost"
+        className="nav-link"
+        variant="unstyled"
         icon={<Icon boxSize={10} as={BiMenu} />}
         onClick={() => toggleOpen()}
-        type="button"
         mr={6}
+        sx={{ padding: '0 0.5rem' }}
       />
-      <Link className="navBrandLink" to="/">
+      <Link to="/">
         <Image
           h={10}
           objectFit="contain"

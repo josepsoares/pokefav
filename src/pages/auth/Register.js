@@ -16,13 +16,17 @@ import {
   Avatar,
   CircularProgress,
   Box,
-  IconButton
+  IconButton,
+  HStack,
+  Icon
 } from '@chakra-ui/react'
 import Button from 'components/layout/Button'
-import { BiAt, BiKey, BiUserCircle, BiLowVision, BiShow } from 'react-icons/bi'
+import { BiAt, BiKey, BiUserCircle, BiLowVision, BiShow, BiIdCard } from 'react-icons/bi'
 import { Formik, Form, Field } from 'formik'
 import * as Yup from 'yup'
 import _ from 'lodash'
+import { FaUser } from 'react-icons/fa'
+import { CgPokemon } from 'react-icons/cg'
 
 // src={`https://www.serebii.net/diamondpearl/avatar/${item}.png`}
 
@@ -65,19 +69,38 @@ const Register = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const avatars = [
-    'acetrainerf',
+  const avatarHumans = [
+    'ace-f',
+    'ace-m',
+    'artist-f',
+    'beauty',
+    'butler',
+    'fisherman',
+    'furisode-girl',
+    'guitarist',
+    'hex-maniac',
+    'hiker',
     'lady',
-    'lass',
-    'idol',
-    'battlegirl',
-    'cowgirl',
-    'acetrainerm',
-    'richboy',
-    'ruinmaniac',
-    'blackbelt',
-    'roughneck',
-    'bugcatcher'
+    'punk-f',
+    'punk-m',
+    'ranger-f',
+    'ranger-m',
+    'rich-m'
+  ]
+
+  const avatarPokemons = [
+    'bidoof',
+    'cleffa',
+    'ditto',
+    'eevee',
+    'growlithe',
+    'jigglypuff',
+    'meowth',
+    'mimikyu',
+    'pikachu',
+    'psyduck',
+    'skitty',
+    'slakoth'
   ]
 
   const RegisterSchema = Yup.object().shape({
@@ -370,19 +393,95 @@ const Register = props => {
                         <Heading as="h4" textAlign="center" pb={8}>
                           2. Chose your avatar*
                         </Heading>
-                        <SimpleGrid
-                          columns={[1, 2, 3, 4]}
-                          justify="center"
+                        <HStack
+                          pb={10}
+                          spacing={4}
                           align="center"
-                          griGap={10}
+                          justify="center"
+                          color="#3c3c3b"
                         >
-                          {avatars.map((item, index) => {
+                          <FaUser size="1rem" />
+                          <Heading
+                            pb={0}
+                            as="h6"
+                            color="#3c3c3b"
+                            fontSize="1.5rem"
+                            textAlign="center"
+                          >
+                            Human Avatars
+                          </Heading>
+                        </HStack>
+
+                        <SimpleGrid
+                          columns={[1, 2, 3, 6]}
+                          placeItems="center"
+                          align="center"
+                          gridGap={10}
+                        >
+                          {avatarHumans.map((item, index) => {
                             const isAvatarSelected = field.value === item
 
                             return (
                               <Avatar
                                 key={index}
-                                boxSize={24}
+                                boxSize={32}
+                                alt={item}
+                                boxShadow="md"
+                                transitionProperty="all"
+                                transition="ease-in-out"
+                                transitionDuration="0.5s"
+                                opacity={isAvatarSelected ? 1 : 0.65}
+                                bg={isAvatarSelected ? '#ffe066' : '#1688b9'}
+                                src={`/img/avatars/avatar-${item}.png`}
+                                _active={{
+                                  opacity: 1
+                                }}
+                                _hover={{
+                                  opacity: 1
+                                }}
+                                onClick={() =>
+                                  form.setValues({
+                                    ...form.values,
+                                    avatar: item
+                                  })
+                                }
+                              />
+                            )
+                          })}
+                        </SimpleGrid>
+                        <HStack
+                          pt={14}
+                          pb={10}
+                          spacing={4}
+                          align="center"
+                          justify="center"
+                          color="#3c3c3b"
+                        >
+                          <CgPokemon size="1.4rem" />
+                          <Heading
+                            pb={0}
+                            as="h5"
+                            color="#3c3c3b"
+                            fontSize="1.5rem"
+                            textAlign="center"
+                          >
+                            Pokémon Avatars
+                          </Heading>
+                        </HStack>
+
+                        <SimpleGrid
+                          columns={[1, 2, 3, 6]}
+                          placeItems="center"
+                          align="center"
+                          gridGap={10}
+                        >
+                          {avatarPokemons.map((item, index) => {
+                            const isAvatarSelected = field.value === item
+
+                            return (
+                              <Avatar
+                                key={index}
+                                boxSize={32}
                                 alt={item}
                                 boxShadow="md"
                                 transitionProperty="all"
@@ -415,12 +514,14 @@ const Register = props => {
                   </Field>
                 </Box>
               </SimpleGrid>
-              <Flex pt={10} justify="center">
+              <Flex pt={20} justify="center">
                 <Button
                   w={['80%', '60%', '40%']}
-                  bg="yellow.300"
+                  bg="secondary"
                   type="submit"
-                  isDisabled={isSubmitting}
+                  isLoading={props.isSubmitting}
+                  isDisabled={props.isSubmitting}
+                  rightIcon={<Icon as={BiIdCard} />}
                 >
                   Register
                 </Button>

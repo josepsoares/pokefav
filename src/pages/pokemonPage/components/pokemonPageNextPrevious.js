@@ -42,46 +42,42 @@ const PokemonPageNextPrevious = props => {
           : 'flex-start'
       }
     >
-      <Box>
-        {hasPreviousPokemonLink && (
-          <Link
-            className="basicLink"
-            to={`/pokemon-list/national/pokemon-page/${pokemonPreviousName.toLowerCase()}`}
-            onClick={ev => dispatch(getInfoPokemonPage(ev.currentTarget.id))}
-          >
-            <Flex flexDir="row" align="center" justify="flex-start">
-              <Icon as={IoIosArrowBack} mr={2} />
-              <Image
-                objectPosition="0 -5px"
-                objectFit="contain"
-                alt={pokemonPreviousName}
-                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-vii/icons/${pokemonIds[0]}.png`}
-              />
-              <Text py={2}>{pokemonPreviousName}</Text>
-            </Flex>
-          </Link>
-        )}
-      </Box>
-      <Box>
-        {hasNextPokemonLink && (
-          <Link
-            className="basicLink"
-            to={`/pokemon-list/national/pokemon-page/${pokemonNextName.toLowerCase()}`}
-            onClick={ev => dispatch(getInfoPokemonPage(ev.currentTarget.id))}
-          >
-            <Flex flexDir="row" align="center" justify="flex-end">
-              <Image
-                mr={1}
-                objectFit="contain"
-                alt={pokemonNextName}
-                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-vii/icons/${pokemonIds[1]}.png`}
-              />
-              <Text>{pokemonNextName}</Text>
-              <Icon ml="13px" as={IoIosArrowForward} />
-            </Flex>
-          </Link>
-        )}
-      </Box>
+      {hasPreviousPokemonLink && (
+        <Box
+          as={Link}
+          className="basicLink"
+          to={`/pokemon-list/national/pokemon-page/${pokemonPreviousName.toLowerCase()}`}
+          onClick={ev => dispatch(getInfoPokemonPage(ev.currentTarget.id))}
+        >
+          <Flex flexDir="row" align="center" justify="flex-start">
+            <Icon as={IoIosArrowBack} mr={2} />
+            <Image
+              objectFit="contain"
+              alt={pokemonPreviousName}
+              src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-vii/icons/${pokemonIds[0]}.png`}
+            />
+            <Text py={2}>{pokemonPreviousName}</Text>
+          </Flex>
+        </Box>
+      )}
+      {hasNextPokemonLink && (
+        <Box
+          as={Link}
+          className="basicLink"
+          to={`/pokemon-list/national/pokemon-page/${pokemonNextName.toLowerCase()}`}
+          onClick={ev => dispatch(getInfoPokemonPage(ev.currentTarget.id))}
+        >
+          <Flex flexDir="row" align="center" justify="flex-end">
+            <Image
+              objectFit="contain"
+              alt={pokemonNextName}
+              src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-vii/icons/${pokemonIds[1]}.png`}
+            />
+            <Text py={2}>{pokemonNextName}</Text>
+            <Icon ml="13px" as={IoIosArrowForward} />
+          </Flex>
+        </Box>
+      )}
     </Flex>
   )
 }

@@ -30,7 +30,8 @@ const apiReducer = (state = initState, action) => {
     case 'API_REQUEST_START':
       return {
         ...state,
-        isLoading: true
+        isLoading: true,
+        error: null
       }
     case 'API_REQUEST_END':
       return {
@@ -140,9 +141,10 @@ const apiReducer = (state = initState, action) => {
         error: null,
         apiData: {
           ...state.apiData,
+          getPokedex: action.payload.pokedex,
           getPokedexDropdowns: {
-            regions: action.payload[0].results,
-            types: action.payload[1].results
+            regions: action.payload.regions,
+            types: action.payload.types
           }
         }
       }
@@ -164,18 +166,6 @@ const apiReducer = (state = initState, action) => {
         ...state,
         isLoading: false,
         error: action.error
-      }
-    case 'GET_USER_SUCCESS':
-      return {
-        ...state,
-        isLoading: false,
-        apiData: { ...state.apiData, queryUser: action.payload }
-      }
-    case 'GET_USER_ERROR':
-      return {
-        ...state,
-        isLoading: false,
-        apiData: { ...state.apiData, queryUser: action.payload }
       }
     default:
       return state

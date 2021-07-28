@@ -7,6 +7,7 @@ const PokemonImage = ({ pokemonName, pokemonNumber }) => {
     <Box className="pokemon-image" position="relative">
       <Image
         h="110px"
+        w="130px"
         objectFit="scale-down"
         src={`
         https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-vi/x-y/${pokemonNumber}.png`}
@@ -19,7 +20,7 @@ const PokemonImage = ({ pokemonName, pokemonNumber }) => {
         boxSize="10rem"
         position="absolute"
         top="39%"
-        left="51%"
+        left="50%"
         opacity="0.5"
         transform="translate(-50%, -50%)"
         zIndex="-1"

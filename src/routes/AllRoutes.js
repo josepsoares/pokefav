@@ -3,7 +3,10 @@ import PokemonList from 'pages/PokemonList'
 import PokemonPage from 'pages/pokemonPage/PokemonPage'
 import PokemonTrainers from 'pages/PokemonTrainers'
 import Profile from 'pages/Profile'
-import PokemonTrivia from 'pages/pokemonTrivia/PokemonTrivia'
+import PokemonMinigames from 'pages/minigames/PokemonMinigames'
+import PokemonTrivia from 'pages/minigames/pokemonTrivia/PokemonTrivia'
+import PokemonTypes from 'pages/minigames/pokemonTypes/PokemonTypes'
+import PokemonGuess from 'pages/minigames/pokemonGuess/PokemonGuess'
 import Register from 'pages/auth/Register'
 import Login from 'pages/auth/Login'
 import RecoverPassword from 'pages/auth/RecoverPassword'
@@ -60,9 +63,27 @@ const routes = [
     isPrivate: false
   },
   {
-    path: '/pokemon-trivia',
+    path: '/minigames',
+    name: 'Pokémon Minigames',
+    Component: PokemonMinigames,
+    isPrivate: true
+  },
+  {
+    path: '/minigames/pokemon-trivia',
     name: 'Pokémon Trivia',
     Component: PokemonTrivia,
+    isPrivate: true
+  },
+  {
+    path: '/minigames/pokemon-types',
+    name: 'Pokémon Types',
+    Component: PokemonTypes,
+    isPrivate: true
+  },
+  {
+    path: '/minigames/pokemon-guess',
+    name: 'Pokémon Guess',
+    Component: PokemonGuess,
     isPrivate: true
   },
   ...communityRoutes,

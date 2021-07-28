@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { IconButton } from '@chakra-ui/react'
+import { Icon, IconButton } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import { FaArrowUp } from 'react-icons/fa'
 
@@ -42,15 +42,16 @@ const ScrollingWrapper = () => {
       <IconButton
         colorScheme="blue"
         position="fixed"
-        left="90%"
-        top="85%"
         opacity="0.85"
         zIndex={3}
         isRound={true}
         onClick={scrollToTop}
         aria-label="Scroll Top"
         boxShadow="md"
-        icon={<FaArrowUp size={16} />}
+        left={['90%', null, null, null, '94%']}
+        top={['85%', null, null, null, '92%']}
+        boxSize={['2.5rem', null, '3rem', '3.25rem']}
+        icon={<Icon as={FaArrowUp} boxSize={[6, null, 7, 8]} />}
       />
     </motion.div>
   )

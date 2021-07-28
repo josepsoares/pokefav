@@ -22,18 +22,18 @@ const pokeFavFeatures = [
     description: ''
   },
   {
-    img: 'xy_wallpaper5_1920x1200.jpg',
-    title: 'discover your poképersonalities',
+    img: 'xy05-wallpaper3-1920-en.jpg',
+    title: 'play a set of challenging minigames',
     description: ''
   },
   {
-    img: 'xy05-wallpaper3-1920-en.jpg',
-    title: 'play a challenging pokétrivia',
+    img: 'xy_wallpaper5_1920x1200.jpg',
+    title: 'discover your poképersonalities, pokémove and pokétype knowledge',
     description: ''
   },
   {
     img: 'xy05-wallpaper4-1920-en.jpg',
-    title: 'battle fellow pokéfav trainers',
+    title: 'encounter your favorite pokémon cards',
     description: ''
   }
 ]
@@ -87,7 +87,7 @@ const StaticHome = () => {
           h={[16, 20, 40]}
           objectFit="contain"
           alt="Pokéfav"
-          src="img/pokefav-full-title.svg"
+          src="img/logo/pokefav-full-title.svg"
         />
         <Box position="relative" h="150px" w="100%">
           {pokeFavFeatures.map((item, index) => (
@@ -126,6 +126,7 @@ const StaticHome = () => {
               left: 0,
               height: '100%',
               width: '100%',
+              backgroundSize: 'cover',
               backgroundImage: `url(img/${item.img})`,
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',

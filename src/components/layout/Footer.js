@@ -12,7 +12,10 @@ const Footer = () => {
       p={6}
     >
       <Text mb={1} fontSize="xxs">
-        Pokéfav © 2021 - <a href="https://josepsoares.now.sh/">josepsoares</a>
+        Pokéfav © 2021 -{' '}
+        <a className="basicLink" href="https://josepsoares.now.sh/">
+          josepsoares
+        </a>
       </Text>
       <Text mb={1} fontSize="xxs">
         Pokémon Reactions Icons made by{' '}

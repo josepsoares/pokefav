@@ -248,7 +248,7 @@ class pokemonPageEvChain extends Component {
             )}
           </Flex>
           {key < pokemonChainEvolutionNames.length - 1 && (
-            <Flex flexDir="column" align="center">
+            <Flex color="secondary" flexDir="column" align="center">
               {_.isArray(pokemonChainEvolutionNames[_.add(key, 1)][0]) ? (
                 <Text>
                   Evolves into <b>one</b> of the following Pokémon:

@@ -13,7 +13,6 @@ import {
   SimpleGrid,
   Stack,
   Input,
-  Image,
   Heading,
   Text,
   useDisclosure,
@@ -23,7 +22,9 @@ import {
   DrawerBody,
   FormControl,
   FormLabel,
-  CloseButton
+  CloseButton,
+  Box,
+  Avatar
 } from '@chakra-ui/react'
 import { FaSearch } from 'react-icons/fa'
 
@@ -31,7 +32,7 @@ import Error from 'components/feedback/Error'
 import Loading from 'components/feedback/Loading'
 import SEO from 'components/Seo'
 import Button from 'components/layout/Button'
-import useWindowSize from 'scripts/hooks/useWindowSize'
+import useWindowSize from 'utils/hooks/useWindowSize'
 
 const PokemonTrainers = props => {
   const [state, setState] = useState({
@@ -43,7 +44,8 @@ const PokemonTrainers = props => {
     ref: null,
     lastUser: null,
     hasMore: true,
-    typeSearch: 'region',
+    filterType: 'createdAt',
+    typeSearch: 'date',
     selectValue: 'national',
     selectList: '',
     disposition: 'items'
@@ -98,11 +100,14 @@ const PokemonTrainers = props => {
       requestUsers = db.collection('users').orderBy('createdAt', 'desc')
     }
 
+    console.log(resultsPerPage)
+
     try {
       const getUsersRequest = await requestUsers.limit(resultsPerPage).get()
       let lastVisible = getUsersRequest.docs[getUsersRequest.docs.length - 1]
       getUsersRequest.docs.forEach(doc => {
         let { username, avatar, level, statute } = doc.data()
+        console.log(username, avatar)
         userList.push({ key: doc.id, username, avatar, level, statute })
       })
 
@@ -132,6 +137,7 @@ const PokemonTrainers = props => {
         })
       }
     } catch (err) {
+      console.log(err)
       setState({ ...state, error: err.message })
     }
   }
@@ -142,6 +148,7 @@ const PokemonTrainers = props => {
       const requestNumber = getTotatUsers.data()
       return { usersLength: requestNumber.number }
     } catch (err) {
+      console.log(err)
       return { err: err }
     }
   }
@@ -152,11 +159,15 @@ const PokemonTrainers = props => {
     const { lastUser, ref, resultsPerPage, filterType } = state
     const thresholdOfUsers = totalUsers - resultsPerPage
 
+    console.log(thresholdOfUsers)
+
     if (list.length > thresholdOfUsers) {
-      numberOfUsersToRequest = list.length - resultsPerPage
+      numberOfUsersToRequest = resultsPerPage - list.length
     } else {
       numberOfUsersToRequest = resultsPerPage
     }
+    console.log(numberOfUsersToRequest)
+    console.log(state)
 
     ref
       .startAfter(lastUser)
@@ -197,9 +208,9 @@ const PokemonTrainers = props => {
   }
 
   const typeOptions = [
-    { value: 'createdAt', label: 'Creation Date' },
-    { value: 'username', label: 'Name' },
-    { value: 'triviaPokemon', label: 'Trivia Pokémon' }
+    { value: 'createdAt', label: 'Creation date' },
+    { value: 'username', label: 'Username' },
+    { value: 'triviaPokemon', label: 'Minigames score' }
   ]
 
   const methodOptions = [
@@ -209,8 +220,7 @@ const PokemonTrainers = props => {
 
   const methodNameOptions = [
     { value: 'asc', label: 'Ascendant' },
-    { value: 'desc', label: 'Descendant' },
-    { value: 'writeUsername', label: 'Write Name' }
+    { value: 'desc', label: 'Descendant' }
   ]
 
   const methodTriviaOptions = [
@@ -221,7 +231,7 @@ const PokemonTrainers = props => {
   ]
 
   const handleSearchChange = event => {
-    const { value } = event.target
+    /* const { value } = event.target
     const { allPokedexEntries } = state
 
     if (value !== '') {
@@ -249,7 +259,7 @@ const PokemonTrainers = props => {
         currentIndex: 1,
         searchPokemon: ''
       })
-    }
+    } */
   }
 
   const handleSelectChange = async (value, action) => {
@@ -342,7 +352,7 @@ const PokemonTrainers = props => {
     })
   }
 
-  console.log(error)
+  console.log('condition to more =>', list.length >= totalUsers ? false : true)
 
   return (
     <>
@@ -355,10 +365,10 @@ const PokemonTrainers = props => {
         flexDir={['column', null, 'row']}
         justify={['center', null, 'space-between']}
         align="center"
-        pb={10}
+        pb={[12, 16]}
       >
-        <Heading pb={[6, null, 0]} as="h1">
-          PokéList
+        <Heading as="h1" pb={[4, null, 0]}>
+          PokéTrainers
         </Heading>
 
         <Button
@@ -371,16 +381,6 @@ const PokemonTrainers = props => {
         </Button>
       </Flex>
 
-      <Flex
-        flexDir={['column', null, 'row']}
-        justify={['center', null, 'space-between']}
-        align="center"
-      >
-        <Heading as="h1" pb={10}>
-          PokéTrainers
-        </Heading>
-      </Flex>
-
       {isLoading ? (
         <Loading />
       ) : error ? (
@@ -391,27 +391,39 @@ const PokemonTrainers = props => {
       ) : (
         <InfiniteScroll
           dataLength={list.length}
-          next={() => fetchMoreData()}
+          next={fetchMoreData}
           hasMore={list.length >= totalUsers ? false : true}
-          loader={<Loading />}
+          endMessage={
+            <Text>You have seen all the PokéTrainers in PokéFav</Text>
+          }
         >
-          <SimpleGrid columns={[2, 4]}>
+          <SimpleGrid
+            columns={[2, 3, null, 4]}
+            gridGap={6}
+            align="center"
+            justify="center"
+          >
             {list.map((item, index) => (
               <Link
                 key={index}
-                className="containerLink py-2"
                 onClick={() => dispatch(getUser(item.username))}
                 to={`/pokemon-trainers/profile/${item.username}`}
               >
-                <Flex textAlign="center" flexDir="row" align="center">
-                  <Image
+                <Box className="user-avatar">
+                  <Avatar
+                    mb={4}
+                    objectFit="scale-down"
+                    bg="#1688b9"
+                    boxShadow="md"
+                    boxSize={32}
                     alt={item.avatar}
-                    src={`https://www.serebii.net/diamondpearl/avatar/${item.avatar}.png`}
+                    transitionProperty="all"
+                    transition="ease-in-out"
+                    transitionDuration="0.5s"
+                    src={`/img/avatars/avatar-${item.avatar}.png`}
                   />
                   <Text>{item.username}</Text>
-                  <Text>{item.nationality}</Text>
-                  <Text>{item.gender}</Text>
-                </Flex>
+                </Box>
               </Link>
             ))}
           </SimpleGrid>
@@ -434,42 +446,6 @@ const PokemonTrainers = props => {
                 <CloseButton onClick={onClose} />
               </Flex>
               <Stack spacing={4} w="100%" direction="column">
-                <Stack direction={['column', null, 'row']} spacing={4}>
-                  <Select
-                    options={typeOptions}
-                    isClearable={true}
-                    isSearchable={false}
-                    placeholder="Selecione a forma de filtrar"
-                    classNamePrefix="react-select"
-                    aria-label="Menu de formas de filtragem"
-                    aria-labelledby="Formas de filtragem"
-                    onChange={(ev, { action }) =>
-                      updateFilter(ev, { action }, 'filterType')
-                    }
-                  />
-
-                  <Select
-                    isDisabled={!state.filterType ? true : false}
-                    options={
-                      filterType === 'username'
-                        ? methodNameOptions
-                        : filterType === 'trivia'
-                        ? methodTriviaOptions
-                        : methodOptions
-                    }
-                    isClearable={true}
-                    isSearchable={false}
-                    placeholder="Selecione o método de filtragem"
-                    classNamePrefix="react-select"
-                    aria-label="Menu de métodos de filtragem"
-                    aria-labelledby="Método de filtragem"
-                    onChange={(ev, { action }) => {
-                      updateFilter(ev, { action }, 'filterMethod')
-                    }}
-                  />
-
-                  {filterMethod === 'writeName' && <Input></Input>}
-                </Stack>
                 <FormControl id="pokemon-name">
                   <FormLabel>PokéTrainer Username</FormLabel>
                   <Input
@@ -511,41 +487,30 @@ const PokemonTrainers = props => {
                       label: _.startCase(typeSearch)
                     }}
                     onChange={handleSelectChange}
-                    options={[
-                      { label: 'Region', value: 'region' },
-                      { label: 'Type', value: 'type' }
-                    ]}
+                    options={typeOptions}
                     placeholder="method to sort by"
                     isSearchable={false}
                   />
                 </FormControl>
-                {typeSearch === 'region' && (
-                  <FormControl>
-                    <FormLabel>Pokédex</FormLabel>
-                    <Select
-                      styles={{
-                        valueContainer: () => ({
-                          padding: '0 1rem'
-                        }),
-                        control: provided => ({
-                          ...provided,
-                          '&:hover': {
-                            borderColor: '#f88d87'
-                          }
-                        })
-                      }}
-                      size="md"
-                      name="selectValue"
-                      value={{
-                        value: selectValue,
-                        label: _.startCase(selectValue)
-                      }}
-                      onChange={handleSelectChange}
-                      options={optionsSelectSpecifics}
-                      isSearchable={false}
-                    />
-                  </FormControl>
-                )}
+                <Select
+                  isDisabled={!state.filterType ? true : false}
+                  options={
+                    filterType === 'username'
+                      ? methodNameOptions
+                      : filterType === 'trivia'
+                      ? methodTriviaOptions
+                      : methodOptions
+                  }
+                  isClearable={true}
+                  isSearchable={false}
+                  placeholder="Selecione o método de filtragem"
+                  classNamePrefix="react-select"
+                  aria-label="Menu de métodos de filtragem"
+                  aria-labelledby="Método de filtragem"
+                  onChange={(ev, { action }) => {
+                    updateFilter(ev, { action }, 'filterMethod')
+                  }}
+                />
               </Stack>
             </DrawerBody>
           </DrawerContent>

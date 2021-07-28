@@ -1,127 +1,28 @@
-import moment from 'moment'
-
-export const signIn = credentials => {
-  return async (dispatch, _, { getFirebase }) => {
-    const firebase = getFirebase()
-    const signInType = credentials.rememberMe
-      ? firebase.auth.Auth.Persistence.LOCAL
-      : firebase.auth.Auth.Persistence.SESSION
-
-    try {
-      await firebase.auth().setPersistence(signInType)
-
-      await firebase
-        .auth()
-        .signInWithEmailAndPassword(credentials.email, credentials.password)
-      dispatch({ type: 'LOGIN_SUCCESS' })
-    } catch (err) {
-      dispatch({ type: 'LOGIN_ERROR' })
-    }
-  }
-}
-
-export const signUp = newUser => {
-  return (dispatch, _, { getFirebase, getFirestore }) => {
-    const firebase = getFirebase()
-    const firestore = getFirestore()
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(newUser.email, newUser.password)
-      .then(response => {
-        return firestore
-          .collection('users')
-          .doc(response.user.uid)
-          .set({
-            createdAt: moment().format('Do MMMM YYYY'),
-            email: newUser.email,
-            username: newUser.username,
-            gender: newUser.gender,
-            nationality: newUser.nationality,
-            avatar: newUser.avatar,
-            favoriteGame: newUser.favoriteGame,
-            favoriteRegion: newUser.favoriteRegion,
-            friends: [],
-            favoriteTeam: [],
-            favoritePokemons: [],
-            triviaRecord: {
-              pokemonIQ: null,
-              realizedTrivias: 0,
-              correctAnswers: 0,
-              wrongAnswers: 0
-            },
-            notificationLikes: [],
-            addFavoriteAction: null
-          })
-      })
-      .then(() => {
-        dispatch({ type: 'SIGNUP_SUCCESS' })
-      })
-      .catch(error => {
-        dispatch({ type: 'SIGNUP_ERROR', error: error })
-      })
-  }
-}
-
-export const signOut = () => {
-  return async (dispatch, _, { getFirebase }) => {
-    try {
-      const firebase = getFirebase()
-      await firebase.auth().signOut()
-      firebase.logout()
-      dispatch({ type: 'SIGNOUT_SUCCESS' })
-    } catch (err) {
-      dispatch({ type: 'SIGNOUT_ERROR' })
-    }
-  }
-}
-
-export const recoverPassword = email => {
-  return async (dispatch, _, { getFirebase }) => {
-    const firebase = getFirebase()
-
-    try {
-      await firebase.auth().sendPasswordResetEmail(email)
-
-      dispatch({
-        type: 'RESET_PASSWORD_SUCCESS',
-        payload: 'Reset password email sent. Go check your inbox.'
-      })
-    } catch (error) {
-      dispatch({
-        type: 'RESET_PASSWORD_ERROR',
-        payload: error.message
-      })
-    }
-  }
-}
-
-export const editProfileField = (field, value) => {
-  return async (dispatch, getState, { getFirestore }) => {
-    const firestore = getFirestore()
-    const uid = getState().firebase.auth.uid
-
-    try {
-      await firestore
-        .collection('users')
-        .doc(uid)
-        .update({
-          [field]: value
-        })
-      dispatch({ type: 'CHANGE_PROFILE_SUCCESS', payload: field })
-    } catch (err) {
-      console.log(err)
-      dispatch({ type: 'CHANGE_PROFILE_ERROR', payload: field })
-    }
-  }
-}
+import _ from 'lodash/array'
+import {
+  GET_USER_SUCCESS,
+  GET_USER_ERROR,
+  CHANGE_PROFILE_SUCCESS,
+  CHANGE_PROFILE_ERROR,
+  ADD_FAVORITE_SUCCESS,
+  ADD_FAVORITE_ERROR,
+  REMOVE_FAVORITE_SUCCESS,
+  REMOVE_FAVORITE_ERROR,
+  UPDATE_FAVORITE_SUCCESS,
+  UPDATE_FAVORITE_ERROR,
+  ADD_POKEMON_TEAM_SUCCESS,
+  ADD_POKEMON_TEAM_ERROR,
+  REMOVE_POKEMON_TEAM_SUCCESS,
+  REMOVE_POKEMON_TEAM_ERROR,
+  UPDATE_POKEMON_TEAM_SUCCESS,
+  UPDATE_POKEMON_TEAM_ERROR
+} from 'redux/types/userTypes'
 
 export const getUser = user => {
-  return async (dispatch, getState, { getFirestore, getFirebase }) => {
+  return async (dispatch, _, { getFirestore }) => {
     dispatch({ type: 'API_REQUEST_START' })
     const firestore = getFirestore()
     let userInfo
-
-    console.log(user)
 
     try {
       const queryUser = await firestore
@@ -138,17 +39,165 @@ export const getUser = user => {
       })
 
       dispatch({
-        type: 'GET_USER_SUCCESS',
+        type: GET_USER_SUCCESS,
         payload: userInfo
       })
       dispatch({ type: 'API_REQUEST_END' })
     } catch (err) {
-      console.log(err)
       dispatch({
-        type: 'GET_USER_ERROR',
+        type: GET_USER_ERROR,
         payload: err.error
       })
       dispatch({ type: 'API_REQUEST_END' })
+    }
+  }
+}
+
+export const editProfileField = (field, value) => {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore()
+    const uid = getState().firebase.auth.uid
+
+    try {
+      await firestore
+        .collection('users')
+        .doc(uid)
+        .update({
+          [field]: value
+        })
+      dispatch({ type: CHANGE_PROFILE_SUCCESS, payload: field })
+    } catch (err) {
+      dispatch({ type: CHANGE_PROFILE_ERROR, payload: field })
+    }
+  }
+}
+
+export const addFavoritePokemon = favorite => {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore()
+    const uid = getState().firebase.auth.uid
+    const profileFavoritePokemons = getState().firebase.profile.favoritePokemons
+
+    try {
+      await firestore
+        .collection('users')
+        .doc(uid)
+        .update({
+          addFavoriteAction: true,
+          favoritePokemons: profileFavoritePokemons.concat({
+            name: favorite[0],
+            editedName: favorite[1],
+            stats: favorite[2],
+            id: favorite[3]
+          })
+        })
+
+      dispatch({ type: ADD_FAVORITE_SUCCESS })
+    } catch (err) {
+      dispatch({ type: ADD_FAVORITE_ERROR, error: err.message })
+    }
+  }
+}
+
+export const removeFavoritePokemon = favorite => {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore()
+    const uid = getState().firebase.auth.uid
+    const profileFavoritePokemons = getState().firebase.profile.favoritePokemons
+
+    try {
+      _.remove(profileFavoritePokemons, item => {
+        return item.name === favorite
+      })
+      await firestore.collection('users').doc(uid).update({
+        addFavoriteAction: false,
+        favoritePokemons: profileFavoritePokemons
+      })
+      dispatch({ type: REMOVE_FAVORITE_SUCCESS })
+    } catch (err) {
+      dispatch({ type: REMOVE_FAVORITE_ERROR, error: err.message })
+    }
+  }
+}
+
+export const updateFavoritePokeList = updatedPokeFavList => {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore()
+    const uid = getState().firebase.auth.uid
+
+    try {
+      await firestore.collection('users').doc(uid).update({
+        addFavoriteAction: false,
+        favoritePokemons: updatedPokeFavList
+      })
+      dispatch({ type: UPDATE_FAVORITE_SUCCESS })
+    } catch (err) {
+      dispatch({ type: UPDATE_FAVORITE_ERROR, error: err.message })
+    }
+  }
+}
+
+export const addPokemonToTeam = pokemon => {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore()
+    const uid = getState().firebase.auth.uid
+    const profileTeamPokemons = getState().firebase.profile.favoriteTeam
+
+    try {
+      await firestore
+        .collection('users')
+        .doc(uid)
+        .update({
+          addFavoriteAction: true,
+          favoriteTeam: profileTeamPokemons.concat({
+            name: pokemon[0],
+            editedName: pokemon[1],
+            stats: pokemon[2],
+            id: pokemon[3]
+          })
+        })
+      dispatch({ type: ADD_POKEMON_TEAM_SUCCESS })
+    } catch (err) {
+      dispatch({ type: ADD_POKEMON_TEAM_ERROR, error: err.message })
+    }
+  }
+}
+
+export const removePokemonFromTeam = pokemon => {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore()
+    const uid = getState().firebase.auth.uid
+    const profileTeamPokemons = getState().firebase.profile.favoriteTeam
+
+    try {
+      _.remove(profileTeamPokemons, item => {
+        return item.name === pokemon
+      })
+
+      await firestore.collection('users').doc(uid).update({
+        addFavoriteAction: false,
+        favoriteTeam: profileTeamPokemons
+      })
+      dispatch({ type: REMOVE_POKEMON_TEAM_SUCCESS })
+    } catch (err) {
+      dispatch({ type: REMOVE_POKEMON_TEAM_ERROR, error: err.message })
+    }
+  }
+}
+
+export const updatePokeTeamList = updatedPokeTeam => {
+  return async (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore()
+    const uid = getState().firebase.auth.uid
+
+    try {
+      await firestore.collection('users').doc(uid).update({
+        addFavoriteAction: false,
+        favoriteTeam: updatedPokeTeam
+      })
+      dispatch({ type: UPDATE_POKEMON_TEAM_SUCCESS })
+    } catch (err) {
+      dispatch({ type: UPDATE_POKEMON_TEAM_ERROR, error: err.message })
     }
   }
 }

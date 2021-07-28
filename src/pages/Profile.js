@@ -34,24 +34,35 @@ import {
   AlertDialogHeader,
   AlertDialogFooter,
   Select,
-  Icon
+  Icon,
+  Grid,
+  Wrap,
+  WrapItem
 } from '@chakra-ui/react'
 import {
   FaArrowRight,
   FaCheck,
   FaEdit,
+  FaMinus,
+  FaPlus,
   FaSignOutAlt,
   FaTimes,
   FaTrashAlt
 } from 'react-icons/fa'
+import { CgPokemon } from 'react-icons/cg'
 
 import SEO from 'components/Seo'
 import avatarsList from 'assets/content/avatarsList'
-import getStatsMessages from 'scripts/getMessageFavoritesTeam'
+import getStatsMessages from 'utils/getMessageFavoritesTeam'
 import Button from 'components/layout/Button'
 import PokemonImage from 'components/layout/PokemonImage'
+import DragGridList from 'components/layout/DragGridList'
+import PokeballMinigameStat from 'components/layout/PokeballMinigameStat'
 import Loading from 'components/feedback/Loading'
-import { CgPokemon } from 'react-icons/cg'
+import { updatePokeTeamList } from 'redux/actions/userFavoritesActions'
+import { updateFavoritePokeList } from 'redux/actions/userFavoritesActions'
+
+// import { motion } from 'framer-motion'
 
 const EditableSelect = ({ initialValue, selectList, fieldType }) => {
   const dispatch = useDispatch()
@@ -59,8 +70,6 @@ const EditableSelect = ({ initialValue, selectList, fieldType }) => {
     isEditing: false,
     value: initialValue
   })
-
-  console.log(selectList)
 
   return (
     <Flex
@@ -127,14 +136,18 @@ function EditableControls({ onEdit, isEditing, onSubmit, onCancel }) {
         bgColor="secondary"
         color="primary"
         borderRadius="50%"
-        size="sm"
+        size="md"
         icon={<FaEdit />}
         onClick={onEdit}
+        fontSize={14}
+        opacity="0.9"
         _hover={{
-          fontSize: 16
+          opacity: 1,
+          fontSize: 22
         }}
         _active={{
-          fontSize: 16
+          opacity: 1,
+          fontSize: 24
         }}
       />
     </Flex>
@@ -199,11 +212,20 @@ const Profile = props => {
     triviaRecord
   } = userInfo
 
-  const messageFavorites = getStatsMessages(
-    userInfo.favoritePokemons,
-    'favorites'
-  )
-  const messageTeam = getStatsMessages(userInfo.favoriteTeam, 'team')
+  let findOccupiedPokeSlotsInPokeFavorites
+
+  if (favoritePokemons?.length !== 0) {
+    for (let index = 0; index <= 20 - favoritePokemons.length; index++) {
+      favoritePokemons.push({ isEmpty: true })
+    }
+
+    findOccupiedPokeSlotsInPokeFavorites = favoritePokemons.filter(item =>
+      !item.isEmpty ? true : false
+    )
+  }
+
+  const messageFavorites = getStatsMessages(favoritePokemons, 'favorites')
+  const messageTeam = getStatsMessages(favoriteTeam, 'team')
 
   const [editContent, setEditContent] = useState(null)
   const [isLoading, setLoading] = useState(true)
@@ -214,10 +236,25 @@ const Profile = props => {
     pokemon: null,
     type: null
   })
-  const [showAllFavorites, setShowAllFavorites] = useState(false)
+
+  const [showAllFavorites, setShowAllFavorites] = useState({
+    isOpen: false,
+    pokemons:
+      favoritePokemons?.length === 0 ? null : favoritePokemons.slice(0, 12)
+  })
+
+  const [pokeFavoriteList, setPokeFavoriteList] = useState(favoritePokemons)
+  const [pokeTeamList, setPokeTeamList] = useState(favoriteTeam)
+
+  const [editOrder, setEditOrder] = useState({
+    isEditingOrderFavPoke: false,
+    isEditingOrderFavTeam: false
+  })
 
   const pokeFavoriteListRef = useRef(null)
   const pokeTeamRef = useRef(null)
+  const pokeCarerPerRef = useRef(null)
+  const pokeTrainerPerRef = useRef(null)
 
   let averageCorrectAnswers, pokemonIQText
 
@@ -274,7 +311,7 @@ const Profile = props => {
     <>
       <SEO
         title={username}
-        description={'Explore the profiles of specifics users from Pokéfav'}
+        description={'Explore the profiles of specific users from Pokéfav'}
       />
 
       {isLoading ? (
@@ -286,7 +323,7 @@ const Profile = props => {
               <Link
                 onClick={() => dispatch(signOut())}
                 className="nav-link"
-                to={`/profile/edit/${username}`}
+                to="/"
               >
                 <Box>
                   <FaSignOutAlt size={14} />
@@ -311,18 +348,21 @@ const Profile = props => {
                 transition="ease-in-out"
                 transitionDuration="0.5s"
                 bgColor="secondary"
+                position="absolute"
                 color="primary"
                 isRound={true}
                 icon={<FaEdit />}
                 zIndex="3"
-                position="absolute"
-                top="-0.7rem"
-                right="43.5%"
+                top="6rem"
+                fontSize={14}
+                opacity="0.9"
                 _hover={{
-                  fontSize: 18
+                  opacity: 1,
+                  fontSize: 22
                 }}
                 _active={{
-                  fontSize: 18
+                  opacity: 1,
+                  fontSize: 24
                 }}
                 onClick={() => setAvatarModal(true)}
               />
@@ -358,17 +398,53 @@ const Profile = props => {
               <Heading as="h5" fontSize={20}>
                 Personalities
               </Heading>
-              <Text>
+              <Box>
                 {messageFavorites[0].includes(
                   "You still haven't added any Pokémon"
-                )
-                  ? 'Unknown'
-                  : messageFavorites[0]}
-                {'  '}|{'  '}
-                {messageTeam[0].includes("You still haven't added any Pokémon")
-                  ? 'Unknown'
-                  : messageTeam[0]}
-              </Text>
+                ) ? (
+                  <Text pb={1}>Unknown</Text>
+                ) : (
+                  <Text
+                    color="blue.400"
+                    fontWeight="600"
+                    pb={1}
+                    transition="all ease-in-out 0.3s"
+                    onClick={() => scrollToRef(pokeCarerPerRef)}
+                    _hover={{
+                      color: 'blue.300',
+                      cursor: 'pointer'
+                    }}
+                    _active={{
+                      color: 'blue.300',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {messageFavorites[0]}
+                  </Text>
+                )}
+                {messageTeam[0].includes(
+                  "You still haven't added any Pokémon"
+                ) ? (
+                  <Text>Unknown</Text>
+                ) : (
+                  <Text
+                    color="blue.400"
+                    fontWeight="600"
+                    transition="all ease-in-out 0.3s"
+                    onClick={() => scrollToRef(pokeTrainerPerRef)}
+                    _hover={{
+                      color: 'blue.300',
+                      cursor: 'pointer'
+                    }}
+                    _active={{
+                      color: 'blue.300',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {messageTeam[0]}
+                  </Text>
+                )}
+              </Box>
             </Box>
             <Box>
               <Heading as="h5" fontSize={20}>
@@ -400,20 +476,17 @@ const Profile = props => {
             </Box>
           </SimpleGrid>
 
-          <Box
-            ref={pokeFavoriteListRef}
-            w="100%"
-            pb={[12, null, 14]}
-            textAlign="center"
-          >
+          <Box ref={pokeFavoriteListRef} w="100%" pb={[20]} textAlign="center">
             <Heading as="h3" pb={favoritePokemons.length !== 0 ? 4 : 10}>
               Favorite Pokémons
             </Heading>
+
             {favoritePokemons.length !== 0 && (
               <Text fontSize={14} color="grey" fontStyle="italic" pb={10}>
                 {isUserLoggedInProfile ? 'You' : 'They'} have{' '}
-                <b>{favoritePokemons.length} out of 20</b> possible Pokémons in{' '}
-                {isUserLoggedInProfile ? 'your' : 'their'} Favorite Pokémon List
+                <b>{findOccupiedPokeSlotsInPokeFavorites.length} out of 20</b>{' '}
+                possible Pokémons in {isUserLoggedInProfile ? 'your' : 'their'}{' '}
+                Favorite Pokémon List
               </Text>
             )}
 
@@ -470,103 +543,209 @@ const Profile = props => {
                 </Flex>
               </SimpleGrid>
             ) : (
-              <Flex
-                wrap="wrap"
-                flexDir="row"
-                justify="center"
-                align="center"
-                gridGap={6}
-              >
-                {favoritePokemons.map((item, key) => (
-                  <Box key={key} position="relative">
-                    <Link
-                      to={`/pokemon-list/pokemon-page/${item.name}`}
-                      onClick={() => {
-                        dispatch(getInfoPokemonPage(item.id, item.name))
-                      }}
-                    >
-                      <PokemonImage
-                        pokemonName={item.name}
-                        pokemonNumber={item.id}
-                      />
-                    </Link>
-
-                    <IconButton
-                      zIndex="3"
-                      left="70%"
-                      top="0"
-                      transitionProperty="all"
-                      transition="ease-in-out"
-                      transitionDuration="0.5s"
-                      fontSize={14}
-                      bgColor="secondary"
-                      color="primary"
-                      position="absolute"
-                      borderRadius="50%"
-                      icon={<FaTrashAlt />}
-                      _hover={{
-                        fontSize: 20
-                      }}
-                      _active={{
-                        fontSize: 20
-                      }}
-                      onClick={() =>
-                        setRemovePokemonAlert({
-                          isOpen: true,
-                          pokemon: item.name,
-                          type: 'Pokémon Favorites List'
-                        })
-                      }
-                    />
-                  </Box>
-                ))}
-                {favoritePokemons.length !== 20 &&
-                  [...Array(20 - favoritePokemons.length).keys()].map(
-                    (_, index) => (
-                      <Box
-                        key={index}
-                        position="relative"
-                        opacity="0.25"
-                        p="1rem 0"
-                        pr={2}
-                      >
-                        <Box boxSize="110px" position="relative" />
-                        <Icon
-                          position="absolute"
-                          boxSize="10rem"
-                          top="39%"
-                          left="51%"
-                          opacity="0.5"
-                          transform="translate(-50%, -50%)"
-                          as={CgPokemon}
-                        />
-                        <Text
-                          letterSpacing="0.1em"
-                          fontFamily="'Rubick', sans-serif"
-                          pt={6}
+              <>
+                {isUserLoggedInProfile && editOrder.isEditingOrderFavPoke ? (
+                  <DragGridList
+                    data={pokeFavoriteList}
+                    list="Pokémon Favorites List"
+                    updateListFunc={list => setPokeFavoriteList(list)}
+                    funcPokemonAlert={item =>
+                      setRemovePokemonAlert({
+                        isOpen: true,
+                        pokemon: item.name,
+                        type: 'Pokémon Favorites List'
+                      })
+                    }
+                  />
+                ) : (
+                  <Grid
+                    gridGap={[4, 2]}
+                    templateColumns={[
+                      'repeat(auto-fit, minmax(145px, 1fr))',
+                      null,
+                      'repeat(3, 1fr)',
+                      'repeat(6, 1fr)'
+                    ]}
+                  >
+                    {showAllFavorites.pokemons.map((item, index) =>
+                      item?.isEmpty ? (
+                        <Flex
+                          key={index}
+                          flexDir="column"
+                          align="center"
+                          position="relative"
+                          opacity="0.25"
+                          p="1rem 0"
                         >
-                          slot
-                        </Text>
-                      </Box>
-                    )
+                          <Box boxSize="110px" position="relative" />
+                          <Icon
+                            position="absolute"
+                            boxSize="10rem"
+                            top="39%"
+                            left="50%"
+                            opacity="0.5"
+                            transform="translate(-50%, -50%)"
+                            as={CgPokemon}
+                          />
+                          <Text
+                            letterSpacing="0.1em"
+                            fontFamily="'Rubick', sans-serif"
+                            pt={6}
+                          >
+                            ---
+                          </Text>
+                        </Flex>
+                      ) : (
+                        <Flex justify="center" key={index} position="relative">
+                          <Box
+                            as={Link}
+                            position="relative"
+                            to={`/pokemon-list/pokemon-page/${item.name}`}
+                            onClick={() => {
+                              dispatch(getInfoPokemonPage(item.id, item.name))
+                            }}
+                          >
+                            <PokemonImage
+                              pokemonName={item.name}
+                              pokemonNumber={item.id}
+                            />
+                          </Box>
+                          {isUserLoggedInProfile && (
+                            <IconButton
+                              zIndex="3"
+                              left="70%"
+                              top="0"
+                              transitionProperty="all"
+                              transition="ease-in-out"
+                              transitionDuration="0.5s"
+                              fontSize={14}
+                              bgColor="secondary"
+                              color="primary"
+                              position="absolute"
+                              borderRadius="50%"
+                              icon={<FaTrashAlt />}
+                              _hover={{
+                                fontSize: 20
+                              }}
+                              _active={{
+                                fontSize: 20
+                              }}
+                              onClick={() =>
+                                setRemovePokemonAlert({
+                                  isOpen: true,
+                                  pokemon: item.name,
+                                  type: 'Pokémon Favorites List'
+                                })
+                              }
+                            />
+                          )}
+                        </Flex>
+                      )
+                    )}
+                  </Grid>
+                )}
+
+                <Wrap
+                  pt={6}
+                  spacing={4}
+                  align="center"
+                  justify="center"
+                  w="100%"
+                >
+                  {(!isUserLoggedInProfile ||
+                    (editOrder.isEditingOrderFavTeam &&
+                      !editOrder.isEditingOrderFavPoke) ||
+                    (!editOrder.isEditingOrderFavTeam &&
+                      !editOrder.isEditingOrderFavPoke)) && (
+                    <WrapItem>
+                      <Button
+                        colorScheme={!showAllFavorites.isOpen ? 'green' : 'red'}
+                        leftIcon={
+                          !showAllFavorites.isOpen ? <FaPlus /> : <FaMinus />
+                        }
+                        onClick={() =>
+                          setShowAllFavorites({
+                            isOpen: !showAllFavorites.isOpen,
+                            pokemons:
+                              findOccupiedPokeSlotsInPokeFavorites.length <=
+                                12 && !showAllFavorites.isOpen
+                                ? favoritePokemons
+                                : favoritePokemons.slice(0, 12)
+                          })
+                        }
+                      >
+                        {!showAllFavorites.isOpen
+                          ? 'Show all slots'
+                          : 'Show less'}
+                      </Button>
+                    </WrapItem>
                   )}
-              </Flex>
+
+                  {isUserLoggedInProfile && (
+                    <>
+                      {!editOrder.isEditingOrderFavPoke ? (
+                        <WrapItem>
+                          <Button
+                            colorScheme="green"
+                            leftIcon={<FaEdit />}
+                            isDisabled={editOrder.isEditingOrderFavTeam}
+                            onClick={() =>
+                              setEditOrder({
+                                isEditingOrderFavPoke: true,
+                                isEditingOrderFavTeam: false
+                              })
+                            }
+                          >
+                            Edit Pokémon order in Favorite Pokémon list
+                          </Button>
+                        </WrapItem>
+                      ) : (
+                        <>
+                          <WrapItem>
+                            <Button
+                              colorScheme="red"
+                              onClick={() =>
+                                setEditOrder({
+                                  isEditingOrderFavPoke: false
+                                })
+                              }
+                            >
+                              Cancel
+                            </Button>
+                          </WrapItem>
+                          <WrapItem>
+                            <Button
+                              colorScheme="green"
+                              leftIcon={<FaEdit />}
+                              onClick={() => {
+                                setEditOrder({
+                                  isEditingOrderFavPoke: false
+                                })
+                                dispatch(
+                                  updateFavoritePokeList(pokeFavoriteList)
+                                )
+                              }}
+                            >
+                              Update Pokémon order in Favorite Pokémon
+                            </Button>
+                          </WrapItem>
+                        </>
+                      )}
+                    </>
+                  )}
+                </Wrap>
+              </>
             )}
           </Box>
 
-          <Box
-            w="100%"
-            ref={pokeTeamRef}
-            pb={[12, null, 20]}
-            textAlign="center"
-          >
+          <Box w="100%" ref={pokeTeamRef} pb={[20]} textAlign="center">
             <Heading as="h3" pb={favoriteTeam.length !== 0 ? 4 : 10}>
               Pokémon Team
             </Heading>
             {favoriteTeam.length !== 0 && (
               <Text fontSize={14} color="grey" fontStyle="italic" pb={10}>
                 {isUserLoggedInProfile ? 'You' : 'They'} have{' '}
-                <b>{favoriteTeam.length} out of 20</b> possible Pokémons in{' '}
+                <b>{favoriteTeam.length} out of 6</b> possible Pokémons in{' '}
                 {isUserLoggedInProfile ? 'your' : 'their'} Pokémon Team
               </Text>
             )}
@@ -618,85 +797,169 @@ const Profile = props => {
                 </Box>
               </SimpleGrid>
             ) : (
-              <Flex
-                wrap="wrap"
-                flexDir="row"
-                justify="center"
-                align="center"
-                gridGap={6}
-              >
-                {favoriteTeam.map((item, key) => (
-                  <Box key={key} position="relative">
-                    <Link
-                      to={`/pokemon-list/pokemon-page/${item.name}`}
-                      onClick={() => {
-                        dispatch(getInfoPokemonPage(item.id, item.name))
-                      }}
-                    >
-                      <PokemonImage
-                        pokemonName={item.name}
-                        pokemonNumber={item.id}
-                      />
-                    </Link>
+              <>
+                {isUserLoggedInProfile && editOrder.isEditingOrderFavTeam ? (
+                  <DragGridList
+                    data={pokeTeamList}
+                    list="Pokémon Team"
+                    updateListFunc={list => setPokeTeamList(list)}
+                    funcPokemonAlert={item =>
+                      setRemovePokemonAlert({
+                        isOpen: true,
+                        pokemon: item.name,
+                        type: 'Pokémon Team'
+                      })
+                    }
+                  />
+                ) : (
+                  <Grid
+                    gridGap={[4, 2]}
+                    templateColumns={[
+                      'repeat(auto-fit, minmax(145px, 1fr))',
+                      null,
+                      'repeat(3, 1fr)',
+                      'repeat(6, 1fr)'
+                    ]}
+                  >
+                    {favoriteTeam.map((item, key) => (
+                      <Flex key={key} justify="center" position="relative">
+                        <Box
+                          as={Link}
+                          position="relative"
+                          to={`/pokemon-list/pokemon-page/${item.name}`}
+                          onClick={() => {
+                            dispatch(getInfoPokemonPage(item.id, item.name))
+                          }}
+                        >
+                          <PokemonImage
+                            pokemonName={item.name}
+                            pokemonNumber={item.id}
+                          />
+                        </Box>
+                        {isUserLoggedInProfile && (
+                          <IconButton
+                            zIndex="3"
+                            left="70%"
+                            top="0"
+                            transitionProperty="all"
+                            transition="ease-in-out"
+                            transitionDuration="0.5s"
+                            fontSize={14}
+                            bgColor="secondary"
+                            color="primary"
+                            position="absolute"
+                            borderRadius="50%"
+                            icon={<FaTrashAlt />}
+                            _hover={{
+                              fontSize: 20
+                            }}
+                            _active={{
+                              fontSize: 20
+                            }}
+                            onClick={() =>
+                              setRemovePokemonAlert({
+                                isOpen: true,
+                                pokemon: item.name,
+                                type: 'Pokémon Team'
+                              })
+                            }
+                          />
+                        )}
+                      </Flex>
+                    ))}
+                    {favoriteTeam.length !== 6 &&
+                      [...Array(6 - favoriteTeam.length).keys()].map(
+                        (_, index) => (
+                          <Flex
+                            key={index}
+                            flexDir="column"
+                            align="center"
+                            position="relative"
+                            opacity="0.25"
+                            p="1rem 0"
+                          >
+                            <Box boxSize="110px" position="relative" />
+                            <Icon
+                              position="absolute"
+                              boxSize="10rem"
+                              top="39%"
+                              left="50%"
+                              opacity="0.5"
+                              transform="translate(-50%, -50%)"
+                              as={CgPokemon}
+                            />
+                            <Text
+                              letterSpacing="0.1em"
+                              fontFamily="'Rubick', sans-serif"
+                              pt={6}
+                            >
+                              ---
+                            </Text>
+                          </Flex>
+                        )
+                      )}
+                  </Grid>
+                )}
 
-                    <IconButton
-                      zIndex="3"
-                      left="70%"
-                      top="0"
-                      transitionProperty="all"
-                      transition="ease-in-out"
-                      transitionDuration="0.5s"
-                      fontSize={14}
-                      bgColor="secondary"
-                      color="primary"
-                      position="absolute"
-                      borderRadius="50%"
-                      icon={<FaTrashAlt />}
-                      _hover={{
-                        fontSize: 20
-                      }}
-                      _active={{
-                        fontSize: 20
-                      }}
-                      onClick={() =>
-                        setRemovePokemonAlert({
-                          isOpen: true,
-                          pokemon: item.name,
-                          type: 'Pokémon Team'
-                        })
-                      }
-                    />
-                  </Box>
-                ))}
-                {favoriteTeam.length !== 6 &&
-                  [...Array(6 - favoriteTeam.length).keys()].map((_, index) => (
-                    <Box
-                      key={index}
-                      position="relative"
-                      opacity="0.25"
-                      p="1rem 0"
-                      pr={2}
-                    >
-                      <Box boxSize="110px" position="relative" />
-                      <Icon
-                        position="absolute"
-                        boxSize="10rem"
-                        top="39%"
-                        left="51%"
-                        opacity="0.5"
-                        transform="translate(-50%, -50%)"
-                        as={CgPokemon}
-                      />
-                      <Text
-                        letterSpacing="0.1em"
-                        fontFamily="'Rubick', sans-serif"
-                        pt={6}
-                      >
-                        slot
-                      </Text>
-                    </Box>
-                  ))}
-              </Flex>
+                <Wrap
+                  pt={6}
+                  spacing={4}
+                  align="center"
+                  justify="center"
+                  w="100%"
+                >
+                  {isUserLoggedInProfile && (
+                    <>
+                      {!editOrder.isEditingOrderFavTeam ? (
+                        <WrapItem>
+                          <Button
+                            colorScheme="green"
+                            leftIcon={<FaEdit />}
+                            isDisabled={editOrder.isEditingOrderFavPoke}
+                            onClick={() =>
+                              setEditOrder({
+                                isEditingOrderFavPoke: false,
+                                isEditingOrderFavTeam: true
+                              })
+                            }
+                          >
+                            Edit Pokémon order in Pokémon Team
+                          </Button>
+                        </WrapItem>
+                      ) : (
+                        <>
+                          <WrapItem>
+                            <Button
+                              colorScheme="red"
+                              onClick={() =>
+                                setEditOrder({
+                                  isEditingOrderFavTeam: false
+                                })
+                              }
+                            >
+                              Cancel
+                            </Button>
+                          </WrapItem>
+                          <WrapItem>
+                            <Button
+                              colorScheme="green"
+                              leftIcon={<FaEdit />}
+                              onClick={() => {
+                                setEditOrder({
+                                  isEditingOrderFavTeam: false
+                                })
+                                dispatch(updateFavoritePokeList(pokeTeamList))
+                              }}
+                            >
+                              Update Pokémon order in Pokémon Team
+                            </Button>
+                          </WrapItem>
+                        </>
+                      )}
+                    </>
+                  )}
+                </Wrap>
+              </>
             )}
           </Box>
 
@@ -711,111 +974,36 @@ const Profile = props => {
             align="center"
           >
             <Heading as="h4" pb={10}>
-              PokéTrivia Stats
+              PokéMinigames Stats
             </Heading>
 
-            <SimpleGrid
-              columns={[1, null, null, 2]}
-              justify="center"
-              gridGap={6}
-            >
-              <Box>
-                {triviaRecord.realizedTrivias > 0 ? (
-                  <>
-                    <SimpleGrid columns={[1, null, 2]} pb={8} gridGap={6}>
-                      <Flex flexDir="column">
-                        <Text fontWeight="bold" pb={2}>
-                          PokéTrivias played
-                        </Text>
-                        <Text>{triviaRecord.realizedTrivias}</Text>
-                      </Flex>
-                      <Flex flexDir="column">
-                        <Text fontWeight="bold" pb={2}>
-                          Average of correct answers
-                        </Text>
-                        <Text>{averageCorrectAnswers}%</Text>
-                      </Flex>
-                      <Flex flexDir="column">
-                        <Text fontWeight="bold" pb={2}>
-                          All correct answers
-                        </Text>
-                        <Text>{triviaRecord.correctAnswers}</Text>
-                      </Flex>
-                      <Flex flexDir="column">
-                        <Text fontWeight="bold" pb={2}>
-                          All incorrect answers
-                        </Text>
-                        <Text>{triviaRecord.wrongAnswers}</Text>
-                      </Flex>
-                    </SimpleGrid>
+            {triviaRecord.realizedTrivias <= 0 ? (
+              <Flex>
+                <Box w={['85%', null, null, '50%']}>
+                  {isUserLoggedInProfile ? (
                     <Text>
-                      With these PokéTrivia numbers we found out that{' '}
-                      {isUserLoggedInProfile ? 'you are' : `${username} is`}{' '}
-                      intelligent as a{' '}
-                      <Link>
-                        <Box as="b" color="#f24643" fontSize={18}>
-                          {triviaRecord.pokemonIQ}!
-                        </Box>
-                      </Link>
+                      You still haven't played any PokéTrivia to calculte your
+                      Pokémon IQ... Don't be lazy like Slakoth and start playing
+                      PokéTrivia to find out the Pokémon that represents your
+                      intelligence!
                     </Text>
-                    <Text>{pokemonIQText}</Text>
-                  </>
-                ) : (
-                  <>
-                    {isUserLoggedInProfile ? (
-                      <>
-                        <Text>
-                          You still haven't played any PokéTrivia to calculte
-                          your Pokémon IQ... Don't be lazy like Slakoth and
-                          start playing PokéTrivia to find out the Pokémon that
-                          represents your intelligence!
-                        </Text>
+                  ) : (
+                    <Text>
+                      {username} still hasn't played any PokéTrivia to calculte
+                      their Pokémon IQ... It seems they're a little bit like
+                      Slakoth, you know, in the lazy department. Because of that
+                      don't know which Pokémon represents the best their
+                      intelligence...
+                    </Text>
+                  )}
 
-                        <Link to="/pokemon-trivia">
-                          <Button
-                            rightIcon={<FaArrowRight />}
-                            colorScheme="blue"
-                          >
-                            Go to PokéTrivia
-                          </Button>
-                        </Link>
-                      </>
-                    ) : (
-                      <>
-                        <Text>
-                          {username} still hasn't played any PokéTrivia to
-                          calculte their Pokémon IQ... It seems they're a little
-                          bit like Slakoth, you know, in the lazy department.
-                          Because of that don't know which Pokémon represents
-                          the best their intelligence...
-                        </Text>
-                        <Link to="/pokemon-trivia">
-                          <Button
-                            rightIcon={<FaArrowRight />}
-                            colorScheme="blue"
-                          >
-                            Go to PokéTrivia
-                          </Button>
-                        </Link>
-                      </>
-                    )}
-                  </>
-                )}
-              </Box>
-              <Flex py={3} justify="center" align="center">
-                {triviaRecord.realizedTrivias > 0 ? (
-                  <Link
-                    to={`/pokemon-list/pokemon-page/${triviaRecord.pokemonIQNumber}`}
-                    onClick={() => getInfoPokemonPage(triviaRecord.pokemonIQ)}
-                  >
-                    <Image
-                      maxH="250px"
-                      maxW="250px"
-                      alt={triviaRecord.pokemonIQ}
-                      src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${triviaRecord.pokemonIQNumber}.png`}
-                    />
+                  <Link to="/pokemon-trivia">
+                    <Button rightIcon={<FaArrowRight />} colorScheme="blue">
+                      Go to PokéTrivia
+                    </Button>
                   </Link>
-                ) : (
+                </Box>
+                <Flex justify="center" align="center">
                   <Link
                     to={`/pokemon-list/pokemon-page/slakoth`}
                     onClick={() => getInfoPokemonPage('slakoth')}
@@ -824,12 +1012,145 @@ const Profile = props => {
                       maxH="250px"
                       maxW="250px"
                       alt="Slakoth"
-                      src="/img/slakoth.png"
+                      src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/287.png`}
                     />
                   </Link>
-                )}
+                </Flex>
               </Flex>
-            </SimpleGrid>
+            ) : (
+              <>
+                <Flex
+                  pb={8}
+                  wrap="wrap"
+                  flexDir="row"
+                  justify="center"
+                  align="center"
+                  gridGap={8}
+                >
+                  <Box w={['85%', null, null, '50%']}>
+                    <Text pb={6}>
+                      With {isUserLoggedInProfile ? 'your' : 'their'} shown
+                      performance in our minigames we found out that{' '}
+                      {isUserLoggedInProfile ? 'you are' : `${username} is`}{' '}
+                      intelligent as a{' '}
+                      <Link
+                        to={`/pokemon-list/pokemon-page/${triviaRecord.pokemonIQNumber}`}
+                        className="basicLink"
+                      >
+                        <Box as="b" fontSize={18}>
+                          {triviaRecord.pokemonIQ}!
+                        </Box>
+                      </Link>
+                    </Text>
+                    <Text fontSize={20} color="tertiary" fontWeight="bold">
+                      {pokemonIQText}
+                    </Text>
+                  </Box>
+                  <Flex justify="center" align="center">
+                    <Link
+                      to={`/pokemon-list/pokemon-page/${triviaRecord.pokemonIQNumber}`}
+                      onClick={() => getInfoPokemonPage(triviaRecord.pokemonIQ)}
+                    >
+                      <Image
+                        maxH="250px"
+                        maxW="250px"
+                        alt={triviaRecord.pokemonIQ}
+                        src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${triviaRecord.pokemonIQNumber}.png`}
+                      />
+                    </Link>
+                  </Flex>
+                </Flex>
+
+                <Heading as="h2" pb={6}>
+                  PokéTrivia
+                </Heading>
+                <Flex
+                  w="100%"
+                  wrap="wrap"
+                  flexDir="row"
+                  pb={[14, null, null, 10]}
+                  justify="center"
+                  gridGap={6}
+                >
+                  <PokeballMinigameStat
+                    statData={triviaRecord.realizedTrivias}
+                    statTitle="PokéTrivias played"
+                  />
+                  <PokeballMinigameStat
+                    statData={`${averageCorrectAnswers}%`}
+                    statTitle="Average of correct answers"
+                  />
+                  <PokeballMinigameStat
+                    statData={triviaRecord.correctAnswers}
+                    statTitle="All correct answers"
+                  />
+                  <PokeballMinigameStat
+                    statData={triviaRecord.wrongAnswers}
+                    statTitle="All incorrect answers"
+                  />
+                </Flex>
+                <Heading pb={6}>PokéTypes</Heading>
+                <Flex
+                  w="100%"
+                  wrap="wrap"
+                  flexDir="row"
+                  pb={[14, null, null, 10]}
+                  justify="center"
+                  gridGap={6}
+                >
+                  <PokeballMinigameStat
+                    statData={triviaRecord.realizedTrivias}
+                    statTitle="PokéTypes played"
+                  />
+                  <PokeballMinigameStat
+                    statData={triviaRecord.wrongAnswers}
+                    statTitle="Average time per session"
+                  />
+                  <PokeballMinigameStat
+                    statData={`${averageCorrectAnswers}%`}
+                    statTitle="Average of correct types chosen"
+                  />
+                  <PokeballMinigameStat
+                    statData={triviaRecord.correctAnswers}
+                    statTitle="All correct types chosen"
+                  />
+                  <PokeballMinigameStat
+                    statData={triviaRecord.wrongAnswers}
+                    statTitle="All incorrect types chosen"
+                  />
+                </Flex>
+                <Heading pb={6}>PokéGuess</Heading>
+                <Flex
+                  w="100%"
+                  wrap="wrap"
+                  flexDir="row"
+                  pb={[14, null, null, 10]}
+                  justify="center"
+                  gridGap={6}
+                >
+                  <PokeballMinigameStat
+                    statData={triviaRecord.realizedTrivias}
+                    statTitle="PokéGuesses played"
+                  />
+                  <PokeballMinigameStat
+                    statData={triviaRecord.wrongAnswers}
+                    statTitle="Average of correct guesses"
+                  />
+                  <PokeballMinigameStat
+                    statData={triviaRecord.wrongAnswers}
+                    statTitle="Best correct answers streak"
+                  />
+                  <PokeballMinigameStat
+                    statData={`${averageCorrectAnswers}%`}
+                    statTitle="All correct guesses"
+                  />
+                  <PokeballMinigameStat
+                    statData={triviaRecord.correctAnswers}
+                    statTitle="All incorrect guesses"
+                  />
+                </Flex>
+              </>
+            )}
           </Flex>
 
           <Box pb={14}>
@@ -838,7 +1159,7 @@ const Profile = props => {
             </Heading>
 
             <SimpleGrid columns={[1, null, 2]} gridGap={[10, null, 14]}>
-              <Box>
+              <Box ref={pokeCarerPerRef}>
                 <Heading pb={6} textAlign="center" as="h4">
                   PokéCarer Personality
                 </Heading>
@@ -851,7 +1172,10 @@ const Profile = props => {
                       fontWeight="bold"
                       color="white"
                     >
-                      You're a{' '}
+                      {isUserLoggedInProfile
+                        ? "You're"
+                        : `You - ${username} - are`}{' '}
+                      a{' '}
                       <Text as="span" color="secondary">
                         {messageFavorites[0]}
                       </Text>
@@ -864,8 +1188,10 @@ const Profile = props => {
                         fontStyle="italic"
                         color="grey"
                       >
-                        This result varies depending which Pokémons you have in
-                        your Favorite Pokémon List
+                        This result varies depending which Pokémons{' '}
+                        {isUserLoggedInProfile ? 'you' : 'they'} have in{' '}
+                        {isUserLoggedInProfile ? 'your' : 'their'} Favorite
+                        Pokémon List
                       </Text>
                     )}
                   </>
@@ -914,7 +1240,7 @@ const Profile = props => {
                   </>
                 )}
               </Box>
-              <Box>
+              <Box ref={pokeTrainerPerRef}>
                 <Heading pb={6} textAlign="center" as="h4">
                   PokéTrainer Personality
                 </Heading>
@@ -927,7 +1253,10 @@ const Profile = props => {
                       fontWeight="bold"
                       color="white"
                     >
-                      You're a{' '}
+                      {isUserLoggedInProfile
+                        ? "You're"
+                        : `You - ${username} - are`}{' '}
+                      a{' '}
                       <Text as="span" color="secondary">
                         {messageTeam[0]}
                       </Text>
@@ -940,8 +1269,10 @@ const Profile = props => {
                         fontStyle="italic"
                         color="grey"
                       >
-                        This result varies depending which Pokémons you have in
-                        your Favorite Pokémon List
+                        This result varies depending which Pokémons{' '}
+                        {isUserLoggedInProfile ? 'you' : 'they'} have in{' '}
+                        {isUserLoggedInProfile ? 'your' : 'their'} Favorite
+                        Pokémon List
                       </Text>
                     )}
                   </>
@@ -1002,14 +1333,19 @@ const Profile = props => {
           >
             <AlertDialogOverlay>
               <AlertDialogContent color="#3c3c3b" bgColor="#ebebd3" p={4}>
-                <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                <AlertDialogHeader as="h2" fontSize="lg" fontWeight="bold">
                   Remove {removePokemonAlert.pokemon}
                 </AlertDialogHeader>
 
                 <AlertDialogBody>
-                  Are you sure you want to remove {removePokemonAlert.pokemon}{' '}
-                  from your {removePokemonAlert.type}? You can't undo this
-                  action afterwards.
+                  <Text pb={2}>
+                    Are you sure you want to remove{' '}
+                    <b>{removePokemonAlert.pokemon}</b> from your{' '}
+                    <b>{removePokemonAlert.type}</b>?
+                  </Text>
+                  <Text color="red.500">
+                    You can't undo this action afterwards.
+                  </Text>
                 </AlertDialogBody>
 
                 <AlertDialogFooter>
@@ -1102,7 +1438,7 @@ const Profile = props => {
                     dispatch(editProfileField('avatar', chosenAvatar))
                   }}
                 >
-                  Edit Avatar
+                  Update Avatar
                 </Button>
               </ModalFooter>
             </ModalContent>

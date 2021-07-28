@@ -8,6 +8,7 @@ import { animated, Transition } from 'react-spring/renderprops'
 // Components
 import ScrollingWrapper from './components/scroll/ScrollingWrapper'
 import NavigationBar from './components/layout/navbar/Navbar'
+import ToastProvider from './components/feedback/ToastProvider'
 import Loading from './components/feedback/Loading'
 import Error from './components/feedback/Error'
 import NoMatch from './pages/NoMatch'
@@ -48,10 +49,11 @@ const App = () => {
 
   return (
     <>
-      <SEO description="PokéFav, a place to gather your favorite Pokémons, create a ideal Pokémon Team, play PokéTrivia, explore Pokémon Cards and more!" />
+      <SEO description="PokéFav, a place to gather your favorite Pokémons, create a ideal Pokémon Team, play PokéMinigames, explore Pokémon Cards and more!" />
 
       <ScrollToTop />
       <ScrollingWrapper />
+      <ToastProvider />
       <Grid
         minHeight="100vh"
         gridTemplateRows={auth ? 'auto 1fr auto' : 'auto 1fr'}

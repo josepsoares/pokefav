@@ -1,54 +1,70 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { useDisclosure } from '@chakra-ui/hooks'
 import {
   Box,
-  SimpleGrid,
-  Image,
-  Heading,
-  Text,
   Flex,
+  Heading,
+  SimpleGrid,
   Stack,
   StackDivider,
-  useDisclosure,
-  ModalFooter,
+  Text
+} from '@chakra-ui/layout'
+import {
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
   ModalBody,
-  ModalCloseButton
-} from '@chakra-ui/react'
-import { useSelector } from 'react-redux'
-import { FaArrowRight, FaGraduationCap } from 'react-icons/fa'
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay
+} from '@chakra-ui/modal'
+import { Image } from '@chakra-ui/image'
+import { FaDna, FaArrowLeft, FaArrowRight, FaQuestion } from 'react-icons/fa'
 
 import Button from 'components/layout/Button'
 import SEO from 'components/Seo'
 
-const PokemonTriviaStatic = ({ startTrivia }) => {
+const contentsAvailableForGame = ['Pokémons', 'Moves', 'Pokémons and Moves']
+
+const PokemonTypesStatic = ({ startPokeTypes }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const [tutorial, setTutorial] = useState(null)
+  const [contentInGame, setContentInGame] = useState('Pokémons')
+
   const profile = useSelector(state => state.firebase.profile)
-  const {
+  /*   const {
     realizedTrivias,
     correctAnswers,
     wrongAnswers,
     pokemonIQ
-  } = profile.triviaRecord
+  } = profile.triviaRecord */
 
   return (
     <>
       <SEO
-        title="PokéTrivia"
-        description="Play a fun trivia filled with challeging questions about facts and mechanics about Pokémon Franchise"
+        title="PokéTypes"
+        description="Play a fun minigame with challeging questions about specific details about Pokémon Moves"
       />
 
-      <Heading as="h1" pb={8}>
-        PokéTrivia
-      </Heading>
+      <Flex>
+        <Button onClick={onOpen} colorScheme="blue" leftIcon={<FaArrowLeft />}>
+          Go Back to PokéMinigames
+        </Button>
+      </Flex>
+
+      <Flex>
+        <Heading as="h1" pb={8}>
+          PokéTypes
+        </Heading>
+        <Button colorScheme="blue" onClick={onOpen} leftIcon={<FaQuestion />}>
+          How to Play
+        </Button>
+      </Flex>
+
       <SimpleGrid columns={[1, null, null, 2]} justify="center" gridGap={6}>
         <Box order={[2, null, null, 1]}>
-          <Heading as="h4">
-            Do you think you know your fair share of knowledge of the Pokémon
-            universe?{' '}
-          </Heading>
+          <Heading as="h4">Moves, they're </Heading>
           <Text pb={4}>
             How about testing those skills by playing this Trivia, made by us,
             in order to determine what Pokémon you would be based on your
@@ -66,14 +82,14 @@ const PokemonTriviaStatic = ({ startTrivia }) => {
             you're done to find out what pokémon are you!
           </Text>
 
-          {pokemonIQ && (
+          {/* {pokemonIQ && (
             <Text fontSize={18} textAlign="center">
               Your Pokémon IQ currently is the same as a{' '}
               <Box as="b" color="#ffe066">
                 {pokemonIQ}
               </Box>
             </Text>
-          )}
+          )} */}
 
           <Flex
             pt={12}
@@ -83,19 +99,16 @@ const PokemonTriviaStatic = ({ startTrivia }) => {
             justify="center"
             gridGap={6}
           >
-            <Button
-              colorScheme="blue"
-              leftIcon={<FaGraduationCap />}
-              onClick={onOpen}
-            >
-              Check your Trivia Stats
+            <Button colorScheme="blue" onClick={onOpen} leftIcon={<FaDna />}>
+              Check your PokéTypes Stats
             </Button>
+
             <Button
               colorScheme="green"
+              onClick={startPokeTypes}
               rightIcon={<FaArrowRight />}
-              onClick={startTrivia}
             >
-              Start Trivia Now
+              Start PokéTypes Now
             </Button>
           </Flex>
         </Box>
@@ -110,6 +123,12 @@ const PokemonTriviaStatic = ({ startTrivia }) => {
           />
         </Flex>
       </SimpleGrid>
+      <SimpleGrid
+        columns={[1, null, null, 2]}
+        justify="center"
+        gridGap={6}
+      ></SimpleGrid>
+
       <Modal
         isCentered
         isOpen={isOpen}
@@ -133,27 +152,27 @@ const PokemonTriviaStatic = ({ startTrivia }) => {
             >
               <Flex flexDir="column" align="center">
                 <Text fontWeight="bold" pb={2}>
-                  PokéTrivias played
+                  PokéTypes played
                 </Text>
-                <Text>{realizedTrivias}</Text>
+                <Text>{/* realizedTrivias */}</Text>
               </Flex>
               <Flex flexDir="column" align="center">
                 <Text fontWeight="bold" pb={2}>
                   Correct answers
                 </Text>
-                <Text>{correctAnswers}</Text>
+                <Text>{/* correctAnswers */}</Text>
               </Flex>
               <Flex flexDir="column" align="center">
                 <Text fontWeight="bold" pb={2}>
                   Incorrect answers
                 </Text>
-                <Text>{wrongAnswers}</Text>
+                <Text>{/* wrongAnswers */}</Text>
               </Flex>
               <Flex flexDir="column" align="center">
                 <Text fontWeight="bold" pb={2}>
                   Pokémon IQ
                 </Text>
-                <Text>{!pokemonIQ ? 'None' : pokemonIQ}</Text>
+                <Text>{/* !pokemonIQ ? 'None' : pokemonIQ */}</Text>
               </Flex>
             </Stack>
           </ModalBody>
@@ -169,4 +188,4 @@ const PokemonTriviaStatic = ({ startTrivia }) => {
   )
 }
 
-export default PokemonTriviaStatic
+export default PokemonTypesStatic

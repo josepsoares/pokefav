@@ -243,24 +243,6 @@ class PokePage extends Component {
           title={pokemonName}
           description={`Explore all the details about ${pokemonName}, like moves, stats, evolution and more, and also check ${pokemonName} cards`}
         />
-        {auth.uid && (
-          <Flex
-            w="100%"
-            pb={10}
-            align="center"
-            justify={['center', null, null, 'end']}
-          >
-            <ButtonGroup
-              spacing={4}
-              direction={['column', 'row']}
-              justify={['center', 'end']}
-              align="center"
-            >
-              {this._getPokemonTeamUserButton(pokemonName, stats, id)}
-              {this._getPokemonFavoritesUserButton(pokemonName, stats, id)}
-            </ButtonGroup>
-          </Flex>
-        )}
 
         <Flex flexDir="column" justify="center" align="center">
           <Flex flexDir="row" pb={4} justify="center" align="center">
@@ -274,13 +256,32 @@ class PokePage extends Component {
             />
             <Heading as="h1">{pokemonName}</Heading>
           </Flex>
-          <Flex flexWrap="wrap" justify="center" gridGap={4} fontSize={12}>
+          <Flex
+            pb={6}
+            flexWrap="wrap"
+            justify="center"
+            gridGap={4}
+            fontSize={12}
+          >
             {Array.from(uniqueNames).map((uniqueNameItem, key) => (
               <Text fontStyle="italic" key={key}>
                 {uniqueNameItem}
               </Text>
             ))}
           </Flex>
+          {auth.uid && (
+            <Flex w="100%" align="center" justify="center">
+              <ButtonGroup
+                spacing={4}
+                direction={['column', 'row']}
+                justify={['center', 'end']}
+                align="center"
+              >
+                {this._getPokemonTeamUserButton(pokemonName, stats, id)}
+                {this._getPokemonFavoritesUserButton(pokemonName, stats, id)}
+              </ButtonGroup>
+            </Flex>
+          )}
         </Flex>
 
         <Box pt={20} pb={8}>
@@ -459,7 +460,15 @@ class PokePage extends Component {
           <Flex flexWrap="wrap" gridGap={8} justify="center">
             {cards.map((item, index) => (
               <Flex align="center" justify="center" key={index}>
-                <Image w="70%" h="auto" src={item.imageUrl} />
+                <Image
+                  boxShadow="md"
+                  w="70%"
+                  h="auto"
+                  transition="ease-in-out all 0.4s"
+                  src={item.imageUrl}
+                  _hover={{ transform: 'scale(1.05)' }}
+                  _active={{ transform: 'scale(1.05)' }}
+                />
               </Flex>
             ))}
           </Flex>
