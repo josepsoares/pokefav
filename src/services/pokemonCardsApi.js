@@ -1,21 +1,22 @@
 class PokemonCardsApiService {
-  API_URL = 'https://api.pokemontcg.io/v2'
+  API_URL = 'https://api.pokemontcg.io/v2';
 
   getCardsRarities = () => {
-    return fetch(`${this.API_URL}/rarities`)
-  }
+    return fetch(`${this.API_URL}/rarities`);
+  };
 
-  getCardsSubTypes = async () => {
-    return fetch(`${this.API_URL}/subtypes`)
-  }
+  getCards = (name, rarity, orderBy, page, pageSize) => {
+    const qParam =
+      !rarity || rarity === 'All'
+        ? `name:"${name}"`
+        : `name:"${name} (rarity:${rarity})"`;
 
-  getCards = (name, subtypes, hp, rarity, orderBy, pageSize) => {
-    const qParam = ''
+    console.log(qParam);
 
     return fetch(
-      `${this.API_URL}/cards?q=${qParam}&orderBy=${orderBy}&pageSize=${pageSize}`
-    )
-  }
+      `${this.API_URL}/cards?q=${qParam}&orderBy=${orderBy}&page=${page}&pageSize=${pageSize}`
+    );
+  };
 }
 
-export default new PokemonCardsApiService()
+export default new PokemonCardsApiService();

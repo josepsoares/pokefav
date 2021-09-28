@@ -1,7 +1,9 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { NavLink } from 'react-router-dom'
-import { getUser, signOut } from 'redux/actions/userActions'
+import { getUser } from 'redux/actions/userActions'
+import { signOut } from 'redux/actions/authActions'
+
 import { FaHome, FaSignOutAlt, FaUser, FaUsers, FaDice } from 'react-icons/fa'
 import { CgPokemon } from 'react-icons/cg'
 import { Avatar, Menu, MenuList, MenuButton, Box } from '@chakra-ui/react'
@@ -11,7 +13,7 @@ import useWindowSize from 'utils/hooks/useWindowSize'
 const NavbarLinks = ({ profile }) => {
   const { username, avatar } = profile
   const { width } = useWindowSize()
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   return (
     <>

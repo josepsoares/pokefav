@@ -1,125 +1,163 @@
-import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import Select from 'react-select'
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector, shallowEqual } from 'react-redux';
+import { getCards, getCardsRarities } from 'redux/actions/pokemonCardsActions';
+
 import {
   Flex,
   Wrap,
   WrapItem,
   FormControl,
   FormLabel,
-  Image
-} from '@chakra-ui/react'
-import Button from 'components/layout/Button'
-import { FaPlus } from 'react-icons/fa'
-import useWindowSize from 'utils/hooks/useWindowSize'
-import { getCards } from 'redux/actions/pokemonCardsActions'
+  Image,
+  Box
+} from '@chakra-ui/react';
+import Select from 'react-select';
+import { FaPlus } from 'react-icons/fa';
 
-const genericOptions = [
-  { value: 'asc', label: 'Ascendant' },
-  { value: 'desc', label: 'Descendant' }
-]
-
-const rarityOptions = [
-  { value: 'createdAt', label: 'Creation date' },
-  { value: 'username', label: 'Username' },
-  { value: 'triviaPokemon', label: 'Minigames score' }
-]
-
-const releaseOptions = genericOptions
-const hpOptions = genericOptions
-const priceOptions = genericOptions
+import Button from 'components/layout/Button';
+import Error from 'components/feedback/Error';
+import Loading from 'components/feedback/Loading';
+import useWindowSize from 'utils/hooks/useWindowSize';
 
 const PokemonPageCards = ({ pokemon }) => {
-  const dispatch = useDispatch()
-  const { width } = useWindowSize()
+  const dispatch = useDispatch();
+  const pokeCardsApiReducer = useSelector(
+    state => state.pokemonCardsApi,
+    shallowEqual
+  );
+
+  let {
+    isLoadingCardsData,
+    errorCardsData,
+    cardsData,
+    page,
+    isLoadingNextPage,
+    errorNextPage,
+    rarities,
+    isLoadingRarities,
+    errorRarities
+  } = pokeCardsApiReducer;
+
+  const { width } = useWindowSize();
+  console.log(width);
   const [state, setState] = useState({
     isLoading: false,
     error: null,
     cards: [],
     cardsShown: 6
-  })
+  });
 
   const [selectState, setSelectState] = useState({
     selectFilter: { value: 'releasedAt', label: 'Release date' },
-    selectFilterType: { value: 'desc', label: 'Descendant' },
+    selectFilterOrder: { value: 'desc', label: 'Descendant' },
+    selectRarity: null,
     selectFilterOptions: [
-      { value: 'hp', label: 'HP' },
-      { value: 'releasedAt', label: 'Release date' },
+      { value: 'releasedDate', label: 'Release date' },
       { value: 'price', label: 'Price' },
       { value: 'rarity', label: 'Rarity' }
-    ]
-  })
+    ],
+    selectFilterOrderOptions: [
+      { value: 'asc', label: 'Ascendant' },
+      { value: 'desc', label: 'Descendant' }
+    ],
+    selectRarityOptions: rarities || null
+  });
+
+  useEffect(() => {
+    const getWidth = window.innerWidth;
+
+    if (cardsData?.length === 0 || cardsData[0]?.name !== pokemon) {
+      dispatch(
+        getCards(
+          pokemon,
+          null,
+          '-releasedDate',
+          1,
+          getWidth >= 1920 ? 12 : getWidth > 1024 ? 10 : 6
+        )
+      );
+    }
+
+    setState({
+      ...state,
+      cardsShown: getWidth >= 1920 ? 12 : getWidth > 1024 ? 10 : 6
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setState({
       ...state,
-      cardsShown: width > 1024 ? 10 : 6
-    })
-  }, [])
+      cardsShown: width >= 1920 ? 12 : width > 1024 ? 10 : 6
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [width]);
 
-  const handleSelectChange = async (value, action) => {
+  const handleSelectChange = async (select, action) => {
     setState({
       ...state,
       isLoading: true
-    })
+    });
 
     if (action.name === 'cardsFilters') {
-      const getPokedexByRegion = await getPokedex('national', 'region')
-      const pokedexEntriesSlice = getPokedexByRegion.allPokedexEntries.slice(
-        0,
-        808
-      )
+      setSelectState({
+        ...selectState,
+        selectFilter: select
+      });
 
-      dispatch(getCards())
-
-      setState({
-        ...state,
-        currentIndex: 1,
-        items: getPokedexByRegion.items,
-        allPokedexEntries: pokedexEntriesSlice,
-        typeSearch: value.value,
-        selectList: regions,
-        selectValue: 'national',
-        isLoading: false
-      })
-
-      dispatch(getCards())
-    } else {
-      const getPokemons = await getPokedex(value.value, state.typeSearch)
-      let filterAllPokedexEntries
-
-      if (typeSearch === 'type') {
-        filterAllPokedexEntries = getPokemons.allPokedexEntries.filter(item => {
-          if (item.slot !== 2) {
-            const splitUrl = item.pokemon.url.split('/')
-            return splitUrl[6] < 808
-          } else {
-            return false
-          }
-        })
-      } else if (value.value === 'national') {
-        filterAllPokedexEntries = getPokemons.allPokedexEntries.slice(0, 808)
-      } else {
-        filterAllPokedexEntries = getPokemons.allPokedexEntries
-      }
-
-      const getItems = calculatePage(filterAllPokedexEntries, 1)
-
-      setState({
-        ...state,
-        currentIndex: 1,
-        items: getItems,
-        allPokedexEntries: filterAllPokedexEntries,
-        selectValue: value.value,
-        isLoading: false
-      })
+      dispatch(
+        getCards(pokemon, selectState.rarity, '-', page, state.cardsShown)
+      );
     }
-  }
+    if (action.name === 'rarities') {
+      dispatch(getCardsRarities());
 
-  return (
+      setSelectState({
+        ...selectState,
+        rarity: select
+      });
+
+      dispatch(
+        getCards(
+          pokemon,
+          selectState.rarity,
+          selectState.selectFilterOrder === 'desc'
+            ? `-${selectState.selectFilter}`
+            : selectState.selectFilter,
+          page,
+          state.cardsShown
+        )
+      );
+    } else {
+      setSelectState({
+        ...selectState,
+        selectFilterOrder: select
+      });
+
+      dispatch(
+        getCards(
+          pokemon,
+          selectState.rarity,
+          selectState.selectFilterOrder === 'desc'
+            ? `-${selectState.selectFilter}`
+            : selectState.selectFilter,
+          page,
+          state.cardsShown
+        )
+      );
+    }
+  };
+
+  console.log(cardsData, state);
+
+  return isLoadingCardsData ? (
+    <Loading />
+  ) : errorCardsData ? (
+    <Error />
+  ) : (
     <>
-      <Wrap>
-        <WrapItem>
+      <Wrap pb={8} justify="center" align="center">
+        <WrapItem w="44">
           <FormControl id="sort-by">
             <FormLabel>Sort By</FormLabel>
             <Select
@@ -135,7 +173,7 @@ const PokemonPageCards = ({ pokemon }) => {
                 })
               }}
               isFullWidth={true}
-              size="md"
+              size="lg"
               name="cardsFilters"
               onChange={handleSelectChange}
               value={selectState.selectFilter}
@@ -145,8 +183,44 @@ const PokemonPageCards = ({ pokemon }) => {
             />
           </FormControl>
         </WrapItem>
-        <WrapItem>
-          <FormControl id="sort-by">
+        {selectState.rarity && (
+          <WrapItem w="44">
+            <FormControl id="sort-rarity">
+              <FormLabel>Rarity</FormLabel>
+              <Select
+                isLoading={isLoadingRarities}
+                styles={{
+                  valueContainer: () => ({
+                    padding: '0 1rem'
+                  }),
+                  control: provided => ({
+                    ...provided,
+                    '&:hover': {
+                      borderColor: '#f88d87'
+                    }
+                  })
+                }}
+                isFullWidth={true}
+                size="md"
+                name="raritySelect"
+                isDisabled={errorRarities}
+                value={!errorRarities ? selectState.selectRarity : null}
+                onChange={handleSelectChange}
+                options={
+                  !errorRarities ? selectState.selectRarityOptions : null
+                }
+                placeholder={
+                  errorRarities
+                    ? "couldn't fetch rarities"
+                    : 'rarity to sort by'
+                }
+                isSearchable={false}
+              />
+            </FormControl>
+          </WrapItem>
+        )}
+        <WrapItem w="44">
+          <FormControl id="sort-order">
             <FormLabel>Sort By</FormLabel>
             <Select
               styles={{
@@ -162,56 +236,69 @@ const PokemonPageCards = ({ pokemon }) => {
               }}
               isFullWidth={true}
               size="md"
-              name="cardsFiltersOrderOrExtras"
-              value={{
-                value: typeSearch,
-                label: _.startCase(typeSearch)
-              }}
+              name="cardsFiltersOrders"
+              value={selectState.selectFilterOrder}
               onChange={handleSelectChange}
-              options={[
-                { label: 'Region', value: 'region' },
-                { label: 'Type', value: 'type' }
-              ]}
-              placeholder="method to sort by"
+              options={selectState.selectFilterOrderOptions}
+              placeholder="order to sort by"
               isSearchable={false}
             />
           </FormControl>
         </WrapItem>
       </Wrap>
       <Flex flexWrap="wrap" gridGap={8} justify="center">
-        {cards.map((item, index) => (
+        {cardsData.map((item, index) => (
           <Flex align="center" justify="center" key={index}>
             <Image
               boxShadow="md"
-              w="70%"
-              h="auto"
+              w="200px"
+              h="100%"
               transition="ease-in-out all 0.4s"
-              src={item.imageUrl}
-              _hover={{ transform: 'scale(1.05)' }}
-              _active={{ transform: 'scale(1.05)' }}
+              src={item.images.large}
+              _hover={{ transform: 'scale(1.05)', cursor: 'pointer' }}
+              _active={{ transform: 'scale(1.05)', cursor: 'pointer' }}
             />
           </Flex>
         ))}
-      </Flex>
-      <Flex justify="center" pt={10}>
-        {cards.length !== pokemonCards.length && (
-          <Button
-            onClick={() =>
-              this.setState({
-                cards: cards.concat(
-                  pokemonCards.slice(cards.length, cards.length + cardsShown)
-                )
-              })
-            }
-            leftIcon={<FaPlus />}
-            colorScheme="blue"
-          >
-            Show more
-          </Button>
+        {isLoadingNextPage && (
+          <Box pt={4}>
+            <Loading size="" />
+          </Box>
+        )}
+        {errorNextPage && (
+          <Box pt={4}>
+            <Error
+              size="100px"
+              direction="row"
+              message="Ops! Couldn't fetch the next cards in the list"
+            />
+          </Box>
         )}
       </Flex>
+      <Flex justify="center" pt={10}>
+        <Button
+          onClick={() =>
+            dispatch(
+              getCards(
+                pokemon,
+                selectState.rarity,
+                selectState.selectFilterOrder === 'desc'
+                  ? `-${selectState.selectFilter}`
+                  : selectState.selectFilter,
+                page++,
+                state.cardsShown
+              )
+            )
+          }
+          isDisabled={errorNextPage}
+          leftIcon={<FaPlus />}
+          colorScheme="blue"
+        >
+          Show more
+        </Button>
+      </Flex>
     </>
-  )
-}
+  );
+};
 
-export default PokemonPageCards
+export default PokemonPageCards;

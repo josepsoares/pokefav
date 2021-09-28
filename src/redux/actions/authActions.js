@@ -1,4 +1,4 @@
-import moment from 'moment'
+import moment from 'moment';
 import {
   LOGIN_SUCCESS,
   LOGIN_ERROR,
@@ -8,32 +8,32 @@ import {
   SIGNOUT_ERROR,
   RESET_PASSWORD_ERROR,
   RESET_PASSWORD_SUCCESS
-} from 'redux/types/authTypes'
+} from 'redux/types/authTypes';
 
 export const signIn = credentials => {
   return async (dispatch, _, { getFirebase }) => {
-    const firebase = getFirebase()
+    const firebase = getFirebase();
     const signInType = credentials.rememberMe
       ? firebase.auth.Auth.Persistence.LOCAL
-      : firebase.auth.Auth.Persistence.SESSION
+      : firebase.auth.Auth.Persistence.SESSION;
 
     try {
-      await firebase.auth().setPersistence(signInType)
+      await firebase.auth().setPersistence(signInType);
 
       await firebase
         .auth()
-        .signInWithEmailAndPassword(credentials.email, credentials.password)
-      dispatch({ type: LOGIN_SUCCESS })
+        .signInWithEmailAndPassword(credentials.email, credentials.password);
+      dispatch({ type: LOGIN_SUCCESS });
     } catch (err) {
-      dispatch({ type: LOGIN_ERROR })
+      dispatch({ type: LOGIN_ERROR });
     }
-  }
-}
+  };
+};
 
 export const signUp = newUser => {
   return (dispatch, _, { getFirebase, getFirestore }) => {
-    const firebase = getFirebase()
-    const firestore = getFirestore()
+    const firebase = getFirebase();
+    const firestore = getFirestore();
     firebase
       .auth()
       .createUserWithEmailAndPassword(newUser.email, newUser.password)
@@ -53,55 +53,75 @@ export const signUp = newUser => {
             friends: [],
             favoriteTeam: [],
             favoritePokemons: [],
-            triviaRecord: {
+            minigames: {
+              overallScore: 0,
+              played: 0,
+              pokeGuess: {
+                correctGuesses: 0,
+                incorrectGuesses: 0,
+                played: 0,
+                score: 0,
+                streak: 0
+              },
+              pokeTrivia: {
+                correctAnswers: 0,
+                incorrectAnswers: 0,
+                played: 0,
+                score: 0
+              },
+              pokeTypes: {
+                avgTime: 0,
+                correctTypesChosen: 0,
+                incorrectTypesChosen: 0,
+                played: 0,
+                score: 0
+              },
               pokemonIQ: null,
-              realizedTrivias: 0,
-              correctAnswers: 0,
-              wrongAnswers: 0
+              pokemonIQNr: null
             },
             notificationLikes: [],
             addFavoriteAction: null
-          })
-        await firebase.auth().currentUser.sendEmailVerification()
+          });
+        await firebase.auth().currentUser.sendEmailVerification();
       })
       .then(() => {
-        dispatch({ type: SIGNUP_SUCCESS })
+        dispatch({ type: SIGNUP_SUCCESS });
       })
       .catch(error => {
-        dispatch({ type: SIGNUP_ERROR, error: error })
-      })
-  }
-}
+        dispatch({ type: SIGNUP_ERROR, error: error });
+      });
+  };
+};
 
 export const signOut = () => {
   return async (dispatch, _, { getFirebase }) => {
     try {
-      const firebase = getFirebase()
-      await firebase.auth().signOut()
-      firebase.logout()
-      dispatch({ type: SIGNOUT_SUCCESS })
+      const firebase = getFirebase();
+      await firebase.auth().signOut();
+      firebase.logout();
+      dispatch({ type: SIGNOUT_SUCCESS });
     } catch (err) {
-      dispatch({ type: SIGNOUT_ERROR })
+      dispatch({ type: SIGNOUT_ERROR });
     }
-  }
-}
+  };
+};
 
 export const recoverPassword = email => {
   return async (dispatch, _, { getFirebase }) => {
-    const firebase = getFirebase()
+    const firebase = getFirebase();
 
     try {
-      await firebase.auth().sendPasswordResetEmail(email)
+      await firebase.auth().sendPasswordResetEmail(email);
 
       dispatch({
         type: RESET_PASSWORD_SUCCESS,
         payload: 'Reset password email sent. Go check your inbox.'
-      })
+      });
     } catch (error) {
       dispatch({
         type: RESET_PASSWORD_ERROR,
         payload: error.message
-      })
+      });
     }
-  }
-}
+  };
+};

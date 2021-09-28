@@ -1,11 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
-import InfiniteScroll from 'react-infinite-scroll-component'
-import Select from 'react-select'
-import Loading from 'components/feedback/Loading'
-import { getInfoPokemonPage } from 'redux/actions/apiActions'
-import _ from 'lodash'
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  getDataPokeListPage,
+  getInfoPokemonPage,
+  getPokedex as getPokedexAction
+} from 'redux/actions/pokemonActions';
+
+import { Link } from 'react-router-dom';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import Select from 'react-select';
+import { useWindowSize } from 'react-use';
+import _ from 'lodash';
 import {
   CloseButton,
   Drawer,
@@ -22,34 +27,33 @@ import {
   Stack,
   Text,
   useDisclosure
-} from '@chakra-ui/react'
-import Error from 'components/feedback/Error'
-import PokemonImage from 'components/layout/PokemonImage'
-import { FaSearch } from 'react-icons/fa'
+} from '@chakra-ui/react';
+import { FaSearch } from 'react-icons/fa';
+
+import Loading from 'components/feedback/Loading';
+import Error from 'components/feedback/Error';
+import PokemonImage from 'components/layout/PokemonImage';
+import SEO from 'components/Seo';
 
 // import Button from 'components/layout/Button'
-import { useWindowSize } from 'react-use'
-import { getDataPokeListPage, getPokedexAct } from 'redux/actions/apiActions'
-import SEO from 'components/Seo'
 
 const PokemonList = () => {
-  // const { getInfoPokemonPage, match } = this.props
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const { width } = useWindowSize()
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { width } = useWindowSize();
 
-  const pokedexEntries = useSelector(state => state.apiCalls.apiData.getPokedex)
+  const pokedexEntries = useSelector(state => state.pokemonApi.data.pokedex);
 
   const regions = useSelector(
-    state => state.apiCalls.apiData.getPokedexDropdowns.regions
-  )
+    state => state.pokemonApi.data.pokedexDropdowns.regions
+  );
   const types = useSelector(
-    state => state.apiCalls.apiData.getPokedexDropdowns.types
-  )
+    state => state.pokemonApi.data.pokedexDropdowns.types
+  );
 
   const [state, setState] = useState({
-    allPokedexEntries: pokedexEntries,
+    allPokedexEntries: [],
     searchPokemon: '',
     currentIndex: 1,
     resultsPerPage: 24,
@@ -57,91 +61,120 @@ const PokemonList = () => {
     hasMore: true,
     typeSearch: 'region',
     selectValue: 'national',
-    selectList: regions,
+    selectList: [],
+    optionsList: [],
     isLoading: false,
     error: null
-  })
+  });
 
-  const { items, typeSearch, selectValue, hasMore, isLoading, error } = state
-  const drawerBtnRef = useRef()
+  const {
+    items,
+    typeSearch,
+    selectValue,
+    optionsList,
+    hasMore,
+    isLoading,
+    error
+  } = state;
+  const drawerBtnRef = useRef();
 
   useEffect(() => {
-    const { allPokedexEntries } = state
-    if (!allPokedexEntries) {
-      dispatch(getPokedexAct('national', 'region'))
-      dispatch(getDataPokeListPage())
-    } else {
-      const pokedexEntriesSlice = pokedexEntries.slice(0, 808)
+    console.log(pokedexEntries);
+    if (!pokedexEntries) {
+      dispatch(getPokedexAction('national'));
+      dispatch(getDataPokeListPage());
+      /*
+      const pokedexEntriesSlice = pokedexEntries.slice(0, 808);
       setState({
         ...state,
         allPokedexEntries: pokedexEntriesSlice,
         items: calculatePage(pokedexEntriesSlice, 1)
-      })
+      }); */
+    } else {
+      const pokedexEntriesSlice = pokedexEntries.slice(0, 808);
+      console.log(pokedexEntriesSlice);
+
+      let optionsSelectSpecifics = [];
+
+      for (let item of regions) {
+        optionsSelectSpecifics.push({
+          value: item.name,
+          label: _.startCase(item.name)
+        });
+      }
+
+      setState({
+        ...state,
+        allPokedexEntries: pokedexEntriesSlice,
+        items: calculatePage(pokedexEntriesSlice, 1),
+        selectList: regions,
+        optionsList: optionsSelectSpecifics
+      });
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   const calculatePage = (caculateResults, index) => {
-    const { resultsPerPage } = state
-    const indexOfLastResults = index * resultsPerPage
-    const indexOfFirstResults = indexOfLastResults - resultsPerPage
+    const { resultsPerPage } = state;
+    const indexOfLastResults = index * resultsPerPage;
+    const indexOfFirstResults = indexOfLastResults - resultsPerPage;
     const currentResults = caculateResults.slice(
       indexOfFirstResults,
       indexOfLastResults
-    )
+    );
 
-    return currentResults
-  }
+    return currentResults;
+  };
 
   const fetchMoreData = () => {
-    let { currentIndex, allPokedexEntries } = state
-    currentIndex = currentIndex += 1
+    let { currentIndex, allPokedexEntries } = state;
+    currentIndex = currentIndex += 1;
     setState({
       ...state,
       items: state.items.concat(calculatePage(allPokedexEntries, currentIndex)),
       currentIndex: currentIndex
-    })
-  }
+    });
+  };
 
   const getPokedex = async (param, param2) => {
-    console.log(param2)
+    console.log(param2);
     const url =
       param2 === 'region'
         ? `https://pokeapi.co/api/v2/pokedex/${param}/`
-        : `https://pokeapi.co/api/v2/type/${param}/`
+        : `https://pokeapi.co/api/v2/type/${param}/`;
 
     try {
-      const pokemonListRequest = await fetch(url)
-      const pokemonListData = await pokemonListRequest.json()
+      const pokemonListRequest = await fetch(url);
+      const pokemonListData = await pokemonListRequest.json();
 
       const pokemonsList =
         param2 === 'region'
           ? pokemonListData.pokemon_entries
-          : pokemonListData.pokemon
+          : pokemonListData.pokemon;
 
-      const setItems = calculatePage(pokemonsList, 1)
+      const setItems = calculatePage(pokemonsList, 1);
 
-      setState({ ...state, items: setItems, allPokedexEntries: pokemonsList })
+      setState({ ...state, items: setItems, allPokedexEntries: pokemonsList });
     } catch (error) {
-      setState({ ...state, error: error.message, isLoading: false })
+      setState({ ...state, error: error.message, isLoading: false });
     }
-  }
+  };
 
   const handleSearchChange = event => {
-    const { value } = event.target
-    const { allPokedexEntries } = state
+    const { value } = event.target;
+    const { allPokedexEntries } = state;
 
     if (value !== '') {
-      var pokemon
-      var pokemonSearched = []
-      pokemon = value.toLowerCase()
+      var pokemon;
+      var pokemonSearched = [];
+      pokemon = value.toLowerCase();
       for (let pokedexItem of allPokedexEntries) {
         if (
           pokedexItem.pokemon_species.name.startsWith(pokemon) ||
           pokedexItem.pokemon_species.name.includes(pokemon)
         ) {
-          pokemonSearched.push(pokedexItem)
+          pokemonSearched.push(pokedexItem);
         }
       }
       setState({
@@ -149,30 +182,30 @@ const PokemonList = () => {
         items: calculatePage(pokemonSearched, 1),
         currentIndex: 1,
         searchPokemon: pokemonSearched
-      })
+      });
     } else {
       setState({
         ...state,
         items: calculatePage(allPokedexEntries, 1),
         currentIndex: 1,
         searchPokemon: ''
-      })
+      });
     }
-  }
+  };
 
   const handleSelectChange = async (value, action) => {
     setState({
       ...state,
       isLoading: true
-    })
+    });
 
     if (action.name === 'typeSearch') {
       if (value.value === 'region') {
-        const getPokedexByRegion = await getPokedex('national', 'region')
+        const getPokedexByRegion = await getPokedex('national', 'region');
         const pokedexEntriesSlice = getPokedexByRegion.allPokedexEntries.slice(
           0,
           808
-        )
+        );
 
         setState({
           ...state,
@@ -183,20 +216,20 @@ const PokemonList = () => {
           selectList: regions,
           selectValue: 'national',
           isLoading: false
-        })
+        });
       } else {
-        const getPokedexByType = await getPokedex('normal', 'type')
+        const getPokedexByType = await getPokedex('normal', 'type');
 
         let filterAllPokedexEntries = getPokedexByType.allPokedexEntries.filter(
           item => {
             if (item.slot !== 2) {
-              const splitUrl = item.pokemon.url.split('/')
-              return splitUrl[6] < 808
+              const splitUrl = item.pokemon.url.split('/');
+              return splitUrl[6] < 808;
             } else {
-              return false
+              return false;
             }
           }
-        )
+        );
 
         setState({
           ...state,
@@ -207,28 +240,28 @@ const PokemonList = () => {
           selectList: types,
           selectValue: 'normal',
           isLoading: false
-        })
+        });
       }
     } else {
-      const getPokemons = await getPokedex(value.value, state.typeSearch)
-      let filterAllPokedexEntries
+      const getPokemons = await getPokedex(value.value, state.typeSearch);
+      let filterAllPokedexEntries;
 
       if (typeSearch === 'type') {
         filterAllPokedexEntries = getPokemons.allPokedexEntries.filter(item => {
           if (item.slot !== 2) {
-            const splitUrl = item.pokemon.url.split('/')
-            return splitUrl[6] < 808
+            const splitUrl = item.pokemon.url.split('/');
+            return splitUrl[6] < 808;
           } else {
-            return false
+            return false;
           }
-        })
+        });
       } else if (value.value === 'national') {
-        filterAllPokedexEntries = getPokemons.allPokedexEntries.slice(0, 808)
+        filterAllPokedexEntries = getPokemons.allPokedexEntries.slice(0, 808);
       } else {
-        filterAllPokedexEntries = getPokemons.allPokedexEntries
+        filterAllPokedexEntries = getPokemons.allPokedexEntries;
       }
 
-      const getItems = calculatePage(filterAllPokedexEntries, 1)
+      const getItems = calculatePage(filterAllPokedexEntries, 1);
 
       setState({
         ...state,
@@ -237,18 +270,11 @@ const PokemonList = () => {
         allPokedexEntries: filterAllPokedexEntries,
         selectValue: value.value,
         isLoading: false
-      })
+      });
     }
-  }
+  };
 
-  let optionsSelectSpecifics = []
-
-  for (let item of state.selectList) {
-    optionsSelectSpecifics.push({
-      value: item.name,
-      label: _.startCase(item.name)
-    })
-  }
+  console.log(state);
 
   return (
     <>
@@ -288,7 +314,7 @@ const PokemonList = () => {
           endMessage={<Text>You have seen all the pokémon available</Text>}
         >
           <SimpleGrid
-            columns={[2, 3, 4]}
+            columns={[2, 3, 4, 5, 6]}
             gridGap={6}
             align="center"
             justify="center"
@@ -302,13 +328,13 @@ const PokemonList = () => {
                 const url =
                   pokedexItem.pokemon_species !== undefined
                     ? pokedexItem.pokemon_species.url.trim()
-                    : pokedexItem.pokemon.url.trim()
-                const pokemonNumber = url.split('/')[6]
+                    : pokedexItem.pokemon.url.trim();
+                const pokemonNumber = url.split('/')[6];
                 const pokemonName =
                   pokedexItem.pokemon_species !== undefined
                     ? pokedexItem.pokemon_species.name
-                    : pokedexItem.pokemon.name
-                const pokemonNameEdited = _.startCase(pokemonName)
+                    : pokedexItem.pokemon.name;
+                const pokemonNameEdited = _.startCase(pokemonName);
 
                 if (pokemonNumber <= 808) {
                   return (
@@ -316,7 +342,9 @@ const PokemonList = () => {
                       key={index}
                       to={`/pokemon-list/pokemon-page/${pokemonName}`}
                       onClick={() => {
-                        dispatch(getInfoPokemonPage(pokemonNumber, pokemonName))
+                        dispatch(
+                          getInfoPokemonPage(pokemonNumber, pokemonName)
+                        );
                       }}
                     >
                       <PokemonImage
@@ -324,12 +352,12 @@ const PokemonList = () => {
                         pokemonNumber={pokemonNumber}
                       />
                     </Link>
-                  )
+                  );
                 } else {
-                  return null
+                  return null;
                 }
               } else {
-                return null
+                return null;
               }
             })}
           </SimpleGrid>
@@ -425,7 +453,7 @@ const PokemonList = () => {
                         label: _.startCase(selectValue)
                       }}
                       onChange={handleSelectChange}
-                      options={optionsSelectSpecifics}
+                      options={optionsList}
                       isSearchable={false}
                     />
                   </FormControl>
@@ -453,7 +481,7 @@ const PokemonList = () => {
                         label: _.startCase(selectValue)
                       }}
                       onChange={handleSelectChange}
-                      options={optionsSelectSpecifics}
+                      options={optionsList}
                       isSearchable={false}
                     />
                   </FormControl>
@@ -464,7 +492,7 @@ const PokemonList = () => {
         </DrawerOverlay>
       </Drawer>
     </>
-  )
-}
+  );
+};
 
-export default PokemonList
+export default PokemonList;

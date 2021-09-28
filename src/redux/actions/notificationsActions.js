@@ -1,28 +1,28 @@
-import array from 'lodash/array'
+import array from 'lodash/array';
 
 export const getNotifications = () => {
   return (dispatch, { getFirestore }) => {
-    const firestore = getFirestore()
+    const firestore = getFirestore();
     firestore
       .collection('notifications')
       .get()
       .then(content => {
-        var returnContent = []
-        content.docs.map(doc => returnContent.push(doc.data()))
-        dispatch({ type: 'GET_NOTIFICATIONS_SUCCESS', payload: returnContent })
+        var returnContent = [];
+        content.docs.map(doc => returnContent.push(doc.data()));
+        dispatch({ type: 'GET_NOTIFICATIONS_SUCCESS', payload: returnContent });
       })
       .catch(error => {
-        dispatch({ type: 'GET_NOTIFICATIONS_ERROR', payload: error })
-      })
-  }
-}
+        dispatch({ type: 'GET_NOTIFICATIONS_ERROR', payload: error });
+      });
+  };
+};
 
 export const likeNotification = (notificationID, reactionType) => {
   return (dispatch, getState, { getFirestore }) => {
-    dispatch({ type: 'LIKE_REQUEST_START' })
-    const firestore = getFirestore()
-    const uid = getState().firebase.auth.uid
-    const profile = getState().firebase.profile
+    dispatch({ type: 'LIKE_REQUEST_START' });
+    const firestore = getFirestore();
+    const uid = getState().firebase.auth.uid;
+    const profile = getState().firebase.profile;
     firestore
       .collection('users')
       .doc(uid)
@@ -38,7 +38,7 @@ export const likeNotification = (notificationID, reactionType) => {
           .doc(notificationID)
           .get()
           .then(doc => {
-            const data = doc.data()
+            const data = doc.data();
             return firestore
               .collection('notifications')
               .doc(notificationID)
@@ -47,23 +47,23 @@ export const likeNotification = (notificationID, reactionType) => {
                   ...data.reactions,
                   [reactionType]: (data.reactions[reactionType] += 1)
                 }
-              })
+              });
           })
           .then(() => dispatch({ type: 'LIKE_NOTIFICATION_SUCCESS' }))
-          .catch(() => dispatch({ type: 'LIKE_NOTIFICATION_ERROR' }))
+          .catch(() => dispatch({ type: 'LIKE_NOTIFICATION_ERROR' }));
       })
-      .catch(() => dispatch({ type: 'LIKE_NOTIFICATION_ERROR' }))
-  }
-}
+      .catch(() => dispatch({ type: 'LIKE_NOTIFICATION_ERROR' }));
+  };
+};
 
 export const dislikeNotification = (notificationID, reactionType) => {
   return (dispatch, getState, { getFirestore }) => {
-    const firestore = getFirestore()
-    const uid = getState().firebase.auth.uid
-    const profile = getState().firebase.profile
+    const firestore = getFirestore();
+    const uid = getState().firebase.auth.uid;
+    const profile = getState().firebase.profile;
     array.remove(profile.notificationLikes, item => {
-      return item.id === notificationID
-    })
+      return item.id === notificationID;
+    });
     firestore
       .collection('users')
       .doc(uid)
@@ -76,7 +76,7 @@ export const dislikeNotification = (notificationID, reactionType) => {
           .doc(notificationID)
           .get()
           .then(doc => {
-            const data = doc.data()
+            const data = doc.data();
             return firestore
               .collection('notifications')
               .doc(notificationID)
@@ -85,11 +85,11 @@ export const dislikeNotification = (notificationID, reactionType) => {
                   ...data.reactions,
                   [reactionType]: (data.reactions[reactionType] -= 1)
                 }
-              })
+              });
           })
           .then(() => dispatch({ type: 'DISLIKE_NOTIFICATION_SUCCESS' }))
-          .catch(() => dispatch({ type: 'DISLIKE_NOTIFICATION_ERROR' }))
+          .catch(() => dispatch({ type: 'DISLIKE_NOTIFICATION_ERROR' }));
       })
-      .catch(() => dispatch({ type: 'DISLIKE_NOTIFICATION_ERROR' }))
-  }
-}
+      .catch(() => dispatch({ type: 'DISLIKE_NOTIFICATION_ERROR' }));
+  };
+};

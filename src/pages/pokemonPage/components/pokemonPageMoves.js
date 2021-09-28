@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import _ from 'lodash'
+import React, { useState, useEffect } from 'react';
+import _ from 'lodash';
 
 import {
   Box,
@@ -15,11 +15,11 @@ import {
   Text,
   useDisclosure,
   Heading
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import Loading from 'components/feedback/Loading'
-import Error from 'components/feedback/Error'
-import Button from 'components/layout/Button'
+import Loading from 'components/feedback/Loading';
+import Error from 'components/feedback/Error';
+import Button from 'components/layout/Button';
 
 const PokemonPageMoves = props => {
   const [state, setState] = useState({
@@ -27,12 +27,12 @@ const PokemonPageMoves = props => {
     error: null,
     move: null,
     moveConditions: null
-  })
+  });
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const { isLoading, error, move, moveConditions } = state
-  const { pokemonMoves, method } = props
-  const orderedMovesArray = []
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isLoading, error, move, moveConditions } = state;
+  const { pokemonMoves, method } = props;
+  const orderedMovesArray = [];
 
   for (var itemMove of pokemonMoves) {
     for (let itemMoveSpecifics of itemMove.version_group_details) {
@@ -41,10 +41,10 @@ const PokemonPageMoves = props => {
         orderedMovesArray.push({
           name: itemMove.move.name,
           level_learned_at: itemMoveSpecifics.level_learned_at
-        })
+        });
     }
     method === 'level-up' &&
-      orderedMovesArray.sort((a, b) => a.level_learned_at - b.level_learned_at)
+      orderedMovesArray.sort((a, b) => a.level_learned_at - b.level_learned_at);
   }
 
   useEffect(() => {
@@ -63,22 +63,22 @@ const PokemonPageMoves = props => {
           [move.meta.drain, 'Drain Amount', 0],
           [move.meta.healing, 'Healing Amount', 0]
         ]
-      })
+      });
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.move])
+  }, [state.move]);
 
   const _getSpecificMove = async move => {
-    setState({ ...state, isLoading: true })
+    setState({ ...state, isLoading: true });
     try {
-      const request = await fetch(`https://pokeapi.co/api/v2/move/${move}/`)
-      const data = await request.json()
-      setState({ ...state, isLoading: false, move: data })
+      const request = await fetch(`https://pokeapi.co/api/v2/move/${move}/`);
+      const data = await request.json();
+      setState({ ...state, isLoading: false, move: data });
     } catch (err) {
-      setState({ ...state, isLoading: false, error: err })
+      setState({ ...state, isLoading: false, error: err });
     }
-  }
+  };
 
   const _printConditionMove = (key, firstName, firstString, firstCondition) => {
     if (firstName !== firstCondition) {
@@ -90,16 +90,16 @@ const PokemonPageMoves = props => {
             {firstCondition !== 0 && '%'}
           </Text>
         </Box>
-      )
+      );
     }
-  }
+  };
 
   const _printMoveModal = () => {
-    const moveName = move?.names.find(item => item.language.name === 'en')
-    const generationName = move?.generation?.name?.split('-')
+    const moveName = move?.names.find(item => item.language.name === 'en');
+    const generationName = move?.generation?.name?.split('-');
     const moveDescription = move?.flavor_text_entries.find(
       item => item.language.name === 'en'
-    )
+    );
 
     return (
       <Modal
@@ -202,14 +202,14 @@ const PokemonPageMoves = props => {
           </ModalContent>
         </ModalOverlay>
       </Modal>
-    )
-  }
+    );
+  };
 
   if (orderedMovesArray.length) {
     return (
       <>
         {method === 'level-up' ? (
-          <SimpleGrid gridGap={4} columns={[1, 2]}>
+          <SimpleGrid gridGap={4} columns={[1, 2, null, 3]}>
             {orderedMovesArray.map((moveItem, key) => (
               <Flex flexDir="column" key={key}>
                 <Button
@@ -217,12 +217,13 @@ const PokemonPageMoves = props => {
                   display="flex"
                   flexDir="row"
                   fontWeight="medium"
+                  color="#3c3c3b"
                   sx={{
                     boxShadow: 'none'
                   }}
                   onClick={() => {
-                    _getSpecificMove(moveItem.name)
-                    onOpen()
+                    _getSpecificMove(moveItem.name);
+                    onOpen();
                   }}
                 >
                   {moveItem.level_learned_at === 0 ? (
@@ -247,9 +248,10 @@ const PokemonPageMoves = props => {
                 key={key}
                 variant="ghost"
                 onClick={() => {
-                  _getSpecificMove(moveItem.name)
-                  onOpen()
+                  _getSpecificMove(moveItem.name);
+                  onOpen();
                 }}
+                color="#3c3c3b"
                 _hover={{
                   color: 'blue.500',
                   bgColor: 'yellow.300'
@@ -269,14 +271,14 @@ const PokemonPageMoves = props => {
         )}
         {_printMoveModal()}
       </>
-    )
+    );
   } else {
     return (
       <Text textAlign="center" py={4}>
         There weren't found any moves that this pokémon can learn by this method
       </Text>
-    )
+    );
   }
-}
+};
 
-export default PokemonPageMoves
+export default PokemonPageMoves;

@@ -1,33 +1,33 @@
-import React, { useEffect, useState } from 'react'
-import { Icon, IconButton } from '@chakra-ui/react'
-import { motion } from 'framer-motion'
-import { FaArrowUp } from 'react-icons/fa'
+import React, { useEffect, useState } from 'react';
+import { Icon, IconButton } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
+import { FaArrowUp } from 'react-icons/fa';
 
 const ScrollingWrapper = () => {
-  const [threshold, setThreshold] = useState(false)
+  const [threshold, setThreshold] = useState(false);
 
   const onScroll = () => {
     if (window.scrollY >= 350) {
-      setThreshold(true)
+      setThreshold(true);
     } else if (window.scrollY < 350) {
-      setThreshold(false)
+      setThreshold(false);
     }
-  }
+  };
 
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       left: 0,
       behavior: 'smooth'
-    })
-  }
+    });
+  };
 
   useEffect(() => {
-    window.addEventListener('scroll', onScroll)
+    window.addEventListener('scroll', onScroll);
     return () => {
-      window.removeEventListener('scroll', onScroll)
-    }
-  }, [])
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
 
   return (
     <motion.div
@@ -49,12 +49,12 @@ const ScrollingWrapper = () => {
         aria-label="Scroll Top"
         boxShadow="md"
         left={['90%', null, null, null, '94%']}
-        top={['85%', null, null, null, '92%']}
+        top={['85%', null, null, null, '90%']}
         boxSize={['2.5rem', null, '3rem', '3.25rem']}
-        icon={<Icon as={FaArrowUp} boxSize={[6, null, 7, 8]} />}
+        icon={<Icon as={FaArrowUp} boxSize={6} />}
       />
     </motion.div>
-  )
-}
+  );
+};
 
-export default ScrollingWrapper
+export default ScrollingWrapper;

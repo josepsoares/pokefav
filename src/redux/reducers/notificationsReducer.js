@@ -1,51 +1,75 @@
+import {
+  GET_NOTIFICATIONS_LOADING,
+  GET_NOTIFICATIONS_SUCCESS,
+  GET_NOTIFICATIONS_ERROR,
+  REACTION_NOTIFICATION_LOADING,
+  LIKE_NOTIFICATION_SUCCESS,
+  LIKE_NOTIFICATION_ERROR,
+  DISLIKE_NOTIFICATION_SUCCESS,
+  DISLIKE_NOTIFICATION_ERROR
+} from 'redux/types/notificationsTypes';
+
 const initState = {
   notifications: '',
-  isLoaded: false,
-  isReactionLoading: false
-}
+  notificationsError: false,
+  isLoadingNotifs: false,
+  isLoadingReaction: false,
+  reactionError: false
+};
 
 const notificationsReducer = (state = initState, action) => {
   switch (action.type) {
-    case 'LIKE_REQUEST_START':
+    case 'CLEAN_ERRORS':
       return {
         ...state,
-        isReactionLoading: true
-      }
-    case 'GET_NOTIFICATIONS_SUCCESS':
+        notificationsError: false,
+        reactionError: false
+      };
+    case GET_NOTIFICATIONS_LOADING:
+      return {
+        ...state,
+        isLoadingNotifs: true
+      };
+    case GET_NOTIFICATIONS_SUCCESS:
       return {
         ...state,
         notifications: action.payload,
-        isLoaded: true
-      }
-    case 'GET_NOTIFICATIONS_ERROR':
+        isLoadingNotifs: false
+      };
+    case GET_NOTIFICATIONS_ERROR:
       return {
         ...state,
-        notifications: action.payload,
-        isLoaded: true
-      }
-    case 'LIKE_NOTIFICATION_SUCCESS':
+        notificationsError: action.payload,
+        isLoadingNotifs: false
+      };
+    case REACTION_NOTIFICATION_LOADING:
       return {
         ...state,
-        isReactionLoading: false
-      }
-    case 'LIKE_NOTIFICATION_ERROR':
+        isLoadingReaction: true
+      };
+    case LIKE_NOTIFICATION_SUCCESS:
       return {
         ...state,
-        isReactionLoading: false
-      }
-    case 'DISLIKE_NOTIFICATION_SUCCESS':
+        isLoadingReaction: false
+      };
+    case LIKE_NOTIFICATION_ERROR:
       return {
         ...state,
-        isReactionLoading: false
-      }
-    case 'DISLIKE_NOTIFICATION_ERROR':
+        isLoadingReaction: false
+      };
+    case DISLIKE_NOTIFICATION_SUCCESS:
       return {
         ...state,
-        isReactionLoading: false
-      }
+        isLoadingReaction: false
+      };
+    case DISLIKE_NOTIFICATION_ERROR:
+      return {
+        ...state,
+        isLoadingReaction: false
+      };
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default notificationsReducer
+export default notificationsReducer;

@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   DndContext,
   DragEndEvent,
@@ -10,14 +10,17 @@ import {
   MouseSensor,
   TouchSensor,
   PointerSensor
-} from '@dnd-kit/core'
+} from '@dnd-kit/core';
 import {
   SortableContext,
   useSortable,
   arrayMove,
   rectSortingStrategy,
+  horizontalListSortingStrategy,
+  rectSwappingStrategy,
+  verticalListSortingStrategy,
   sortableKeyboardCoordinates
-} from '@dnd-kit/sortable'
+} from '@dnd-kit/sortable';
 import {
   Box,
   Flex,
@@ -26,119 +29,159 @@ import {
   IconButton,
   Image,
   Text
-} from '@chakra-ui/react'
-import PokemonImage from 'components/layout/PokemonImage'
-import { FaTrashAlt } from 'react-icons/fa'
-import { CgPokemon } from 'react-icons/cg'
+} from '@chakra-ui/react';
+import PokemonImage from 'components/layout/PokemonImage';
+import { FaTrashAlt } from 'react-icons/fa';
+import { CgPokemon } from 'react-icons/cg';
+
+const defaultInitializer = index => index;
+
+export function createRange(length, initializer = defaultInitializer) {
+  return [...new Array(length)].map((_, index) => initializer(index));
+}
 
 const DragGridList = ({ data, updateListFunc, funcPokemonAlert, list }) => {
-  const [activeId, setActiveId] = useState(null)
+  const [activeId, setActiveId] = useState(null);
   const sensors = useSensors(
     useSensor(PointerSensor),
-    useSensor(MouseSensor),
-    useSensor(TouchSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates
     })
-  )
+  );
+
+  /* const [items, setItems] = useState(() =>
+    createRange(16, index => (index + 1).toString())
+  ); */
+
+  const [items, setItems] = useState(() =>
+    createRange(data.length, index => {
+      const dataWithoutPokeId = data.map(item => {
+        if (item?.id) {
+          delete item.id;
+          return item;
+        } else {
+          return item;
+        }
+      });
+
+      return {
+        id: (index + 1).toString(),
+        pokemonId: data[index].id,
+        ...dataWithoutPokeId[index]
+      };
+    })
+  );
+
+  console.log(items);
 
   function handleDragStart({ active }) {
-    console.log('teste start')
-    setActiveId(active.id)
+    console.log(active);
+    setActiveId(active.id);
   }
 
   function handleDragEnd({ over }) {
-    console.log(over)
-    console.log('teste end')
+    console.log(over);
+    console.log('teste end');
     updateListFunc(
       arrayMove(data, data.indexOf(activeId), data.indexOf(over.id))
-    )
-    setActiveId(null)
+    );
+    setActiveId(null);
   }
 
   return (
-    <Flex>
+    <Flex w="100%">
       <DndContext
         collisionDetection={closestCenter}
         sensors={sensors}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext strategy={rectSortingStrategy} items={data}>
-          <Grid
-            w="100%"
-            gridGap={[4, 2]}
-            templateColumns={[
-              'repeat(auto-fit, minmax(145px, 1fr))',
-              null,
-              'repeat(3, 1fr)',
-              'repeat(6, 1fr)'
-            ]}
-          >
-            {data.map((item, id) =>
-              item?.isEmpty ? (
-                <Flex
-                  key={id}
-                  flexDir="column"
-                  align="center"
-                  position="relative"
-                  opacity="0.25"
-                  p="1rem 0"
-                >
-                  <Box boxSize="110px" position="relative" />
-                  <Icon
-                    position="absolute"
-                    boxSize="10rem"
-                    top="39%"
-                    left="50%"
-                    opacity="0.5"
-                    transform="translate(-50%, -50%)"
-                    as={CgPokemon}
-                  />
-                  <Text
-                    letterSpacing="0.1em"
-                    fontFamily="'Rubick', sans-serif"
-                    pt={6}
-                  >
-                    ---
-                  </Text>
-                </Flex>
-              ) : (
-                <Item
-                  key={id}
-                  id={id}
-                  item={item}
-                  listType={list}
-                  setRemoveAlert={funcPokemonAlert}
-                />
-              )
-            )}
+        <SortableContext strategy={rectSortingStrategy} items={items}>
+          <Grid>
+            {items.map(item => {
+              console.log(typeof item.key);
+              return <Item key={item.id} id={item.id} />;
+            })}
           </Grid>
         </SortableContext>
       </DndContext>
     </Flex>
-  )
-}
+  );
+};
 
-function Item({ id, item, listType, setRemoveAlert }) {
-  const {
-    attributes,
-    setNodeRef,
-    listeners,
-    transform,
-    isDragging
-  } = useSortable({
+function Item({ id }) {
+  const teste = useSortable({
     id,
     transition: null
-  })
+  });
+  const { attributes, setNodeRef, listeners, transform, isDragging } =
+    useSortable({
+      id,
+      transition: null
+    });
 
-  console.log('isDragging =>', isDragging, id)
-  console.log(transform)
+  console.log(teste);
+
+  return (
+    <motion.div
+      style={{
+        position: 'relative',
+        width: 140,
+        height: 140
+      }}
+      ref={setNodeRef}
+      tabIndex={0}
+      layoutId={id}
+      animate={
+        transform
+          ? {
+              x: transform.x,
+              y: transform.y,
+              scale: isDragging ? 1.05 : 1,
+              zIndex: isDragging ? 1 : 0,
+              boxShadow: isDragging
+                ? '0 0 0 1px rgba(63, 63, 68, 0.05), 0px 15px 15px 0 rgba(34, 33, 81, 0.25)'
+                : undefined
+            }
+          : { x: 0, y: 0, scale: 1 }
+      }
+      transition={{
+        duration: !isDragging ? 0.25 : 0,
+        easings: {
+          type: 'spring'
+        },
+        scale: {
+          duration: 0.25
+        },
+        zIndex: {
+          delay: isDragging ? 0 : 0.25
+        }
+      }}
+      {...attributes}
+      {...listeners}
+    >
+      teste
+    </motion.div>
+  );
+}
+
+/* function Item({ id, item, listType, setRemoveAlert }) {
+  const { attributes, setNodeRef, listeners, transform, isDragging } =
+    useSortable({
+      id,
+      transition: null
+    });
+
+  console.log('isDragging =>', isDragging, id);
+  console.log(transform, attributes);
 
   return (
     <motion.div
       key={id}
       style={{
+        position: 'relative',
+        width: 140,
+        height: 140,
         zIndex: 0,
         cursor: 'grab',
         touchAction: 'none',
@@ -246,7 +289,7 @@ function Item({ id, item, listType, setRemoveAlert }) {
         />
       </Flex>
     </motion.div>
-  )
-}
+  );
+} */
 
-export default DragGridList
+export default DragGridList;

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { recoverPassword } from 'redux/actions/userActions'
+import { recoverPassword } from 'redux/actions/authActions'
 import { Formik, Field } from 'formik'
 import * as Yup from 'yup'
 import {

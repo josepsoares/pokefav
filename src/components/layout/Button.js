@@ -1,9 +1,9 @@
-import React, { forwardRef } from 'react'
-import { Button as ChakraButton } from '@chakra-ui/react'
-import _ from 'lodash'
+import React, { forwardRef } from 'react';
+import { Button as ChakraButton } from '@chakra-ui/react';
+import _ from 'lodash';
 
 const Button = forwardRef((props, ref) => {
-  const propsForButton = _.omit(props, 'children')
+  const propsForButton = _.omit(props, 'children');
 
   return (
     <ChakraButton
@@ -19,7 +19,7 @@ const Button = forwardRef((props, ref) => {
     >
       <span>{props.children}</span>
     </ChakraButton>
-  )
-})
+  );
+});
 
-export default Button
+export default Button;

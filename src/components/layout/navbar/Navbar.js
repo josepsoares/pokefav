@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getUser, signOut } from 'redux/actions/userActions'
+import { getUser } from 'redux/actions/userActions'
+import { signOut } from 'redux/actions/authActions'
 
 import { Link, NavLink } from 'react-router-dom'
 import {

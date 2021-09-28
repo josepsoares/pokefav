@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { signIn } from 'redux/actions/userActions'
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { signIn } from 'redux/actions/authActions';
 
-import { Link } from 'react-router-dom'
-import { Formik, Field } from 'formik'
-import * as Yup from 'yup'
+import { Link } from 'react-router-dom';
+import { Formik, Field } from 'formik';
+import * as Yup from 'yup';
 import {
   Box,
   Text,
@@ -21,16 +21,22 @@ import {
   IconButton,
   Heading,
   Flex
-} from '@chakra-ui/react'
-import { BiAt, BiKey, BiLogInCircle, BiLowVision, BiShow } from 'react-icons/bi'
-import { FcGoogle } from 'react-icons/fc'
-import { FaFacebook } from 'react-icons/fa'
-import Button from 'components/layout/Button'
+} from '@chakra-ui/react';
+import {
+  BiAt,
+  BiKey,
+  BiLogInCircle,
+  BiLowVision,
+  BiShow
+} from 'react-icons/bi';
+import { FcGoogle } from 'react-icons/fc';
+import { FaFacebook } from 'react-icons/fa';
+import Button from 'components/layout/Button';
 
 const Login = props => {
-  const dispatch = useDispatch()
-  const [show, setShow] = useState(false)
-  const { registerAutoScroll } = props
+  const dispatch = useDispatch();
+  const [show, setShow] = useState(false);
+  const { registerAutoScroll } = props;
 
   const SignupSchema = Yup.object().shape({
     email: Yup.string()
@@ -39,7 +45,7 @@ const Login = props => {
     password: Yup.string().required(
       'You must type your password to proceed with the login'
     )
-  })
+  });
 
   return (
     <Flex flexDir="column" justify="center">
@@ -47,34 +53,6 @@ const Login = props => {
         Login now
       </Heading>
       <Box bg="#ebebd3" color="#3c3c3b" p={[8, 10]} borderRadius="10px">
-        <VStack>
-          <Button w="60%" colorScheme="facebook" leftIcon={<FaFacebook />}>
-            Facebook
-          </Button>
-          <Button w="60%" bg="white" leftIcon={<FcGoogle />}>
-            Google
-          </Button>
-        </VStack>
-        <Box
-          display="flex"
-          justifyContent="center"
-          position="relative"
-          w="100%"
-        >
-          <Heading
-            px={6}
-            mb={0}
-            pb={0}
-            as="h5"
-            top="28%"
-            zIndex="1"
-            bg="#ebebd3"
-            position="absolute"
-          >
-            Or
-          </Heading>
-          <Divider borderColor="#1688b9" my={12} />
-        </Box>
         <Formik
           validationSchema={SignupSchema}
           initialValues={{
@@ -83,7 +61,7 @@ const Login = props => {
             rememberMe: true
           }}
           onSubmit={values => {
-            dispatch(signIn(values))
+            dispatch(signIn(values));
           }}
         >
           {props => (
@@ -112,6 +90,12 @@ const Login = props => {
                         _hover={{
                           borderColor: 'blue.300'
                         }}
+                        _active={{
+                          borderColor: 'blue.300'
+                        }}
+                        _placeholder={{
+                          color: 'gray.400'
+                        }}
                       />
                     </InputGroup>
                     <FormErrorMessage>{form.errors.email}</FormErrorMessage>
@@ -137,6 +121,12 @@ const Login = props => {
                         placeholder="Type your password"
                         _hover={{
                           borderColor: 'blue.300'
+                        }}
+                        _active={{
+                          borderColor: 'blue.300'
+                        }}
+                        _placeholder={{
+                          color: 'gray.400'
                         }}
                       />
                       <InputRightElement width="4.5rem">
@@ -197,7 +187,7 @@ const Login = props => {
         </Box>
       </Box>
     </Flex>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

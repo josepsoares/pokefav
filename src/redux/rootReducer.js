@@ -1,28 +1,46 @@
-import userReducer from './reducers/userReducer'
-import userFavoritesReducer from './reducers/userFavoritesReducer'
-import triviaReducer from './reducers/minigamesReducer'
-import notificationsReducer from './reducers/notificationsReducer'
-import apiReducer from './reducers/apiReducer'
-import { combineReducers } from 'redux'
-import { firestoreReducer } from 'redux-firestore'
-import { firebaseReducer } from 'react-redux-firebase'
-import { persistReducer } from 'redux-persist'
-import storage from 'redux-persist/lib/storage'
+import { combineReducers } from 'redux';
+import { firestoreReducer } from 'redux-firestore';
+import { firebaseReducer } from 'react-redux-firebase';
+import { persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 
-const apiPersistConfig = {
-  key: 'apiCalls',
+import authReducer from './reducers/authReducer';
+import userReducer from './reducers/userReducer';
+import minigamesReducer from './reducers/minigamesReducer';
+import notificationsReducer from './reducers/notificationsReducer';
+import pokemonReducer from 'redux/reducers/pokemonReducer';
+import pokemonCardsReducer from 'redux/reducers/pokemonCardsReducer';
+
+const userApiPersistConfig = {
+  key: 'user',
   storage: storage,
-  whitelist: ['apiData']
-}
+  whitelist: ['isLoggedIn', 'queryUser']
+};
+
+const pokemonApiPersistConfig = {
+  key: 'pokemonApi',
+  storage: storage,
+  whitelist: ['data']
+};
+
+const pokemonCardsApiPersistConfig = {
+  key: 'pokemonCardsApi',
+  storage: storage,
+  whitelist: ['cardsData', 'page', 'rarities']
+};
 
 const rootReducer = combineReducers({
-  auth: userReducer,
-  favorite: userFavoritesReducer,
-  trivia: triviaReducer,
+  auth: authReducer,
+  user: persistReducer(userApiPersistConfig, userReducer),
+  minigames: minigamesReducer,
   notifications: notificationsReducer,
-  apiCalls: persistReducer(apiPersistConfig, apiReducer),
+  pokemonCardsApi: persistReducer(
+    pokemonCardsApiPersistConfig,
+    pokemonCardsReducer
+  ),
+  pokemonApi: persistReducer(pokemonApiPersistConfig, pokemonReducer),
   firestore: firestoreReducer,
   firebase: firebaseReducer
-})
+});
 
-export default rootReducer
+export default rootReducer;

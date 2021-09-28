@@ -1,59 +1,65 @@
-import PokemonCardsApiService from 'services/pokemonCardsApi'
+import PokemonCardsApiService from 'services/pokemonCardsApi';
 import {
+  POKEMONCARDS_DATA_LOADING,
   POKEMONCARDS_DATA_SUCCESS,
   POKEMONCARDS_DATA_ERROR,
+  POKEMONCARDS_NEXT_CARDS_DATA_LOADING,
+  POKEMONCARDS_NEXT_CARDS_DATA_SUCCESS,
+  POKEMONCARDS_NEXT_CARDS_DATA_ERROR,
+  POKEMONCARDS_RARITIES_DATA_LOADING,
   POKEMONCARDS_RARITIES_DATA_SUCCESS,
-  POKEMONCARDS_RARITIES_DATA_ERROR,
-  POKEMONCARDS_SUBTYPES_DATA_SUCCESS,
-  POKEMONCARDS_SUBTYPES_DATA_ERROR
-} from 'redux/types/pokemonCardsTypes'
+  POKEMONCARDS_RARITIES_DATA_ERROR
+} from 'redux/types/pokemonCardsTypes';
 
-export const getCardsParamsInfo = () => async dispatch => {}
-
-export const getCards = () => async dispatch => {
-  dispatch({ type: 'API_REQUEST_START' })
-
-  try {
-    const cards = await PokemonCardsApiService.getCards()
-    const cardsJson = cards.json()
-
+export const getCards =
+  (name, rarity, orderBy, page, pageSize) => async dispatch => {
     dispatch({
-      type: POKEMONCARDS_DATA_SUCCESS,
-      payload: cardsJson.cards
-    })
-  } catch (err) {
-    dispatch({ type: POKEMONCARDS_DATA_ERROR, error: err })
-  }
-}
+      type:
+        page === 1
+          ? POKEMONCARDS_DATA_LOADING
+          : POKEMONCARDS_NEXT_CARDS_DATA_LOADING
+    });
+
+    try {
+      const cards = await PokemonCardsApiService.getCards(
+        name,
+        rarity,
+        orderBy,
+        page,
+        pageSize
+      );
+      const cardsJson = await cards.json();
+
+      dispatch({
+        type:
+          page === 1
+            ? POKEMONCARDS_DATA_SUCCESS
+            : POKEMONCARDS_NEXT_CARDS_DATA_SUCCESS,
+        payload: cardsJson.data
+      });
+    } catch (err) {
+      dispatch({
+        type:
+          page === 1
+            ? POKEMONCARDS_DATA_ERROR
+            : POKEMONCARDS_NEXT_CARDS_DATA_ERROR,
+        error: err
+      });
+    }
+  };
 
 export const getCardsRarities = () => async dispatch => {
-  dispatch({ type: 'API_REQUEST_START' })
+  dispatch({ type: POKEMONCARDS_RARITIES_DATA_LOADING });
 
   try {
-    const rarities = await PokemonCardsApiService.getCardsRarities()
-    const raritiesJson = rarities.json()
+    const rarities = await PokemonCardsApiService.getCardsRarities();
+    const raritiesJson = rarities.json();
 
     dispatch({
       type: POKEMONCARDS_RARITIES_DATA_SUCCESS,
       payload: raritiesJson.cards
-    })
+    });
   } catch (err) {
-    dispatch({ type: POKEMONCARDS_RARITIES_DATA_ERROR, error: err })
+    dispatch({ type: POKEMONCARDS_RARITIES_DATA_ERROR, error: err });
   }
-}
-
-export const getCardsSubTypes = () => async dispatch => {
-  dispatch({ type: 'API_REQUEST_START' })
-
-  try {
-    const subtypes = await PokemonCardsApiService.getCardsSubTypes()
-    const subtypesJson = subtypes.json()
-
-    dispatch({
-      type: POKEMONCARDS_SUBTYPES_DATA_SUCCESS,
-      payload: subtypesJson.data
-    })
-  } catch (err) {
-    dispatch({ type: POKEMONCARDS_SUBTYPES_DATA_ERROR, error: err })
-  }
-}
+};

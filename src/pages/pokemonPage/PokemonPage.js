@@ -1,21 +1,22 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import {
   addFavoritePokemon,
   removeFavoritePokemon,
   addPokemonToTeam,
   removePokemonFromTeam
-} from 'redux/actions/userFavoritesActions'
+} from 'redux/actions/userActions';
 
-import PokemonPageMoves from './components/pokemonPageMoves'
-import PokemonPageGenericInfo from './components/pokemonPageGenericInfo'
-import PokemonPageEvChain from './components/pokemonPageEvChain'
-import PokemonPageNextPrevious from './components/pokemonPageNextPrevious'
-import PokemonPageAlternateForms from './components/pokemonPageAlternateForms'
-import Button from 'components/layout/Button'
+import PokemonPageMoves from './components/pokemonPageMoves';
+import PokemonPageGenericInfo from './components/pokemonPageGenericInfo';
+import PokemonPageEvChain from './components/pokemonPageEvChain';
+import PokemonPageNextPrevious from './components/pokemonPageNextPrevious';
+import PokemonPageAlternateForms from './components/pokemonPageAlternateForms';
+import PokemonPageCards from './components/pokemonPageCards';
+import Button from 'components/layout/Button';
 
-import pokemon from 'pokemon'
-import _ from 'lodash'
+import pokemon from 'pokemon';
+import _ from 'lodash';
 
 import {
   Text,
@@ -32,44 +33,38 @@ import {
   TabPanel,
   Icon,
   Divider
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 import {
   FaCompactDisc,
   FaEgg,
-  FaPlus,
   FaPlusCircle,
   FaStar,
   FaStopCircle,
   FaTrashAlt
-} from 'react-icons/fa'
-import SEO from 'components/Seo'
+} from 'react-icons/fa';
+import SEO from 'components/Seo';
 
 class PokePage extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       activeTab: 0,
-      moveMethod: 'level-up',
-      cards: [],
-      cardsShown: 6
-    }
+      moveMethod: 'level-up'
+    };
   }
 
   _toggleTab = tab => {
     this.state.activeTab !== tab[0] &&
-      this.setState({ activeTab: tab[0], moveMethod: tab[1] })
-  }
+      this.setState({ activeTab: tab[0], moveMethod: tab[1] });
+  };
 
   _getPokemonTeamUserButton = (name, pokeStats, pokeId) => {
-    const {
-      profilePokemonTeam,
-      addPokemonToTeam,
-      removePokemonFromTeam
-    } = this.props
+    const { profilePokemonTeam, addPokemonToTeam, removePokemonFromTeam } =
+      this.props;
 
     const foundPokemonTeam = profilePokemonTeam.find(
       pokemon => pokemon.name === name
-    )
+    );
 
     if (foundPokemonTeam) {
       return (
@@ -81,7 +76,7 @@ class PokePage extends Component {
         >
           Remove From Team
         </Button>
-      )
+      );
     } else if (profilePokemonTeam.length === 6) {
       return (
         <Button
@@ -91,7 +86,7 @@ class PokePage extends Component {
         >
           Team is Full
         </Button>
-      )
+      );
     } else {
       return (
         <Button
@@ -104,19 +99,19 @@ class PokePage extends Component {
         >
           Add to Team
         </Button>
-      )
+      );
     }
-  }
+  };
 
   _getPokemonFavoritesUserButton = (name, pokeStats, pokeId) => {
     const {
       profilePokemonFavorites,
       addFavoritePokemon,
       removeFavoritePokemon
-    } = this.props
+    } = this.props;
     const foundPokemonFavorites = profilePokemonFavorites.find(
       pokemon => pokemon.name === name
-    )
+    );
 
     if (foundPokemonFavorites) {
       return (
@@ -128,7 +123,7 @@ class PokePage extends Component {
         >
           Remove from Favorites List
         </Button>
-      )
+      );
     } else if (profilePokemonFavorites.length === 15) {
       return (
         <Button
@@ -138,7 +133,7 @@ class PokePage extends Component {
         >
           Favorites List is full
         </Button>
-      )
+      );
     } else {
       return (
         <Button
@@ -151,35 +146,23 @@ class PokePage extends Component {
         >
           Add to Favorites List
         </Button>
-      )
+      );
     }
-  }
-
-  componentDidMount() {
-    const { pokemonCards } = this.props
-
-    this.setState({ cards: pokemonCards.slice(0, 6) })
-  }
+  };
 
   render() {
-    const { cards, cardsShown } = this.state
-    const {
-      auth,
-      pokemonInfo,
-      pokemonEvChainInfo,
-      pokemonAlternateFormInfo,
-      pokemonCards
-    } = this.props
-    const { moves, stats, id, sprites } = pokemonInfo[0]
-    const { names, forms_switchable, flavor_text_entries } = pokemonInfo[1]
-    console.log(pokemonInfo[0], pokemonInfo[1])
-    const pokemonName = pokemon.getName(id)
-    var uniqueNames = new Set()
+    const { auth, pokemonInfo, pokemonEvChainInfo, pokemonAlternateFormInfo } =
+      this.props;
+    const { moves, stats, id, sprites } = pokemonInfo[0];
+    const { names, forms_switchable, flavor_text_entries } = pokemonInfo[1];
+    console.log(pokemonInfo[0], pokemonInfo[1]);
+    const pokemonName = pokemon.getName(id);
+    var uniqueNames = new Set();
 
     for (let item of names) {
       item.language.name !== 'en' &&
         item.name !== pokemonName &&
-        uniqueNames.add(item.name)
+        uniqueNames.add(item.name);
     }
 
     const movesArray = [
@@ -198,7 +181,7 @@ class PokePage extends Component {
         name: 'Egg Moves',
         icon: FaEgg
       }
-    ]
+    ];
 
     const getEngDescriptions = _.shuffle(
       flavor_text_entries.filter((thing, index, self) => {
@@ -207,19 +190,19 @@ class PokePage extends Component {
           self.findIndex(
             t => t.flavor_text === thing.flavor_text && t.language.name === 'en'
           )
-        )
+        );
       })
-    )
+    );
 
     const descriptions =
       getEngDescriptions.length > 3
         ? getEngDescriptions.slice(0, 3)
-        : getEngDescriptions
+        : getEngDescriptions;
 
     getEngDescriptions.length !== 1 &&
-      descriptions.sort((a, b) => a.flavor_text.length < b.flavor_text.length)
+      descriptions.sort((a, b) => a.flavor_text.length < b.flavor_text.length);
 
-    const avaibleSprites = sprites.versions
+    const avaibleSprites = sprites.versions;
 
     const getSprites = [
       avaibleSprites['generation-i'].yellow,
@@ -229,13 +212,18 @@ class PokePage extends Component {
       avaibleSprites['generation-v']['black-white'],
       avaibleSprites['generation-vi']['x-y'],
       avaibleSprites['generation-vii']['ultra-sun-ultra-moon']
-    ]
+    ];
 
     const filteredSprites = getSprites.filter(
       item => item.front_default || false
-    )
+    );
 
-    console.log(filteredSprites)
+    console.log(
+      filteredSprites,
+      pokemonInfo,
+      pokemonEvChainInfo,
+      pokemonAlternateFormInfo
+    );
 
     return (
       <>
@@ -277,8 +265,8 @@ class PokePage extends Component {
                 justify={['center', 'end']}
                 align="center"
               >
-                {this._getPokemonTeamUserButton(pokemonName, stats, id)}
                 {this._getPokemonFavoritesUserButton(pokemonName, stats, id)}
+                {this._getPokemonTeamUserButton(pokemonName, stats, id)}
               </ButtonGroup>
             </Flex>
           )}
@@ -336,9 +324,9 @@ class PokePage extends Component {
             p={8}
           >
             {filteredSprites.map((sprite, index) => {
-              const url = new URL(sprite.front_default)
-              const getInstancesOfUrl = url.pathname.split('/')
-              const getGeneration = getInstancesOfUrl[7]
+              const url = new URL(sprite.front_default);
+              const getInstancesOfUrl = url.pathname.split('/');
+              const getGeneration = getInstancesOfUrl[7];
 
               return sprite.front_default ? (
                 <React.Fragment key={index}>
@@ -363,7 +351,7 @@ class PokePage extends Component {
                     />
                   )}
                 </React.Fragment>
-              ) : null
+              ) : null;
             })}
           </Flex>
         </Box>
@@ -456,42 +444,7 @@ class PokePage extends Component {
           <Heading pb={14} as="h3" textAlign="center">
             Cards
           </Heading>
-
-          <Flex flexWrap="wrap" gridGap={8} justify="center">
-            {cards.map((item, index) => (
-              <Flex align="center" justify="center" key={index}>
-                <Image
-                  boxShadow="md"
-                  w="70%"
-                  h="auto"
-                  transition="ease-in-out all 0.4s"
-                  src={item.imageUrl}
-                  _hover={{ transform: 'scale(1.05)' }}
-                  _active={{ transform: 'scale(1.05)' }}
-                />
-              </Flex>
-            ))}
-          </Flex>
-          <Flex justify="center" pt={10}>
-            {cards.length !== pokemonCards.length && (
-              <Button
-                onClick={() =>
-                  this.setState({
-                    cards: cards.concat(
-                      pokemonCards.slice(
-                        cards.length,
-                        cards.length + cardsShown
-                      )
-                    )
-                  })
-                }
-                leftIcon={<FaPlus />}
-                colorScheme="blue"
-              >
-                Show more
-              </Button>
-            )}
-          </Flex>
+          <PokemonPageCards pokemon={pokemonName} />
         </Box>
 
         <PokemonPageNextPrevious
@@ -499,21 +452,20 @@ class PokePage extends Component {
           pokemonName={pokemonName}
         />
       </>
-    )
+    );
   }
 }
 
 const mapStateToProps = state => {
   return {
     auth: state.firebase.auth,
-    pokemonInfo: state.apiCalls.apiData.getPokemon,
-    pokemonEvChainInfo: state.apiCalls.apiData.getEvChain,
-    pokemonCards: state.apiCalls.apiData.getPokemonCards,
-    pokemonAlternateFormInfo: state.apiCalls.apiData.getAlternateForms,
+    pokemonInfo: state.pokemonApi.data.pokemon,
+    pokemonEvChainInfo: state.pokemonApi.data.pokemonEvChain,
+    pokemonAlternateFormInfo: state.pokemonApi.data.pokemonAlternateForms,
     profilePokemonTeam: state.firebase.profile.favoriteTeam,
     profilePokemonFavorites: state.firebase.profile.favoritePokemons
-  }
-}
+  };
+};
 
 const mapDispatchToProps = dispatch => {
   return {
@@ -521,7 +473,7 @@ const mapDispatchToProps = dispatch => {
     removeFavoritePokemon: pokemon => dispatch(removeFavoritePokemon(pokemon)),
     addPokemonToTeam: pokemon => dispatch(addPokemonToTeam(pokemon)),
     removePokemonFromTeam: pokemon => dispatch(removePokemonFromTeam(pokemon))
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(PokePage)
+export default connect(mapStateToProps, mapDispatchToProps)(PokePage);

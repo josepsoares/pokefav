@@ -1,24 +1,24 @@
-import React from 'react'
-import { Route, Switch } from 'react-router-dom'
-import { Container, Grid } from '@chakra-ui/react'
-import { useSelector } from 'react-redux'
-import { config } from 'react-spring'
-import { animated, Transition } from 'react-spring/renderprops'
+import React, { useEffect } from 'react';
+import { Route, Switch, useLocation } from 'react-router-dom';
+import { Container, Grid } from '@chakra-ui/react';
+import { useDispatch, useSelector } from 'react-redux';
+import { config } from 'react-spring';
+import { animated, Transition } from 'react-spring/renderprops';
 
 // Components
-import ScrollingWrapper from './components/scroll/ScrollingWrapper'
-import NavigationBar from './components/layout/navbar/Navbar'
-import ToastProvider from './components/feedback/ToastProvider'
-import Loading from './components/feedback/Loading'
-import Error from './components/feedback/Error'
-import NoMatch from './pages/NoMatch'
-import Footer from './components/layout/Footer'
-import ScrollToTop from './components/scroll/ScrollToTop'
-import PrivateRoute from 'routes/PrivateRoute'
-import routes from 'routes/AllRoutes'
-import SEO from 'components/Seo'
+import ScrollingWrapper from './components/scroll/ScrollingWrapper';
+import NavigationBar from './components/layout/navbar/Navbar';
+import ToastProvider from './components/feedback/ToastProvider';
+import Loading from './components/feedback/Loading';
+import Error from './components/feedback/Error';
+import NoMatch from './pages/NoMatch';
+import Footer from './components/layout/Footer';
+import ScrollToTop from './components/scroll/ScrollToTop';
+import PrivateRoute from 'routes/PrivateRoute';
+import routes from 'routes/AllRoutes';
+import SEO from 'components/Seo';
 
-const MainContainer = animated(Container)
+const MainContainer = animated(Container);
 
 const AnimatedRoute = ({ children }) => (
   <Route
@@ -32,20 +32,32 @@ const AnimatedRoute = ({ children }) => (
         leave={{ position: 'absolute', opacity: 0, display: 'none' }}
         config={{ ...config.default, duration: 800 }}
       >
-        {location => style => (
-          <animated.div style={style}>{children(location)}</animated.div>
-        )}
+        {location => style =>
+          <animated.div style={style}>{children(location)}</animated.div>}
       </Transition>
     )}
   />
-)
+);
 
 const App = () => {
-  const errorApi = useSelector(state => state.apiCalls.error)
-  const isLoading = useSelector(state => state.apiCalls.isLoading)
-  const auth = useSelector(state => state.firebase.auth.uid)
-  const userProfile = useSelector(state => state.firebase.profile)
-  console.log(userProfile)
+  const isLoadingPokemonApi = useSelector(state => state.pokemonApi.isLoading);
+  const isLoadingUserApi = useSelector(state => state.user.isLoading);
+  const errorPokemonApi = useSelector(state => state.pokemonApi.error);
+  const errorUser = useSelector(state => state.user.error);
+  const auth = useSelector(state => state.firebase.auth.uid);
+  const userProfile = useSelector(state => state.firebase.profile);
+
+  const location = useLocation();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (errorPokemonApi || errorUser) {
+      dispatch({
+        type: 'CLEAN_ERRORS'
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
 
   return (
     <>
@@ -59,10 +71,10 @@ const App = () => {
         gridTemplateRows={auth ? 'auto 1fr auto' : 'auto 1fr'}
       >
         {auth && <NavigationBar />}
-        {isLoading ? (
+        {isLoadingPokemonApi || isLoadingUserApi ? (
           <Loading />
-        ) : errorApi ? (
-          <Error error={errorApi} />
+        ) : errorPokemonApi || errorUser ? (
+          <Error error={errorPokemonApi || errorUser} />
         ) : (
           <MainContainer
             maxW={auth ? ['95%', '90%', '80%'] : '100%'}
@@ -99,7 +111,7 @@ const App = () => {
         <Footer />
       </Grid>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;

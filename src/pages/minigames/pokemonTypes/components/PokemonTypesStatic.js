@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { useDisclosure } from '@chakra-ui/hooks'
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useDisclosure } from '@chakra-ui/hooks';
 import {
   Box,
   Flex,
@@ -9,7 +9,7 @@ import {
   Stack,
   StackDivider,
   Text
-} from '@chakra-ui/layout'
+} from '@chakra-ui/layout';
 import {
   Modal,
   ModalBody,
@@ -18,21 +18,35 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay
-} from '@chakra-ui/modal'
-import { Image } from '@chakra-ui/image'
-import { FaDna, FaArrowLeft, FaArrowRight, FaQuestion } from 'react-icons/fa'
+} from '@chakra-ui/modal';
+import { Image } from '@chakra-ui/image';
+import { FaDna, FaArrowLeft, FaArrowRight, FaQuestion } from 'react-icons/fa';
 
-import Button from 'components/layout/Button'
-import SEO from 'components/Seo'
+import Button from 'components/layout/Button';
+import SEO from 'components/Seo';
+import { IconButton } from '@chakra-ui/button';
 
-const contentsAvailableForGame = ['Pokémons', 'Moves', 'Pokémons and Moves']
+const contentsAvailableForGame = ['Pokémons', 'Moves', 'Pokémons and Moves'];
 
 const PokemonTypesStatic = ({ startPokeTypes }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const [tutorial, setTutorial] = useState(null)
-  const [contentInGame, setContentInGame] = useState('Pokémons')
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [tutorial, setTutorial] = useState(null);
+  const [contentInGame, setContentInGame] = useState('Pokémons');
 
-  const profile = useSelector(state => state.firebase.profile)
+  const profile = useSelector(state => state.firebase.profile);
+  const {
+    pokeTypes,
+    pokemonIQ,
+    pokemonIQNr,
+    played: minigamesPlayed,
+    overallScore
+  } = profile.minigames;
+  const {
+    played: pokeTypesPlayed,
+    correctTypesChosen,
+    incorrectTypesChosen,
+    score: pokeTypesScore
+  } = pokeTypes;
   /*   const {
     realizedTrivias,
     correctAnswers,
@@ -44,16 +58,20 @@ const PokemonTypesStatic = ({ startPokeTypes }) => {
     <>
       <SEO
         title="PokéTypes"
-        description="Play a fun minigame with challeging questions about specific details about Pokémon Moves"
+        description="Play a fun minigame that challenges you to chose correctly the types of random Pokémon"
       />
 
-      <Flex>
-        <Button onClick={onOpen} colorScheme="blue" leftIcon={<FaArrowLeft />}>
+      {/* <Flex w="100%" pb={4}>
+        <Button
+          variant="transparent"
+          onClick={onOpen}
+          leftIcon={<FaArrowLeft />}
+        >
           Go Back to PokéMinigames
         </Button>
-      </Flex>
+      </Flex> */}
 
-      <Flex>
+      <Flex justifyContent="space-between" flexDir="row" flexWrap="wrap">
         <Heading as="h1" pb={8}>
           PokéTypes
         </Heading>
@@ -76,7 +94,7 @@ const PokemonTypesStatic = ({ startPokeTypes }) => {
             10 rounds with a question and 4 answers for each round.
           </Text>
 
-          <Text pb={8}>
+          <Text>
             Are you an intellectual like Alakazam or Metagross or are you as
             oblivious as Slowpoke or Magikarp? Check out your profile when
             you're done to find out what pokémon are you!
@@ -96,7 +114,7 @@ const PokemonTypesStatic = ({ startPokeTypes }) => {
             w="100%"
             flexWrap="wrap"
             align="center"
-            justify="center"
+            justify={['start', 'center']}
             gridGap={6}
           >
             <Button colorScheme="blue" onClick={onOpen} leftIcon={<FaDna />}>
@@ -123,11 +141,19 @@ const PokemonTypesStatic = ({ startPokeTypes }) => {
           />
         </Flex>
       </SimpleGrid>
-      <SimpleGrid
-        columns={[1, null, null, 2]}
-        justify="center"
-        gridGap={6}
-      ></SimpleGrid>
+
+      <Flex position="fixed" top="90%" left="7%">
+        <IconButton
+          boxShadow="dark-lg"
+          width="50px"
+          height="50px"
+          borderRadius="50%"
+          colorScheme="blue"
+          isRound={true}
+        >
+          <FaArrowLeft />
+        </IconButton>
+      </Flex>
 
       <Modal
         isCentered
@@ -140,7 +166,7 @@ const PokemonTypesStatic = ({ startPokeTypes }) => {
         <ModalContent color="#3c3c3b" bgColor="#ebebd3">
           <ModalHeader>
             <Heading pb={2} as="h4">
-              Your PokéTrivia Stats
+              Your PokéTypes Stats
             </Heading>
           </ModalHeader>
           <ModalCloseButton />
@@ -158,19 +184,19 @@ const PokemonTypesStatic = ({ startPokeTypes }) => {
               </Flex>
               <Flex flexDir="column" align="center">
                 <Text fontWeight="bold" pb={2}>
-                  Correct answers
+                  Correct types chosen
                 </Text>
                 <Text>{/* correctAnswers */}</Text>
               </Flex>
               <Flex flexDir="column" align="center">
                 <Text fontWeight="bold" pb={2}>
-                  Incorrect answers
+                  Incorrect types chosen
                 </Text>
                 <Text>{/* wrongAnswers */}</Text>
               </Flex>
               <Flex flexDir="column" align="center">
                 <Text fontWeight="bold" pb={2}>
-                  Pokémon IQ
+                  PokéMinigames IQ
                 </Text>
                 <Text>{/* !pokemonIQ ? 'None' : pokemonIQ */}</Text>
               </Flex>
@@ -185,7 +211,7 @@ const PokemonTypesStatic = ({ startPokeTypes }) => {
         </ModalContent>
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default PokemonTypesStatic
+export default PokemonTypesStatic;

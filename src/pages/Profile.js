@@ -1,15 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { getInfoPokemonPage } from 'redux/actions/apiActions'
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getInfoPokemonPage } from 'redux/actions/pokemonActions';
 import {
+  getUser,
+  editProfileField,
   removeFavoritePokemon,
-  removePokemonFromTeam
-} from 'redux/actions/userFavoritesActions'
-import { editProfileField, getUser, signOut } from 'redux/actions/userActions'
+  removePokemonFromTeam,
+  updatePokeTeamList,
+  updateFavoritePokeList
+} from 'redux/actions/userActions';
+import { signOut } from 'redux/actions/authActions';
 
-import { Link, useRouteMatch } from 'react-router-dom'
-import moment from 'moment'
-import _ from 'lodash'
+import { Link, useRouteMatch } from 'react-router-dom';
+import moment from 'moment';
+import _ from 'lodash';
 
 import {
   Box,
@@ -38,7 +42,7 @@ import {
   Grid,
   Wrap,
   WrapItem
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 import {
   FaArrowRight,
   FaCheck,
@@ -48,28 +52,26 @@ import {
   FaSignOutAlt,
   FaTimes,
   FaTrashAlt
-} from 'react-icons/fa'
-import { CgPokemon } from 'react-icons/cg'
+} from 'react-icons/fa';
+import { CgPokemon } from 'react-icons/cg';
 
-import SEO from 'components/Seo'
-import avatarsList from 'assets/content/avatarsList'
-import getStatsMessages from 'utils/getMessageFavoritesTeam'
-import Button from 'components/layout/Button'
-import PokemonImage from 'components/layout/PokemonImage'
-import DragGridList from 'components/layout/DragGridList'
-import PokeballMinigameStat from 'components/layout/PokeballMinigameStat'
-import Loading from 'components/feedback/Loading'
-import { updatePokeTeamList } from 'redux/actions/userFavoritesActions'
-import { updateFavoritePokeList } from 'redux/actions/userFavoritesActions'
+import SEO from 'components/Seo';
+import avatarsList from 'assets/content/avatarsList';
+import getStatsMessages from 'utils/getMessageFavoritesTeam';
+import Button from 'components/layout/Button';
+import PokemonImage from 'components/layout/PokemonImage';
+import DragGridList from 'components/layout/DragGridList';
+import PokeballMinigameStat from 'components/layout/PokeballMinigameStat';
+import Loading from 'components/feedback/Loading';
 
 // import { motion } from 'framer-motion'
 
 const EditableSelect = ({ initialValue, selectList, fieldType }) => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [state, setState] = useState({
     isEditing: false,
     value: initialValue
-  })
+  });
 
   return (
     <Flex
@@ -101,15 +103,15 @@ const EditableSelect = ({ initialValue, selectList, fieldType }) => {
           onCancel={() => setState({ ...state, isEditing: false })}
           isEditing={state.isEditing}
           onSubmit={() => {
-            console.log(fieldType, state.value)
-            dispatch(editProfileField(fieldType, state.value))
-            setState({ ...state, isEditing: false })
+            console.log(fieldType, state.value);
+            dispatch(editProfileField(fieldType, state.value));
+            setState({ ...state, isEditing: false });
           }}
         />
       </>
     </Flex>
-  )
-}
+  );
+};
 
 function EditableControls({ onEdit, isEditing, onSubmit, onCancel }) {
   return isEditing ? (
@@ -132,7 +134,7 @@ function EditableControls({ onEdit, isEditing, onSubmit, onCancel }) {
       <IconButton
         transitionProperty="all"
         transition="ease-in-out"
-        transitionDuration="0.5s"
+        transitionDuration="0.3s"
         bgColor="secondary"
         color="primary"
         borderRadius="50%"
@@ -143,63 +145,63 @@ function EditableControls({ onEdit, isEditing, onSubmit, onCancel }) {
         opacity="0.9"
         _hover={{
           opacity: 1,
-          fontSize: 22
+          fontSize: 18
         }}
         _active={{
           opacity: 1,
-          fontSize: 24
+          fontSize: 18
         }}
       />
     </Flex>
-  )
+  );
 }
 
 const scrollToRef = ref => {
-  ref.current.scrollIntoView({ behavior: 'smooth' })
-}
+  ref.current.scrollIntoView({ behavior: 'smooth' });
+};
 
 const Profile = props => {
   useEffect(() => {
     if (match.params.username !== userInfo.username) {
-      dispatch(() => getUser(match.params.username))
+      dispatch(() => getUser(match.params.username));
     }
 
     if (isUserLoggedInProfile) {
       const urls = [
         `https://pokeapi.co/api/v2/version-group/`,
         `https://pokeapi.co/api/v2/region/`
-      ]
+      ];
 
       const getRegionsAndGames = async () => {
         const returnRegionsAndGames = await Promise.all(
           urls.map(async url => {
             try {
-              const getRequest = await fetch(url)
-              const getDataRequest = await getRequest.json()
-              return getDataRequest.results
+              const getRequest = await fetch(url);
+              const getDataRequest = await getRequest.json();
+              return getDataRequest.results;
             } catch (err) {
-              return err.response.message
+              return err.response.message;
             }
           })
-        )
+        );
         setEditContent({
           games: returnRegionsAndGames[0],
           regions: returnRegionsAndGames[1]
-        })
-        setLoading(false)
-      }
+        });
+        setLoading(false);
+      };
 
-      getRegionsAndGames()
+      getRegionsAndGames();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
-  const dispatch = useDispatch()
-  const match = useRouteMatch()
-  const profile = useSelector(state => state.firebase.profile)
-  const getUserInfo = useSelector(state => state.apiCalls.apiData.queryUser)
-  const isUserLoggedInProfile = getUserInfo.username === profile.username
-  const userInfo = isUserLoggedInProfile ? profile : getUserInfo
+  const dispatch = useDispatch();
+  const match = useRouteMatch();
+  const profile = useSelector(state => state.firebase.profile);
+  const getUserInfo = useSelector(state => state.user.queryUser);
+  const isUserLoggedInProfile = getUserInfo.username === profile.username;
+  const userInfo = isUserLoggedInProfile ? profile : getUserInfo;
 
   const {
     username,
@@ -209,63 +211,64 @@ const Profile = props => {
     favoriteRegion,
     favoritePokemons,
     favoriteTeam,
+    minigames,
     triviaRecord
-  } = userInfo
+  } = userInfo;
 
-  let findOccupiedPokeSlotsInPokeFavorites
+  let findOccupiedPokeSlotsInPokeFavorites;
 
   if (favoritePokemons?.length !== 0) {
     for (let index = 0; index <= 20 - favoritePokemons.length; index++) {
-      favoritePokemons.push({ isEmpty: true })
+      favoritePokemons.push({ isEmpty: true });
     }
 
     findOccupiedPokeSlotsInPokeFavorites = favoritePokemons.filter(item =>
       !item.isEmpty ? true : false
-    )
+    );
   }
 
-  const messageFavorites = getStatsMessages(favoritePokemons, 'favorites')
-  const messageTeam = getStatsMessages(favoriteTeam, 'team')
+  const messageFavorites = getStatsMessages(favoritePokemons, 'favorites');
+  const messageTeam = getStatsMessages(favoriteTeam, 'team');
 
-  const [editContent, setEditContent] = useState(null)
-  const [isLoading, setLoading] = useState(true)
-  const [avatarModal, setAvatarModal] = useState(false)
-  const [chosenAvatar, setChosenAvatar] = useState(avatar)
+  const [editContent, setEditContent] = useState(null);
+  const [isLoading, setLoading] = useState(true);
+  const [avatarModal, setAvatarModal] = useState(false);
+  const [chosenAvatar, setChosenAvatar] = useState(avatar);
   const [removePokemonAlert, setRemovePokemonAlert] = useState({
     isOpen: false,
     pokemon: null,
     type: null
-  })
+  });
 
   const [showAllFavorites, setShowAllFavorites] = useState({
     isOpen: false,
     pokemons:
       favoritePokemons?.length === 0 ? null : favoritePokemons.slice(0, 12)
-  })
+  });
 
-  const [pokeFavoriteList, setPokeFavoriteList] = useState(favoritePokemons)
-  const [pokeTeamList, setPokeTeamList] = useState(favoriteTeam)
+  const [pokeFavoriteList, setPokeFavoriteList] = useState(favoritePokemons);
+  const [pokeTeamList, setPokeTeamList] = useState(favoriteTeam);
 
   const [editOrder, setEditOrder] = useState({
     isEditingOrderFavPoke: false,
     isEditingOrderFavTeam: false
-  })
+  });
 
-  const pokeFavoriteListRef = useRef(null)
-  const pokeTeamRef = useRef(null)
-  const pokeCarerPerRef = useRef(null)
-  const pokeTrainerPerRef = useRef(null)
+  const pokeFavoriteListRef = useRef(null);
+  const pokeTeamRef = useRef(null);
+  const pokeCarerPerRef = useRef(null);
+  const pokeTrainerPerRef = useRef(null);
 
-  let averageCorrectAnswers, pokemonIQText
+  let averageCorrectAnswers, pokemonIQText;
 
-  if (triviaRecord.pokemonIQ) {
+  if (minigames.pokemonIQ) {
     averageCorrectAnswers =
-      triviaRecord.correctAnswers /
-      (triviaRecord.correctAnswers + triviaRecord.wrongAnswers)
-    averageCorrectAnswers *= 100
-    averageCorrectAnswers = parseInt(averageCorrectAnswers)
+      minigames.pokeTrivia.correctAnswers /
+      (minigames.pokeTrivia.correctAnswers + minigames.pokeTrivia.wrongAnswers);
+    averageCorrectAnswers *= 100;
+    averageCorrectAnswers = parseInt(averageCorrectAnswers);
 
-    switch (triviaRecord.pokemonIQ) {
+    switch (minigames.pokemonIQ) {
       case 'Magikarp':
         pokemonIQText = `Humm, it seems like ${
           isUserLoggedInProfile ? 'you are' : `${username} is`
@@ -273,37 +276,37 @@ const Profile = props => {
           isUserLoggedInProfile ? 'you' : username
         } just ${
           isUserLoggedInProfile ? 'need' : 'needs'
-        } to check the trivia answers on the web or study a little bit to not have the IQ of a Magikarp`
-        break
+        } to check the trivia answers on the web or study a little bit to not have the IQ of a Magikarp`;
+        break;
       case 'Slowpoke':
         pokemonIQText = `It seems ${
           isUserLoggedInProfile ? 'you are' : `${username} is`
         }  quite rusty in PokéTrivia Departement, which means ${
           isUserLoggedInProfile ? 'your' : 'their'
-        } IQ is the same as a Slowpoke... Gotta remember all those facts or maybe just search the answer on the web to improve this IQ`
-        break
+        } IQ is the same as a Slowpoke... Gotta remember all those facts or maybe just search the answer on the web to improve this IQ`;
+        break;
       case 'Quagsire':
         pokemonIQText = `Like, ${
           isUserLoggedInProfile ? 'you are' : `${username} is`
-        } somewhat oblivious but still your brain at certain times can help you solving PokéTrivias... The thing is this IQ is inconsistent, as a Quagsire! Maybe with a little more attention and work and this IQ might level up!`
-        break
+        } somewhat oblivious but still your brain at certain times can help you solving PokéTrivias... The thing is this IQ is inconsistent, as a Quagsire! Maybe with a little more attention and work and this IQ might level up!`;
+        break;
       case 'Beheeyem':
         pokemonIQText = `${
           isUserLoggedInProfile ? 'Your' : username
-        } IQ is a little bit out of this world like Beheeyem intelligence is not from ours! Such alien intelligence, much wow!`
-        break
+        } IQ is a little bit out of this world like Beheeyem intelligence is not from ours! Such alien intelligence, much wow!`;
+        break;
       case 'Metagross':
         pokemonIQText = `${
           isUserLoggedInProfile ? 'Your' : username
-        } IQ in Pokémon Trivia is almost unbelievable matching Metagross's 4 brains said to be superior to a supercomputer! Need to keep up those 4 brains power in Pokémon Trivia!`
-        break
+        } IQ in Pokémon Trivia is almost unbelievable matching Metagross's 4 brains said to be superior to a supercomputer! Need to keep up those 4 brains power in Pokémon Trivia!`;
+        break;
       case 'Alakazam':
         pokemonIQText = `${
           isUserLoggedInProfile ? 'Your' : username
-        } IQ in Pokémon Trivia is so unbelievable it stands toe to toe with Alakazam, the most intelligent Pokémon in the Pokémon Universe, just wow!`
-        break
+        } IQ in Pokémon Trivia is so unbelievable it stands toe to toe with Alakazam, the most intelligent Pokémon in the Pokémon Universe, just wow!`;
+        break;
       default:
-        break
+        break;
     }
   }
 
@@ -346,7 +349,7 @@ const Profile = props => {
               <IconButton
                 transitionProperty="all"
                 transition="ease-in-out"
-                transitionDuration="0.5s"
+                transitionDuration="0.3s"
                 bgColor="secondary"
                 position="absolute"
                 color="primary"
@@ -358,11 +361,11 @@ const Profile = props => {
                 opacity="0.9"
                 _hover={{
                   opacity: 1,
-                  fontSize: 22
+                  fontSize: 18
                 }}
                 _active={{
                   opacity: 1,
-                  fontSize: 24
+                  fontSize: 18
                 }}
                 onClick={() => setAvatarModal(true)}
               />
@@ -602,7 +605,7 @@ const Profile = props => {
                             position="relative"
                             to={`/pokemon-list/pokemon-page/${item.name}`}
                             onClick={() => {
-                              dispatch(getInfoPokemonPage(item.id, item.name))
+                              dispatch(getInfoPokemonPage(item.id, item.name));
                             }}
                           >
                             <PokemonImage
@@ -720,10 +723,10 @@ const Profile = props => {
                               onClick={() => {
                                 setEditOrder({
                                   isEditingOrderFavPoke: false
-                                })
+                                });
                                 dispatch(
                                   updateFavoritePokeList(pokeFavoriteList)
-                                )
+                                );
                               }}
                             >
                               Update Pokémon order in Favorite Pokémon
@@ -828,7 +831,7 @@ const Profile = props => {
                           position="relative"
                           to={`/pokemon-list/pokemon-page/${item.name}`}
                           onClick={() => {
-                            dispatch(getInfoPokemonPage(item.id, item.name))
+                            dispatch(getInfoPokemonPage(item.id, item.name));
                           }}
                         >
                           <PokemonImage
@@ -947,8 +950,8 @@ const Profile = props => {
                               onClick={() => {
                                 setEditOrder({
                                   isEditingOrderFavTeam: false
-                                })
-                                dispatch(updateFavoritePokeList(pokeTeamList))
+                                });
+                                dispatch(updateFavoritePokeList(pokeTeamList));
                               }}
                             >
                               Update Pokémon order in Pokémon Team
@@ -977,18 +980,24 @@ const Profile = props => {
               PokéMinigames Stats
             </Heading>
 
-            {triviaRecord.realizedTrivias <= 0 ? (
-              <Flex>
+            {minigames.played <= 3 ? (
+              <Flex
+                gridGap={12}
+                wrap="wrap"
+                flexDir="row"
+                justify="center"
+                align="center"
+              >
                 <Box w={['85%', null, null, '50%']}>
                   {isUserLoggedInProfile ? (
-                    <Text>
+                    <Text pb={4}>
                       You still haven't played any PokéTrivia to calculte your
                       Pokémon IQ... Don't be lazy like Slakoth and start playing
                       PokéTrivia to find out the Pokémon that represents your
                       intelligence!
                     </Text>
                   ) : (
-                    <Text>
+                    <Text pb={4}>
                       {username} still hasn't played any PokéTrivia to calculte
                       their Pokémon IQ... It seems they're a little bit like
                       Slakoth, you know, in the lazy department. Because of that
@@ -997,11 +1006,13 @@ const Profile = props => {
                     </Text>
                   )}
 
-                  <Link to="/pokemon-trivia">
-                    <Button rightIcon={<FaArrowRight />} colorScheme="blue">
-                      Go to PokéTrivia
-                    </Button>
-                  </Link>
+                  <Flex justify="center">
+                    <Link to="/pokemon-trivia">
+                      <Button rightIcon={<FaArrowRight />} colorScheme="blue">
+                        Go to PokéTrivia
+                      </Button>
+                    </Link>
+                  </Flex>
                 </Box>
                 <Flex justify="center" align="center">
                   <Link
@@ -1034,7 +1045,7 @@ const Profile = props => {
                       {isUserLoggedInProfile ? 'you are' : `${username} is`}{' '}
                       intelligent as a{' '}
                       <Link
-                        to={`/pokemon-list/pokemon-page/${triviaRecord.pokemonIQNumber}`}
+                        to={`/pokemon-list/pokemon-page/${minigames.pokemonIQNr}`}
                         className="basicLink"
                       >
                         <Box as="b" fontSize={18}>
@@ -1048,14 +1059,14 @@ const Profile = props => {
                   </Box>
                   <Flex justify="center" align="center">
                     <Link
-                      to={`/pokemon-list/pokemon-page/${triviaRecord.pokemonIQNumber}`}
-                      onClick={() => getInfoPokemonPage(triviaRecord.pokemonIQ)}
+                      to={`/pokemon-list/pokemon-page/${minigames.pokemonIQNr}`}
+                      onClick={() => getInfoPokemonPage(minigames.pokemonIQ)}
                     >
                       <Image
                         maxH="250px"
                         maxW="250px"
-                        alt={triviaRecord.pokemonIQ}
-                        src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${triviaRecord.pokemonIQNumber}.png`}
+                        alt={minigames.pokemonIQ}
+                        src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${minigames.pokemonIQNr}.png`}
                       />
                     </Link>
                   </Flex>
@@ -1073,7 +1084,7 @@ const Profile = props => {
                   gridGap={6}
                 >
                   <PokeballMinigameStat
-                    statData={triviaRecord.realizedTrivias}
+                    statData={minigames.pokeTrivia.played}
                     statTitle="PokéTrivias played"
                   />
                   <PokeballMinigameStat
@@ -1081,11 +1092,11 @@ const Profile = props => {
                     statTitle="Average of correct answers"
                   />
                   <PokeballMinigameStat
-                    statData={triviaRecord.correctAnswers}
+                    statData={minigames.pokeTrivia.correctAnswers}
                     statTitle="All correct answers"
                   />
                   <PokeballMinigameStat
-                    statData={triviaRecord.wrongAnswers}
+                    statData={minigames.pokeTrivia.wrongAnswers}
                     statTitle="All incorrect answers"
                   />
                 </Flex>
@@ -1099,11 +1110,11 @@ const Profile = props => {
                   gridGap={6}
                 >
                   <PokeballMinigameStat
-                    statData={triviaRecord.realizedTrivias}
+                    statData={minigames.pokeTypes.played}
                     statTitle="PokéTypes played"
                   />
                   <PokeballMinigameStat
-                    statData={triviaRecord.wrongAnswers}
+                    statData={0}
                     statTitle="Average time per session"
                   />
                   <PokeballMinigameStat
@@ -1111,11 +1122,11 @@ const Profile = props => {
                     statTitle="Average of correct types chosen"
                   />
                   <PokeballMinigameStat
-                    statData={triviaRecord.correctAnswers}
+                    statData={minigames.pokeTypes.correctTypesChosen}
                     statTitle="All correct types chosen"
                   />
                   <PokeballMinigameStat
-                    statData={triviaRecord.wrongAnswers}
+                    statData={minigames.pokeTypes.incorrectTypesChosen}
                     statTitle="All incorrect types chosen"
                   />
                 </Flex>
@@ -1129,23 +1140,23 @@ const Profile = props => {
                   gridGap={6}
                 >
                   <PokeballMinigameStat
-                    statData={triviaRecord.realizedTrivias}
+                    statData={minigames.pokeGuess.played}
                     statTitle="PokéGuesses played"
                   />
                   <PokeballMinigameStat
-                    statData={triviaRecord.wrongAnswers}
+                    statData={minigames.pokeGuess.streak}
                     statTitle="Average of correct guesses"
                   />
                   <PokeballMinigameStat
-                    statData={triviaRecord.wrongAnswers}
+                    statData={minigames.pokeGuess.streak}
                     statTitle="Best correct answers streak"
                   />
                   <PokeballMinigameStat
-                    statData={`${averageCorrectAnswers}%`}
+                    statData={minigames.pokeGuess.correctGuesses}
                     statTitle="All correct guesses"
                   />
                   <PokeballMinigameStat
-                    statData={triviaRecord.correctAnswers}
+                    statData={minigames.pokeGuess.incorrectGuesses}
                     statTitle="All incorrect guesses"
                   />
                 </Flex>
@@ -1365,22 +1376,22 @@ const Profile = props => {
                   <Button
                     colorScheme="red"
                     onClick={() => {
-                      console.log(removePokemonAlert)
+                      console.log(removePokemonAlert);
                       if (removePokemonAlert.type === 'Pokémon Team') {
                         dispatch(
                           removePokemonFromTeam(removePokemonAlert.pokemon)
-                        )
+                        );
                       } else {
                         dispatch(
                           removeFavoritePokemon(removePokemonAlert.pokemon)
-                        )
+                        );
                       }
 
                       setRemovePokemonAlert({
                         ...removePokemonAlert,
                         isOpen: false,
                         type: null
-                      })
+                      });
                     }}
                   >
                     Delete
@@ -1434,8 +1445,8 @@ const Profile = props => {
                   colorScheme="green"
                   isDisabled={chosenAvatar === avatar}
                   onClick={() => {
-                    setAvatarModal(false)
-                    dispatch(editProfileField('avatar', chosenAvatar))
+                    setAvatarModal(false);
+                    dispatch(editProfileField('avatar', chosenAvatar));
                   }}
                 >
                   Update Avatar
@@ -1446,7 +1457,7 @@ const Profile = props => {
         </>
       )}
     </>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;

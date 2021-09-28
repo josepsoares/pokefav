@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   Box,
   SimpleGrid,
@@ -8,6 +8,7 @@ import {
   Flex,
   Stack,
   StackDivider,
+  IconButton,
   useDisclosure,
   ModalFooter,
   Modal,
@@ -16,23 +17,34 @@ import {
   ModalHeader,
   ModalBody,
   ModalCloseButton
-} from '@chakra-ui/react'
-import { useSelector } from 'react-redux'
-import { FaArrowLeft, FaArrowRight, FaGraduationCap } from 'react-icons/fa'
+} from '@chakra-ui/react';
+import { useSelector } from 'react-redux';
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaGraduationCap,
+  FaQuestion
+} from 'react-icons/fa';
 
-import Button from 'components/layout/Button'
-import SEO from 'components/Seo'
+import Button from 'components/layout/Button';
+import SEO from 'components/Seo';
 
 const PokemonTriviaStatic = ({ startTrivia }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const [tutorial, setTutorial] = useState(null)
-  const profile = useSelector(state => state.firebase.profile)
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [tutorial, setTutorial] = useState(null);
+  const profile = useSelector(state => state.firebase.profile);
   const {
-    realizedTrivias,
+    pokeTrivia,
+    pokemonIQ,
+    pokemonIQNr,
+    played: minigamesPlayed,
+    overallScore
+  } = profile.minigames;
+  const {
+    played: pokeTriviasPlayed,
     correctAnswers,
-    wrongAnswers,
-    pokemonIQ
-  } = profile.triviaRecord
+    wrongAnswers
+  } = pokeTrivia;
 
   return (
     <>
@@ -41,15 +53,15 @@ const PokemonTriviaStatic = ({ startTrivia }) => {
         description="Play a fun trivia filled with challeging questions about facts and mechanics about Pokémon Franchise"
       />
 
-      <Flex>
-        <Button onClick={onOpen} colorScheme="blue" leftIcon={<FaArrowLeft />}>
-          Go Back to PokéMinigames
+      <Flex justifyContent="space-between" flexDir="row" flexWrap="wrap">
+        <Heading as="h1" pb={8}>
+          PokéTrivia
+        </Heading>
+        <Button colorScheme="blue" onClick={onOpen} leftIcon={<FaQuestion />}>
+          How to Play
         </Button>
       </Flex>
 
-      <Heading as="h1" pb={8}>
-        PokéTrivia
-      </Heading>
       <SimpleGrid columns={[1, null, null, 2]} justify="center" gridGap={6}>
         <Box order={[2, null, null, 1]}>
           <Heading as="h4">
@@ -117,6 +129,20 @@ const PokemonTriviaStatic = ({ startTrivia }) => {
           />
         </Flex>
       </SimpleGrid>
+
+      <Flex position="fixed" top="90%" left="7%">
+        <IconButton
+          boxShadow="dark-lg"
+          width="50px"
+          height="50px"
+          borderRadius="50%"
+          colorScheme="blue"
+          isRound={true}
+        >
+          <FaArrowLeft />
+        </IconButton>
+      </Flex>
+
       <Modal
         isCentered
         isOpen={isOpen}
@@ -142,7 +168,7 @@ const PokemonTriviaStatic = ({ startTrivia }) => {
                 <Text fontWeight="bold" pb={2}>
                   PokéTrivias played
                 </Text>
-                <Text>{realizedTrivias}</Text>
+                <Text>{pokeTriviasPlayed}</Text>
               </Flex>
               <Flex flexDir="column" align="center">
                 <Text fontWeight="bold" pb={2}>
@@ -173,7 +199,7 @@ const PokemonTriviaStatic = ({ startTrivia }) => {
         </ModalContent>
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default PokemonTriviaStatic
+export default PokemonTriviaStatic;

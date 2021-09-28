@@ -1,4 +1,4 @@
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
 import {
   GET_USER_SUCCESS,
   GET_USER_ERROR,
@@ -16,145 +16,159 @@ import {
   REMOVE_POKEMON_TEAM_ERROR,
   UPDATE_POKEMON_TEAM_SUCCESS,
   UPDATE_POKEMON_TEAM_ERROR
-} from 'redux/types/userTypes'
+} from 'redux/types/userTypes';
 
 const initState = {
   error: null,
+  isLoading: false,
   isLoggedIn: false,
   recoverPasswordMessage: null,
   queryUser: null
-}
+};
 
 const userReducer = (state = initState, action) => {
   switch (action.type) {
+    case 'CLEAN_ERRORS':
+      return {
+        ...state,
+        error: false
+      };
+    case 'API_REQUEST_START_USER':
+      return {
+        ...state,
+        isLoading: true,
+        error: false
+      };
     case GET_USER_SUCCESS:
       return {
         ...state,
         isLoading: false,
-        apiData: { ...state.apiData, queryUser: action.payload }
-      }
+        queryUser: action.payload
+      };
     case GET_USER_ERROR:
       return {
         ...state,
         isLoading: false,
-        apiData: { ...state.apiData, queryUser: action.payload }
-      }
+        error: action.payload
+      };
     case CHANGE_PROFILE_SUCCESS:
       if (action.payload === 'avatar') {
-        toast.success('Avatar updated successfully!')
+        toast.success('Avatar updated successfully!');
       } else if (action.payload === 'favoriteGame') {
-        toast.success('Favorite Game updated successfully!')
+        toast.success('Favorite Game updated successfully!');
       } else {
-        toast.success('Favorite Region updated successfully!')
+        toast.success('Favorite Region updated successfully!');
       }
 
       return {
         ...state
-      }
+      };
     case CHANGE_PROFILE_ERROR:
       if (action.payload === 'avatar') {
         toast.error(
           'An error occurred and we were not able to updated your Avatar. Please try again later'
-        )
+        );
       } else if (action.payload === 'favoriteGame') {
         toast.error(
           'An error occurred and we were not able to updated your Favorite Game. Please try again later'
-        )
+        );
       } else {
         // favoriteRegion
         toast.error(
           'An error occurred and we were not able to updated your Favorite Region. Please try again later'
-        )
+        );
       }
 
       return {
         ...state
-      }
+      };
     case ADD_FAVORITE_SUCCESS:
-      toast.success('Pokémon added successfully to your Favorite Pokémon List.')
+      toast.success(
+        'Pokémon added successfully to your Favorite Pokémon List.'
+      );
 
       return {
         ...state
-      }
+      };
     case ADD_FAVORITE_ERROR:
       toast.error(
         'An error occurred while adding this Pokémon to your Favorite Pokémon List.\nPlease try again later'
-      )
+      );
 
       return {
         ...state,
-        actionError: action.error
-      }
+        error: action.error
+      };
     case REMOVE_FAVORITE_SUCCESS:
       toast.success(
         'Pokémon removed successfully from your Favorite Pokémon List!'
-      )
+      );
       return {
         ...state
-      }
+      };
     case REMOVE_FAVORITE_ERROR:
       toast.error(
         'An error occurred while removing this Pokémon from your Favorite Pokémon List.\nPlease try again later'
-      )
+      );
       return {
         ...state,
-        actionError: action.error
-      }
+        error: action.error
+      };
     case UPDATE_FAVORITE_SUCCESS:
-      toast.success('Updated Pokémon Favorite List successfully!')
+      toast.success('Updated Pokémon Favorite List successfully!');
       return {
         ...state
-      }
+      };
     case UPDATE_FAVORITE_ERROR:
       toast.error(
         'An error occurred while updating your Favorite Pokémon List.\nPlease try again later'
-      )
+      );
       return {
         ...state,
-        actionError: action.error
-      }
+        error: action.error
+      };
     case ADD_POKEMON_TEAM_SUCCESS:
-      toast.success('Pokémon added successfully to your Pokémon Team!')
+      toast.success('Pokémon added successfully to your Pokémon Team!');
       return {
         ...state
-      }
+      };
     case ADD_POKEMON_TEAM_ERROR:
       toast.error(
         'An error occurred while adding this Pokémon to your Pokémon Team.\nPlease try again later'
-      )
+      );
       return {
         ...state,
-        actionError: action.error
-      }
+        error: action.error
+      };
     case REMOVE_POKEMON_TEAM_SUCCESS:
-      toast.success('Pokémon removed successfully from your Pokemon Team!')
+      toast.success('Pokémon removed successfully from your Pokemon Team!');
       return {
         ...state
-      }
+      };
     case REMOVE_POKEMON_TEAM_ERROR:
       toast.error(
         'An error occurred while removing this Pokémon from your Pokémon Team.\nPlease try again later'
-      )
+      );
       return {
         ...state,
-        actionError: action.error
-      }
+        error: action.error
+      };
     case UPDATE_POKEMON_TEAM_SUCCESS:
-      toast.success('Updated Pokémon Team successfully!')
+      toast.success('Updated Pokémon Team successfully!');
       return {
         ...state
-      }
+      };
     case UPDATE_POKEMON_TEAM_ERROR:
       toast.error(
         'An error occurred while updating your Pokémon Team.\nPlease try again later'
-      )
+      );
       return {
         ...state,
-        actionError: action.error
-      }
+        error: action.error
+      };
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default userReducer
+export default userReducer;

@@ -1,12 +1,12 @@
-import React from 'react'
-import { Flex, Box } from '@chakra-ui/react'
+import React from 'react';
+import { Flex } from '@chakra-ui/react';
 
-const Loading = () => {
+const Loading = ({ size = '100%' }) => {
   return (
     <Flex
-      flexDir="column"
-      boxSize="100%"
       h="100%"
+      flexDir="column"
+      boxSize={size}
       justify="center"
       align="center"
     >
@@ -15,7 +15,7 @@ const Loading = () => {
         <div className="pokeball-btn"></div>
       </div>
     </Flex>
-  )
-}
+  );
+};
 
-export default Loading
+export default Loading;

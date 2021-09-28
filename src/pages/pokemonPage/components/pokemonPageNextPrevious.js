@@ -1,34 +1,33 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { getInfoPokemonPage } from 'redux/actions/apiActions'
-import { Box, Flex, Image, Icon, Text } from '@chakra-ui/react'
-import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io'
-import pokemon from 'pokemon'
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { getInfoPokemonPage } from 'redux/actions/pokemonActions';
+import { Link } from 'react-router-dom';
+import { Box, Flex, Image, Icon, Text } from '@chakra-ui/react';
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
+import pokemon from 'pokemon';
 
 const PokemonPageNextPrevious = props => {
-  const dispatch = useDispatch()
-  const pokemonIds = []
-  let { pokemonId } = props
-  var pokemonNextName, pokemonPreviousName
+  const dispatch = useDispatch();
+  const pokemonIds = [];
+  let { pokemonId } = props;
+  var pokemonNextName, pokemonPreviousName;
 
   if (pokemonId === 1) {
-    pokemonIds.push((pokemonId += 1))
-    pokemonNextName = pokemon.getName(`${pokemonIds[0]}`)
+    pokemonIds.push((pokemonId += 1));
+    pokemonNextName = pokemon.getName(`${pokemonIds[0]}`);
   } else if (pokemonId === 808) {
-    pokemonIds.push((pokemonId -= 1))
-    pokemonPreviousName = pokemon.getName(`${pokemonIds[0]}`)
+    pokemonIds.push((pokemonId -= 1));
+    pokemonPreviousName = pokemon.getName(`${pokemonIds[0]}`);
   } else {
-    pokemonIds.push((pokemonId -= 1))
-    pokemonIds.push((pokemonId += 2))
-    pokemonPreviousName = pokemon.getName(`${pokemonIds[0]}`)
-    pokemonNextName = pokemon.getName(`${pokemonIds[1]}`)
+    pokemonIds.push((pokemonId -= 1));
+    pokemonIds.push((pokemonId += 2));
+    pokemonPreviousName = pokemon.getName(`${pokemonIds[0]}`);
+    pokemonNextName = pokemon.getName(`${pokemonIds[1]}`);
   }
 
-  const hasPreviousPokemonLink = props.pokemonId > 1 && props.pokemonId <= 808
-  const hasNextPokemonLink = props.pokemonId >= 1 && props.pokemonId < 808
-  const noPreviousPokemon = hasNextPokemonLink && !hasPreviousPokemonLink
-  // const noNextPokemon = !hasNextPokemonLink && hasPreviousPokemonLink
+  const hasPreviousPokemonLink = props.pokemonId > 1 && props.pokemonId <= 808;
+  const hasNextPokemonLink = props.pokemonId >= 1 && props.pokemonId < 808;
+  const noPreviousPokemon = hasNextPokemonLink && !hasPreviousPokemonLink;
 
   return (
     <Flex
@@ -79,7 +78,7 @@ const PokemonPageNextPrevious = props => {
         </Box>
       )}
     </Flex>
-  )
-}
+  );
+};
 
-export default PokemonPageNextPrevious
+export default PokemonPageNextPrevious;

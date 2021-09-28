@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
-import { signUp } from 'redux/actions/userActions'
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { signUp } from 'redux/actions/authActions';
 import {
   Text,
   Flex,
@@ -19,14 +19,21 @@ import {
   IconButton,
   HStack,
   Icon
-} from '@chakra-ui/react'
-import Button from 'components/layout/Button'
-import { BiAt, BiKey, BiUserCircle, BiLowVision, BiShow, BiIdCard } from 'react-icons/bi'
-import { Formik, Form, Field } from 'formik'
-import * as Yup from 'yup'
-import _ from 'lodash'
-import { FaUser } from 'react-icons/fa'
-import { CgPokemon } from 'react-icons/cg'
+} from '@chakra-ui/react';
+import Button from 'components/layout/Button';
+import {
+  BiAt,
+  BiKey,
+  BiUserCircle,
+  BiLowVision,
+  BiShow,
+  BiIdCard
+} from 'react-icons/bi';
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
+import _ from 'lodash';
+import { FaUser } from 'react-icons/fa';
+import { CgPokemon } from 'react-icons/cg';
 
 // src={`https://www.serebii.net/diamondpearl/avatar/${item}.png`}
 
@@ -34,40 +41,40 @@ const Register = props => {
   const [state, setState] = useState({
     games: [],
     regions: []
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [showRePassword, setShowRePassword] = useState(false)
-  const [isLoading, setLoading] = useState(true)
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRePassword, setShowRePassword] = useState(false);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
     const urls = [
       `https://pokeapi.co/api/v2/version-group/`,
       `https://pokeapi.co/api/v2/region/`
-    ]
+    ];
 
     const getRegionsAndGames = async () => {
       const returnRegionsAndGames = await Promise.all(
         urls.map(async url => {
           try {
-            const getRequest = await fetch(url)
-            const getDataRequest = await getRequest.json()
-            return getDataRequest.results
+            const getRequest = await fetch(url);
+            const getDataRequest = await getRequest.json();
+            return getDataRequest.results;
           } catch (err) {
-            return err.message
+            return err.message;
           }
         })
-      )
+      );
       setState({
         ...state,
         games: returnRegionsAndGames[0],
         regions: returnRegionsAndGames[1]
-      })
-      setLoading(false)
-    }
+      });
+      setLoading(false);
+    };
 
-    getRegionsAndGames()
+    getRegionsAndGames();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   const avatarHumans = [
     'ace-f',
@@ -86,7 +93,7 @@ const Register = props => {
     'ranger-f',
     'ranger-m',
     'rich-m'
-  ]
+  ];
 
   const avatarPokemons = [
     'bidoof',
@@ -101,7 +108,7 @@ const Register = props => {
     'psyduck',
     'skitty',
     'slakoth'
-  ]
+  ];
 
   const RegisterSchema = Yup.object().shape({
     email: Yup.string()
@@ -127,10 +134,10 @@ const Register = props => {
     avatar: Yup.string().required('You must choose one avatar to proceed'),
     favoriteRegion: Yup.string(),
     favoriteGame: Yup.string()
-  })
+  });
 
-  const { games, regions } = state
-  const dispatch = useDispatch()
+  const { games, regions } = state;
+  const dispatch = useDispatch();
   /* _.startCase(item.name) */
 
   return (
@@ -156,10 +163,10 @@ const Register = props => {
               actions.setFieldError(
                 'avatar',
                 'You must choose an avatar in order to register'
-              )
+              );
             } else {
-              actions.setFieldError('avatar', false)
-              dispatch(signUp(values))
+              actions.setFieldError('avatar', false);
+              dispatch(signUp(values));
             }
           }}
         >
@@ -197,6 +204,12 @@ const Register = props => {
                             _hover={{
                               borderColor: 'blue.300'
                             }}
+                            _active={{
+                              borderColor: 'blue.300'
+                            }}
+                            _placeholder={{
+                              color: 'gray.400'
+                            }}
                           />
                         </InputGroup>
                         <FormErrorMessage>{form.errors.email}</FormErrorMessage>
@@ -223,6 +236,12 @@ const Register = props => {
                             placeholder="Type your username*"
                             _hover={{
                               borderColor: 'blue.300'
+                            }}
+                            _active={{
+                              borderColor: 'blue.300'
+                            }}
+                            _placeholder={{
+                              color: 'gray.400'
                             }}
                           />
                         </InputGroup>
@@ -257,6 +276,9 @@ const Register = props => {
                             }}
                             _active={{
                               borderColor: 'blue.300'
+                            }}
+                            _placeholder={{
+                              color: 'gray.400'
                             }}
                           />
                           <InputRightElement width="4.5rem">
@@ -301,6 +323,9 @@ const Register = props => {
                             }}
                             _active={{
                               borderColor: 'blue.300'
+                            }}
+                            _placeholder={{
+                              color: 'gray.400'
                             }}
                           />
                           <InputRightElement width="4.5rem">
@@ -419,7 +444,7 @@ const Register = props => {
                           gridGap={10}
                         >
                           {avatarHumans.map((item, index) => {
-                            const isAvatarSelected = field.value === item
+                            const isAvatarSelected = field.value === item;
 
                             return (
                               <Avatar
@@ -446,7 +471,7 @@ const Register = props => {
                                   })
                                 }
                               />
-                            )
+                            );
                           })}
                         </SimpleGrid>
                         <HStack
@@ -476,7 +501,7 @@ const Register = props => {
                           gridGap={10}
                         >
                           {avatarPokemons.map((item, index) => {
-                            const isAvatarSelected = field.value === item
+                            const isAvatarSelected = field.value === item;
 
                             return (
                               <Avatar
@@ -503,7 +528,7 @@ const Register = props => {
                                   })
                                 }
                               />
-                            )
+                            );
                           })}
                         </SimpleGrid>
                         <FormErrorMessage>
@@ -531,7 +556,7 @@ const Register = props => {
         </Formik>
       </Box>
     </Flex>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;

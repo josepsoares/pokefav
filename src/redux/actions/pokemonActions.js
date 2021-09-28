@@ -1,144 +1,88 @@
-export const getInfoPokemonPage = (pokemon, pokemonName) => async dispatch => {
-  console.log(pokemon)
-  dispatch({ type: 'API_REQUEST_START' })
+import PokemonApiService from 'services/pokemonApi';
+import {
+  POKEMON_DATA_SUCCESS,
+  POKEMON_DATA_ERROR,
+  // POKEMON_EVCHAIN_DATA_ERROR,
+  // POKEMON_ALTERNATEFORM_DATA_ERROR,
+  POKELIST_PAGE_DATA_ERROR,
+  POKELIST_PAGE_DATA_SUCCESS,
+  POKEMON_REGIONS_GAMES_LOADING,
+  POKEMON_REGIONS_GAMES_SUCCESS,
+  POKEMON_REGIONS_GAMES_ERROR,
+  // POKEDEX_DATA_LOADING,
+  POKEDEX_DATA_SUCCESS,
+  POKEDEX_DATA_ERROR,
+  API_REQUEST_START
+} from 'redux/types/pokemonTypes';
 
-  const urls = [
-    `https://pokeapi.co/api/v2/pokemon/${pokemon}`,
-    `https://pokeapi.co/api/v2/pokemon-species/${pokemon}`
-  ]
+export const getInfoPokemonPage = pokemon => async dispatch => {
+  dispatch({ type: API_REQUEST_START });
 
   try {
-    const pokemonData = await Promise.all(
-      urls.map(async url => {
-        const pokemonInfo = await fetch(url)
-        return await pokemonInfo.json()
-      })
-    )
+    const pokemonDataReq = await PokemonApiService.getInfoPokemonPageReq(
+      pokemon
+    );
 
-    dispatch({ type: 'POKEMONINFO_DATA_SUCCESS', payload: pokemonData })
-
-    const arrayAlternateForms = []
-    for (let item of pokemonData[1].varieties) {
-      if (!item.is_default) {
-        arrayAlternateForms.push(item.pokemon.url)
+    dispatch({
+      type: POKEMON_DATA_SUCCESS,
+      payload: {
+        pokeData: pokemonDataReq.pokemonData,
+        pokeEvChain: pokemonDataReq.pokemonEvChainData,
+        pokeAlternateF: pokemonDataReq.pokemonAlternateForms
       }
-    }
-
-    if (arrayAlternateForms.length !== 0) {
-      const pokemonAlternateForms = await Promise.all(
-        arrayAlternateForms.map(async url => {
-          const alternateForm = await fetch(url)
-          return await alternateForm.json()
-        })
-      )
-
-      dispatch({
-        type: 'POKEMONINFO_ALTERNATEFORM_DATA_SUCCESS',
-        payload: pokemonAlternateForms
-      })
-    } else {
-      dispatch({
-        type: 'POKEMONINFO_ALTERNATEFORM_DATA_SUCCESS',
-        payload: null
-      })
-    }
-
-    const pokemonEvChain = await fetch(pokemonData[1].evolution_chain.url)
-    const pokemonEvChainData = await pokemonEvChain.json()
-
-    dispatch({
-      type: 'POKEMONINFO_EVOLUTION_DATA_SUCCESS',
-      payload: pokemonEvChainData
-    })
+    });
   } catch (err) {
-    dispatch({ type: 'POKEMONINFO_DATA_ERROR', error: err })
+    dispatch({ type: POKEMON_DATA_ERROR, payload: err });
   }
-
-  // https://api.pokemontcg.io/v2/cards?q=name:charizard%20(subtypes:mega%20OR%20subtypes:vmax)&orderBy=-number
-
-  try {
-    const cards = await fetch(
-      `https://api.pokemontcg.io/v2/cards?name=${pokemonName}`
-    )
-    const cardsData = await cards.json()
-    dispatch({
-      type: 'POKEMONCARDS_DATA_SUCCESS',
-      payload: cardsData.cards
-    })
-  } catch (err) {
-    dispatch({ type: 'POKEMONCARDS_DATA_ERROR', error: err })
-  }
-
-  dispatch({ type: 'API_REQUEST_END' })
-}
-
-export const getRegionsAndGames = () => dispatch => {
-  dispatch({ type: 'API_REQUEST_START' })
-  const urls = [
-    `https://pokeapi.co/api/v2/version-group/`,
-    `https://pokeapi.co/api/v2/region/`
-  ]
-
-  Promise.all(
-    urls.map(url =>
-      fetch(url).then(async response => {
-        return response.json().then(function (json) {
-          return response.ok ? json : Promise.reject(json)
-        })
-      })
-    )
-  )
-    .then(async data => {
-      dispatch({ type: 'SIGNUP_DATA_SUCCESS', payload: data })
-    })
-    .catch(error => dispatch({ type: 'SIGNUP_DATA_ERROR', error: error }))
-}
-
-export const getPokedexAct = region => async dispatch => {
-  dispatch({ type: 'API_REQUEST_START' })
-
-  try {
-    const requestPokedex = await fetch()
-    const requestData = await requestPokedex.json()
-
-    console.log(requestData)
-
-    dispatch({
-      type: 'POKEDEX_DATA_SUCCESS',
-      payload: requestData.pokemon_entries
-    })
-  } catch (err) {
-    dispatch({ type: 'POKEDEX_DATA_ERROR', error: err })
-  }
-}
+};
 
 export const getDataPokeListPage = () => async dispatch => {
-  dispatch({ type: 'API_REQUEST_START' })
-  const urls = [
-    `https://pokeapi.co/api/v2/pokedex/`,
-    `https://pokeapi.co/api/v2/type/`,
-    `https://pokeapi.co/api/v2/pokedex/national`
-  ]
+  dispatch({ type: API_REQUEST_START });
 
   try {
-    const pokeListInitialData = await Promise.all(
-      urls.map(async url => {
-        const requestData = await fetch(url)
-        return await requestData.json()
-      })
-    )
-
-    console.log(pokeListInitialData)
+    const infoForPokeList = await PokemonApiService.getDataPokeListPageReq();
 
     dispatch({
-      type: 'POKELIST_PAGE_DATA_SUCCESS',
+      type: POKELIST_PAGE_DATA_SUCCESS,
       payload: {
-        regions: pokeListInitialData[0].results,
-        types: pokeListInitialData[1].results,
-        pokedex: pokeListInitialData[2].pokemon_entries
+        regions: infoForPokeList[0].results,
+        types: infoForPokeList[1].results,
+        pokedex: infoForPokeList[2].pokemon_entries
       }
-    })
+    });
   } catch (err) {
-    dispatch({ type: 'POKELIST_PAGE_DATA_ERROR', error: err })
+    dispatch({ type: POKELIST_PAGE_DATA_ERROR, payload: err });
   }
-}
+};
+
+export const getPokedex = pokedex => async dispatch => {
+  dispatch({ type: API_REQUEST_START });
+
+  try {
+    const pokedexReq = await PokemonApiService.getPokedexReq(pokedex);
+    const pokedexData = pokedexReq.json();
+
+    dispatch({
+      type: POKEDEX_DATA_SUCCESS,
+      payload: pokedexData
+    });
+  } catch (err) {
+    dispatch({ type: POKEDEX_DATA_ERROR, payload: err });
+  }
+};
+
+export const getRegionsAndGames = () => async dispatch => {
+  dispatch({ type: POKEMON_REGIONS_GAMES_LOADING });
+
+  try {
+    const infoRegionsGamesReq = await PokemonApiService.getRegionsAndGamesReq();
+    const infoRegionsGames = infoRegionsGamesReq.json();
+
+    dispatch({
+      type: POKEMON_REGIONS_GAMES_SUCCESS,
+      payload: infoRegionsGames
+    });
+  } catch (err) {
+    dispatch({ type: POKEMON_REGIONS_GAMES_ERROR, payload: err });
+  }
+};

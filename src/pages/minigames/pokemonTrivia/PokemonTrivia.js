@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { trivia } from 'assets/content/quizz'
-import { updatePokeTriviaResults } from 'redux/actions/minigamesActions'
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { trivia } from 'assets/content/quizz';
+import { updatePokeTriviaResults } from 'redux/actions/minigamesActions';
 import {
   Flex,
   Heading,
@@ -16,18 +16,18 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay
-} from '@chakra-ui/react'
-import { CgPokemon } from 'react-icons/cg'
-import { FaQuestion, FaSignInAlt } from 'react-icons/fa'
-import _ from 'lodash'
+} from '@chakra-ui/react';
+import { CgPokemon } from 'react-icons/cg';
+import { FaQuestion, FaSignInAlt } from 'react-icons/fa';
+import _ from 'lodash';
 
-import Button from 'components/layout/Button'
-import Loading from 'components/feedback/Loading'
-import PokemonTriviaStatic from './components/PokemonTriviaStatic'
-import PokemonTriviaResults from './components/PokemonTriviaResults'
-import ConfirmationLeave from 'components/feedback/ConfirmationLeave'
-import SEO from 'components/Seo'
-import Error from 'components/feedback/Error'
+import Button from 'components/layout/Button';
+import Loading from 'components/feedback/Loading';
+import PokemonTriviaStatic from './components/PokemonTriviaStatic';
+import PokemonTriviaResults from './components/PokemonTriviaResults';
+import ConfirmationLeave from 'components/feedback/ConfirmationLeave';
+import SEO from 'components/Seo';
+import Error from 'components/feedback/Error';
 
 const PokemonTrivia = () => {
   const initState = {
@@ -46,44 +46,44 @@ const PokemonTrivia = () => {
     totalCorrectAnswers: 0,
     totalIncorrectAnswers: 0,
     showAnswersFeedback: false
-  }
+  };
 
-  const [state, setState] = useState(initState)
-  const [confirmModal, setConfirmModal] = useState(false)
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [state, setState] = useState(initState);
+  const [confirmModal, setConfirmModal] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const dispatch = useDispatch()
-  const profileContent = useSelector(state => state.firebase.profile)
+  const dispatch = useDispatch();
+  const profileContent = useSelector(state => state.firebase.profile);
   const updateTriviaResultError = useSelector(
-    state => state.trivia.updateTriviaResultError
-  )
+    state => state.minigames.updateTriviaResultError
+  );
 
   const startTrivia = () => {
-    const startInitState = initState
-    startInitState.isOnGame = true
-    setState(startInitState)
+    const startInitState = initState;
+    startInitState.isOnGame = true;
+    setState(startInitState);
 
     setTimeout(() => {
       const getQuestions = printQuestionsAnswers(
         'questions',
         state.numberOfQuestions
-      )
+      );
 
-      console.log(getQuestions)
+      console.log(getQuestions);
 
-      const getAnswers = printQuestionsAnswers('answers', 4)
-      var answersArray = []
+      const getAnswers = printQuestionsAnswers('answers', 4);
+      var answersArray = [];
 
-      console.log(getAnswers)
+      console.log(getAnswers);
 
       for (let i = 0; i < getQuestions.length; i++) {
-        answersArray.push([])
+        answersArray.push([]);
         for (var x = 0; x < getAnswers.length; x++) {
           if (getAnswers[x] === -1) {
             answersArray[i].push({
               answer: state.allQuestions[getQuestions[i].id].correct_answer,
               res: 'correct'
-            })
+            });
           } else {
             answersArray[i].push({
               answer:
@@ -91,10 +91,10 @@ const PokemonTrivia = () => {
                   getAnswers[x]
                 ],
               res: 'incorrect'
-            })
+            });
           }
         }
-        answersArray[i] = _.shuffle(answersArray[i])
+        answersArray[i] = _.shuffle(answersArray[i]);
       }
 
       setState({
@@ -105,17 +105,17 @@ const PokemonTrivia = () => {
         currentQuestionObject: state.allQuestions[getQuestions[0].id],
         allGameAnswers: answersArray,
         currentAnswers: answersArray[state.questionNumber]
-      })
-    }, 500)
-  }
+      });
+    }, 500);
+  };
 
   const restartTrivia = () => {
-    setState(initState)
-  }
+    setState(initState);
+  };
 
   const printQuestionsAnswers = (type, iterations) => {
-    let repeated
-    const arrayInput = []
+    let repeated;
+    const arrayInput = [];
 
     for (let i = 0; i < iterations; i++) {
       if (arrayInput.length === 0) {
@@ -123,40 +123,40 @@ const PokemonTrivia = () => {
           arrayInput.push({
             id: Math.floor(Math.random() * 47),
             didAnswerCorrect: null
-          })
+          });
         } else {
-          arrayInput.push(Math.floor(Math.random() * iterations) - 1)
+          arrayInput.push(Math.floor(Math.random() * iterations) - 1);
         }
       } else {
         do {
-          repeated = 0
+          repeated = 0;
           var number =
             type === 'questions'
               ? Math.floor(Math.random() * 47)
-              : Math.floor(Math.random() * iterations) - 1
+              : Math.floor(Math.random() * iterations) - 1;
           for (let x = 0; x < arrayInput.length; x++) {
             if (type === 'questions') {
-              number === arrayInput[x].id && repeated++
+              number === arrayInput[x].id && repeated++;
             } else {
-              number === arrayInput[x] && repeated++
+              number === arrayInput[x] && repeated++;
             }
           }
-        } while (repeated !== 0)
+        } while (repeated !== 0);
 
         if (type === 'questions') {
-          arrayInput.push({ id: number, didAnswerCorrect: null })
+          arrayInput.push({ id: number, didAnswerCorrect: null });
         } else {
-          arrayInput.push(number)
+          arrayInput.push(number);
         }
       }
     }
 
-    return arrayInput
-  }
+    return arrayInput;
+  };
 
   const handleAnswer = answer => {
-    const updateGameQuestions = state.allGameQuestions
-    updateGameQuestions[state.questionNumber].didAnswerCorrect = answer
+    const updateGameQuestions = state.allGameQuestions;
+    updateGameQuestions[state.questionNumber].didAnswerCorrect = answer;
 
     setState({
       ...state,
@@ -168,23 +168,23 @@ const PokemonTrivia = () => {
       totalIncorrectAnswers: !answer
         ? _.add(state.totalIncorrectAnswers, 1)
         : state.totalCorrectAnswers
-    })
+    });
 
     setTimeout(() => {
-      var changeQuestion = state.questionNumber + 1
+      var changeQuestion = state.questionNumber + 1;
 
       if (changeQuestion === 10) {
         setState({
           ...state,
           didFinishGame: true
-        })
+        });
 
         dispatch(
           updatePokeTriviaResults({
             correctAnswers: state.totalCorrectAnswers,
             wrongAnswers: state.totalIncorrectAnswers
           })
-        )
+        );
       } else {
         setState({
           ...state,
@@ -202,10 +202,10 @@ const PokemonTrivia = () => {
           totalIncorrectAnswers: !answer
             ? _.add(state.totalIncorrectAnswers, 1)
             : state.totalIncorrectAnswers
-        })
+        });
       }
-    }, 3000)
-  }
+    }, 3000);
+  };
 
   const {
     isOnGame,
@@ -219,25 +219,25 @@ const PokemonTrivia = () => {
     totalCorrectAnswers,
     totalIncorrectAnswers,
     showAnswersFeedback
-  } = state
+  } = state;
 
-  const changeColorCorrect = showAnswersFeedback ? 'green' : 'none'
-  const changeColorWrong = showAnswersFeedback ? 'red' : 'none'
-  const disabledBtn = showAnswersFeedback
+  const changeColorCorrect = showAnswersFeedback ? 'green' : 'none';
+  const changeColorWrong = showAnswersFeedback ? 'red' : 'none';
+  const disabledBtn = showAnswersFeedback;
 
-  console.log(state)
+  console.log(state);
   if (updateTriviaResultError) {
     return (
       <Error error="An error occurred while updating your trivia stats. Please try playing again PokéTrivia later." />
-    )
+    );
   } else if (!isOnGame) {
-    return <PokemonTriviaStatic startTrivia={() => startTrivia()} />
+    return <PokemonTriviaStatic startTrivia={() => startTrivia()} />;
   } else {
     if (!isGameReadyToStart) {
-      return <Loading />
+      return <Loading />;
     } else {
       if (isGameReadyToStart && !didFinishGame) {
-        const answerLetters = ['a)', 'b)', 'c)', 'd)']
+        const answerLetters = ['a)', 'b)', 'c)', 'd)'];
 
         return (
           <>
@@ -258,7 +258,7 @@ const PokemonTrivia = () => {
                       ? '#ebebd3'
                       : item.didAnswerCorrect
                       ? '#38a169'
-                      : '#f24643'
+                      : '#f24643';
 
                   return (
                     <React.Fragment key={index}>
@@ -270,7 +270,7 @@ const PokemonTrivia = () => {
                       />
                       <Divider />
                     </React.Fragment>
-                  )
+                  );
                 })}
               </Flex>
 
@@ -321,7 +321,7 @@ const PokemonTrivia = () => {
                     >
                       <b>{answerLetters[key]}</b> {item.answer}
                     </Button>
-                  )
+                  );
                 })}
               </SimpleGrid>
               <Flex
@@ -372,11 +372,11 @@ const PokemonTrivia = () => {
               <ConfirmationLeave
                 didOpen={confirmModal}
                 closeFunc={() => {
-                  setConfirmModal(false)
+                  setConfirmModal(false);
                 }}
                 proceedFunc={() => {
-                  setConfirmModal(false)
-                  restartTrivia()
+                  setConfirmModal(false);
+                  restartTrivia();
                 }}
                 title="Abandon PokéTrivia?"
                 description="Are you sure you want to abandon your session of PokéTrivia? You'll lose all the progress you made in this session"
@@ -385,7 +385,7 @@ const PokemonTrivia = () => {
               />
             </Flex>
           </>
-        )
+        );
       } else {
         return (
           <PokemonTriviaResults
@@ -398,10 +398,10 @@ const PokemonTrivia = () => {
             restartFunc={restartTrivia}
             userProfile={profileContent}
           />
-        )
+        );
       }
     }
   }
-}
+};
 
-export default PokemonTrivia
+export default PokemonTrivia;

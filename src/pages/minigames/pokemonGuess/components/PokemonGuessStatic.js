@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   SimpleGrid,
@@ -9,6 +9,7 @@ import {
   Stack,
   StackDivider,
   useDisclosure,
+  IconButton,
   ModalFooter,
   Modal,
   ModalOverlay,
@@ -18,34 +19,41 @@ import {
   ModalCloseButton,
   Select,
   FormControl
-} from '@chakra-ui/react'
-import { useSelector } from 'react-redux'
+} from '@chakra-ui/react';
+import { useSelector } from 'react-redux';
 import {
   FaArrowLeft,
   FaArrowRight,
   FaGraduationCap,
   FaQuestion
-} from 'react-icons/fa'
+} from 'react-icons/fa';
 
-import Button from 'components/layout/Button'
-import SEO from 'components/Seo'
+import Button from 'components/layout/Button';
+import SEO from 'components/Seo';
 
-const difficulties = ['normal', 'hard']
+const difficulties = ['normal', 'hard'];
 
 const PokemonGuessStatic = ({ startPokeGuess }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen, onOpen, onClose } = useDisclosure();
   // const [tutorial, setTutorial] = useState(null)
   // const [difficulty, setDifficulty] = useState('normal')
   // const [pokemonSample, setPokemonSample] = useState('national')
-  const profile = useSelector(state => state.firebase.profile)
+  const profile = useSelector(state => state.firebase.profile);
   const {
-    guessGames,
+    pokeGuess,
+    pokemonIQ,
+    pokemonIQNr,
+    played: minigamesPlayed,
+    overallScore
+  } = profile.minigames;
+  const {
+    played: pokeGuessesPlayed,
     correctGuesses,
     incorrectGuesses,
-    guessPerformance
-  } = profile.pokeGuess
+    score: pokeGuessScore
+  } = pokeGuess;
 
-  useEffect(() => {}, [])
+  useEffect(() => {}, []);
 
   return (
     <>
@@ -54,18 +62,14 @@ const PokemonGuessStatic = ({ startPokeGuess }) => {
         description="Play a fun trivia filled with challeging questions about facts and mechanics about the Pokémon Franchise"
       />
 
-      <Flex>
-        <Button onClick={onOpen} colorScheme="blue" leftIcon={<FaArrowLeft />}>
-          Go Back to PokéMinigames
+      <Flex justifyContent="space-between" flexDir="row" flexWrap="wrap">
+        <Heading as="h1" pb={8}>
+          PokéGuess
+        </Heading>
+        <Button colorScheme="blue" onClick={onOpen} leftIcon={<FaQuestion />}>
+          How to Play
         </Button>
       </Flex>
-
-      <Heading as="h1" pb={8}>
-        PokéGuess
-      </Heading>
-      <Button colorScheme="blue" onClick={onOpen} leftIcon={<FaQuestion />}>
-        How to Play
-      </Button>
 
       <SimpleGrid columns={[1, null, null, 2]} justify="center" gridGap={6}>
         <Box order={[2, null, null, 1]}>
@@ -90,39 +94,39 @@ const PokemonGuessStatic = ({ startPokeGuess }) => {
             you're done to find out what pokémon are you!
           </Text>
 
-          {guessPerformance && (
+          {pokeGuessScore && (
             <Text fontSize={18} textAlign="center">
               Your Pokémon IQ currently is the same as a{' '}
               <Box as="b" color="#ffe066">
-                {guessPerformance}
+                {pokeGuessScore}
               </Box>
             </Text>
           )}
 
-          <Button
-            colorScheme="blue"
-            leftIcon={<FaGraduationCap />}
-            onClick={onOpen}
+          <Flex
+            pt={12}
+            w="100%"
+            flexWrap="wrap"
+            align="center"
+            justify="center"
+            gridGap={6}
           >
-            Check your PokéGuess stats
-          </Button>
-
-          <FormControl>
-            <Select
-              borderColor="#1688b9"
-              id="favoriteRegion"
-              _hover={{
-                borderColor: 'blue.300'
-              }}
-              placeholder="Difficulty of PokéGuess session"
+            <Button
+              colorScheme="blue"
+              leftIcon={<FaGraduationCap />}
+              onClick={onOpen}
             >
-              {difficulties.map((item, index) => (
-                <option key={index} value={item}>
-                  {item}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
+              Check your PokéGuess stats
+            </Button>
+            <Button
+              isDisabled={true}
+              colorScheme="green"
+              rightIcon={<FaArrowRight />}
+              onClick={() => startPokeGuess()}
+            >
+              Start game of PokéGuess
+            </Button>
+          </Flex>
 
           {/*
           https://pokeapi.co/api/v2/pokedex/
@@ -152,41 +156,6 @@ const PokemonGuessStatic = ({ startPokeGuess }) => {
               isSearchable={false}
             />
           </FormControl> */}
-
-          <FormControl>
-            <Select
-              borderColor="#1688b9"
-              id="favoriteRegion"
-              _hover={{
-                borderColor: 'blue.300'
-              }}
-              placeholder="Difficulty of PokéGuess session"
-            >
-              {difficulties.map((item, index) => (
-                <option key={index} value={item}>
-                  {item}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-
-          <Flex
-            pt={12}
-            w="100%"
-            flexWrap="wrap"
-            align="center"
-            justify="center"
-            gridGap={6}
-          >
-            <Button
-              isDisabled={true}
-              colorScheme="green"
-              rightIcon={<FaArrowRight />}
-              onClick={() => startPokeGuess()}
-            >
-              Start game of PokéGuess
-            </Button>
-          </Flex>
         </Box>
         <Flex justify="center" align="center" order={[1, null, null, 2]}>
           <Image
@@ -199,6 +168,20 @@ const PokemonGuessStatic = ({ startPokeGuess }) => {
           />
         </Flex>
       </SimpleGrid>
+
+      <Flex position="fixed" top="90%" left="7%">
+        <IconButton
+          boxShadow="dark-lg"
+          width="50px"
+          height="50px"
+          borderRadius="50%"
+          colorScheme="blue"
+          isRound={true}
+        >
+          <FaArrowLeft />
+        </IconButton>
+      </Flex>
+
       <Modal
         isCentered
         isOpen={isOpen}
@@ -224,7 +207,7 @@ const PokemonGuessStatic = ({ startPokeGuess }) => {
                 <Text fontWeight="bold" pb={2}>
                   PokéGuess sessions played
                 </Text>
-                <Text>{guessGames}</Text>
+                <Text>{pokeGuessesPlayed}</Text>
               </Flex>
               <Flex flexDir="column" align="center">
                 <Text fontWeight="bold" pb={2}>
@@ -242,7 +225,7 @@ const PokemonGuessStatic = ({ startPokeGuess }) => {
                 <Text fontWeight="bold" pb={2}>
                   PokéGuess IQ
                 </Text>
-                <Text>{!guessPerformance ? 'None' : guessPerformance}</Text>
+                <Text>{!pokeGuessScore ? 'None' : pokeGuessScore}</Text>
               </Flex>
             </Stack>
           </ModalBody>
@@ -255,7 +238,7 @@ const PokemonGuessStatic = ({ startPokeGuess }) => {
         </ModalContent>
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default PokemonGuessStatic
+export default PokemonGuessStatic;
