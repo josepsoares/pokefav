@@ -32,57 +32,59 @@ export const signIn = credentials => {
 
 export const signUp = newUser => {
   return (dispatch, _, { getFirebase, getFirestore }) => {
+    console.log(newUser);
     const firebase = getFirebase();
     const firestore = getFirestore();
     firebase
       .auth()
       .createUserWithEmailAndPassword(newUser.email, newUser.password)
       .then(async response => {
-        await firestore
-          .collection('users')
-          .doc(response.user.uid)
-          .set({
-            createdAt: moment().format('Do MMMM YYYY'),
-            email: newUser.email,
-            username: newUser.username,
-            gender: newUser.gender,
-            nationality: newUser.nationality,
-            avatar: newUser.avatar,
-            favoriteGame: newUser.favoriteGame,
-            favoriteRegion: newUser.favoriteRegion,
-            friends: [],
-            favoriteTeam: [],
-            favoritePokemons: [],
-            minigames: {
-              overallScore: 0,
-              played: 0,
-              pokeGuess: {
-                correctGuesses: 0,
-                incorrectGuesses: 0,
+        try {
+          await firestore
+            .collection('users')
+            .doc(response.user.uid)
+            .set({
+              createdAt: moment().format('Do MMMM YYYY'),
+              email: newUser.email,
+              username: newUser.username,
+              avatar: newUser.avatar,
+              favoriteGame: newUser.favoriteGame,
+              favoriteRegion: newUser.favoriteRegion,
+              favoriteTeam: [],
+              favoritePokemons: [],
+              minigames: {
+                overallScore: 0,
                 played: 0,
-                score: 0,
-                streak: 0
+                pokeGuess: {
+                  correctGuesses: 0,
+                  incorrectGuesses: 0,
+                  played: 0,
+                  score: 0,
+                  streak: 0
+                },
+                pokeTrivia: {
+                  correctAnswers: 0,
+                  incorrectAnswers: 0,
+                  played: 0,
+                  score: 0
+                },
+                pokeTypes: {
+                  avgTime: 0,
+                  correctTypesChosen: 0,
+                  incorrectTypesChosen: 0,
+                  played: 0,
+                  score: 0
+                },
+                pokemonIQ: null,
+                pokemonIQNr: null
               },
-              pokeTrivia: {
-                correctAnswers: 0,
-                incorrectAnswers: 0,
-                played: 0,
-                score: 0
-              },
-              pokeTypes: {
-                avgTime: 0,
-                correctTypesChosen: 0,
-                incorrectTypesChosen: 0,
-                played: 0,
-                score: 0
-              },
-              pokemonIQ: null,
-              pokemonIQNr: null
-            },
-            notificationLikes: [],
-            addFavoriteAction: null
-          });
-        await firebase.auth().currentUser.sendEmailVerification();
+              notificationLikes: [],
+              addFavoriteAction: null
+            });
+          await firebase.auth().currentUser.sendEmailVerification();
+        } catch (e) {
+          console.log('error', e);
+        }
       })
       .then(() => {
         dispatch({ type: SIGNUP_SUCCESS });

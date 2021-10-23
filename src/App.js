@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { Route, Switch, useLocation } from 'react-router-dom';
-import { Container, Grid } from '@chakra-ui/react';
+import { Link, Route, Switch, useLocation } from 'react-router-dom';
+import { Container, Grid, Flex, Image } from '@chakra-ui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { config } from 'react-spring';
 import { animated, Transition } from 'react-spring/renderprops';
@@ -11,6 +11,7 @@ import NavigationBar from './components/layout/navbar/Navbar';
 import ToastProvider from './components/feedback/ToastProvider';
 import Loading from './components/feedback/Loading';
 import Error from './components/feedback/Error';
+import VerifyEmail from 'components/feedback/VerifyEmail';
 import NoMatch from './pages/NoMatch';
 import Footer from './components/layout/Footer';
 import ScrollToTop from './components/scroll/ScrollToTop';
@@ -45,7 +46,7 @@ const App = () => {
   const errorPokemonApi = useSelector(state => state.pokemonApi.error);
   const errorUser = useSelector(state => state.user.error);
   const auth = useSelector(state => state.firebase.auth.uid);
-  const userProfile = useSelector(state => state.firebase.profile);
+  // const userProfile = useSelector(state => state.firebase.profile);
 
   const location = useLocation();
   const dispatch = useDispatch();
@@ -70,16 +71,48 @@ const App = () => {
         minHeight="100vh"
         gridTemplateRows={auth ? 'auto 1fr auto' : 'auto 1fr'}
       >
-        {auth && <NavigationBar />}
+        {auth /* && auth.emailVerified */ ? (
+          <NavigationBar />
+        ) : (
+          auth &&
+          !auth.emailVerified && (
+            <Flex
+              p={[8, 10]}
+              px={[8, null, 20]}
+              w="100%"
+              as="nav"
+              flexDir="row"
+              justify="center"
+              align="center"
+            >
+              <Link to="/">
+                <Image
+                  h={10}
+                  objectFit="contain"
+                  alt="Pokéfav"
+                  src="/img/logo/pokefav-full-title.svg"
+                />
+              </Link>
+            </Flex>
+          )
+        )}
         {isLoadingPokemonApi || isLoadingUserApi ? (
           <Loading />
         ) : errorPokemonApi || errorUser ? (
           <Error error={errorPokemonApi || errorUser} />
         ) : (
+          /* auth && !auth.emailVerified ? (
           <MainContainer
-            maxW={auth ? ['95%', '90%', '80%'] : '100%'}
-            py={auth ? 12 : 0}
-            px={auth ? 10 : 0}
+            display="flex"
+            maxW={auth ? ['90%', '90%', '80%'] : '100%'}
+            py={auth ? [6, 10, 12] : 0}
+          >
+            <VerifyEmail />
+          </MainContainer>
+        ) : */ <MainContainer
+            maxW={auth ? ['90%', '90%', '80%'] : '100%'}
+            py={auth ? [6, 10, 12] : 0}
+            px={0}
           >
             <AnimatedRoute>
               {location => (

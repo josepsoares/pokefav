@@ -1,6 +1,6 @@
-import React from 'react'
-import { Box, Icon, Image, Text } from '@chakra-ui/react'
-import { CgPokemon } from 'react-icons/cg'
+import React from 'react';
+import { Box, Icon, Image, Text } from '@chakra-ui/react';
+import { CgPokemon } from 'react-icons/cg';
 
 const PokemonImage = ({ pokemonName, pokemonNumber }) => {
   return (
@@ -27,7 +27,7 @@ const PokemonImage = ({ pokemonName, pokemonNumber }) => {
       />
       <Text pt={6}>{pokemonName}</Text>
     </Box>
-  )
-}
+  );
+};
 
-export default PokemonImage
+export default PokemonImage;

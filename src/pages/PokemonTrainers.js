@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { getFirestore } from 'redux-firestore'
-import { getUser } from 'redux/actions/userActions'
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getFirestore } from 'redux-firestore';
+import { getUser } from 'redux/actions/userActions';
 
-import { Link } from 'react-router-dom'
-import InfiniteScroll from 'react-infinite-scroll-component'
-import Select from 'react-select'
-import _ from 'lodash'
+import { Link } from 'react-router-dom';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import Select from 'react-select';
+import _ from 'lodash';
 
 import {
   Flex,
@@ -25,14 +25,14 @@ import {
   CloseButton,
   Box,
   Avatar
-} from '@chakra-ui/react'
-import { FaSearch } from 'react-icons/fa'
+} from '@chakra-ui/react';
+import { FaSearch } from 'react-icons/fa';
 
-import Error from 'components/feedback/Error'
-import Loading from 'components/feedback/Loading'
-import SEO from 'components/Seo'
-import Button from 'components/layout/Button'
-import useWindowSize from 'utils/hooks/useWindowSize'
+import Error from 'components/feedback/Error';
+import Loading from 'components/feedback/Loading';
+import SEO from 'components/Seo';
+import Button from 'components/layout/Button';
+import useWindowSize from 'utils/hooks/useWindowSize';
 
 const PokemonTrainers = props => {
   const [state, setState] = useState({
@@ -45,11 +45,12 @@ const PokemonTrainers = props => {
     lastUser: null,
     hasMore: true,
     filterType: 'createdAt',
+    filterMethod: 'desc',
     typeSearch: 'date',
     selectValue: 'national',
     selectList: '',
     disposition: 'items'
-  })
+  });
 
   const {
     list,
@@ -62,61 +63,71 @@ const PokemonTrainers = props => {
     selectValue,
     selectList,
     filterMethod
-  } = state
+  } = state;
 
-  const dispatch = useDispatch()
-  const db = getFirestore()
+  const dispatch = useDispatch();
+  const db = getFirestore();
 
-  const profile = useSelector(state => state.firebase.profile)
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const drawerBtnRef = useRef()
-  const { width } = useWindowSize()
+  const profile = useSelector(state => state.firebase.profile);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const drawerBtnRef = useRef();
+  const { width } = useWindowSize();
 
   useEffect(() => {
-    getUsers(true)
+    getUsers(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (state.filterMethod !== '') {
-      getUsers(false)
+      getUsers(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.filterMethod])
+  }, [state.filterMethod]);
 
   const getUsers = async isFirstRender => {
-    setState({ ...state, isLoading: true })
-    let requestUsers
-    const userList = []
-    const { resultsPerPage, filterType, filterMethod } = state
+    setState({ ...state, isLoading: true });
+    let requestUsers;
+    const userList = [];
+    const { resultsPerPage, filterType, filterMethod } = state;
 
     if (filterType) {
+      console.log('teste 1');
+
       if (filterMethod && (filterMethod === 'desc' || filterMethod === 'asc')) {
         requestUsers = db
           .collection('users')
-          .orderBy(`${filterType}`, `${filterMethod}`)
+          .limit(resultsPerPage)
+          .orderBy(`${filterType}`, `${filterMethod}`);
       }
     } else {
-      requestUsers = db.collection('users').orderBy('createdAt', 'desc')
+      console.log('teste 2');
+      requestUsers = db
+        .collection('users')
+        .limit(resultsPerPage)
+        .orderBy('createdAt', 'desc');
     }
 
-    console.log(resultsPerPage)
+    console.log('RESULT =>', resultsPerPage);
+    console.log(requestUsers);
 
     try {
-      const getUsersRequest = await requestUsers.limit(resultsPerPage).get()
-      let lastVisible = getUsersRequest.docs[getUsersRequest.docs.length - 1]
+      const getUsersRequest = await requestUsers.get();
+      console.log(getUsersRequest.docs.length);
+      let lastVisible = getUsersRequest.docs[getUsersRequest.docs.length - 1];
       getUsersRequest.docs.forEach(doc => {
-        let { username, avatar, level, statute } = doc.data()
-        console.log(username, avatar)
-        userList.push({ key: doc.id, username, avatar, level, statute })
-      })
+        let { username, avatar, level, statute } = doc.data();
+        userList.push({ key: doc.id, username, avatar, level, statute });
+      });
 
       if (filterType === 'username') {
-        userList.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+        userList.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
       }
 
+      console.log(userList);
+
       if (isFirstRender) {
-        const totalUsers = await getAllUsersLength()
+        const totalUsers = await getAllUsersLength();
         totalUsers?.usersLength
           ? setState({
               ...state,
@@ -126,7 +137,7 @@ const PokemonTrainers = props => {
               isLoading: false,
               totalUsers: totalUsers.usersLength
             })
-          : setState({ ...state, error: totalUsers?.err })
+          : setState({ ...state, error: totalUsers?.err });
       } else {
         setState({
           ...state,
@@ -134,40 +145,41 @@ const PokemonTrainers = props => {
           list: userList,
           lastUser: lastVisible,
           isLoading: false
-        })
+        });
       }
     } catch (err) {
-      console.log(err)
-      setState({ ...state, error: err.message })
+      console.log('ERRO!', err);
+      setState({ ...state, error: err.message });
     }
-  }
+  };
 
   const getAllUsersLength = async () => {
     try {
-      const getTotatUsers = await db.collection('counters').doc('users').get()
-      const requestNumber = getTotatUsers.data()
-      return { usersLength: requestNumber.number }
+      const getTotatUsers = await db.collection('counters').doc('users').get();
+      const requestNumber = getTotatUsers.data();
+      console.log('NUMBER OF TOTAL USERS =>', requestNumber.number);
+      return { usersLength: requestNumber.number };
     } catch (err) {
-      console.log(err)
-      return { err: err }
+      console.log(err);
+      return { err: err };
     }
-  }
+  };
 
   const fetchMoreData = () => {
-    let numberOfUsersToRequest
-    let addNextUsers = []
-    const { lastUser, ref, resultsPerPage, filterType } = state
-    const thresholdOfUsers = totalUsers - resultsPerPage
+    let numberOfUsersToRequest;
+    let addNextUsers = [];
+    const { lastUser, ref, resultsPerPage, filterType } = state;
+    const thresholdOfUsers = totalUsers - resultsPerPage;
 
-    console.log(thresholdOfUsers)
+    console.log(thresholdOfUsers);
 
     if (list.length > thresholdOfUsers) {
-      numberOfUsersToRequest = resultsPerPage - list.length
+      numberOfUsersToRequest = resultsPerPage - list.length;
     } else {
-      numberOfUsersToRequest = resultsPerPage
+      numberOfUsersToRequest = resultsPerPage;
     }
-    console.log(numberOfUsersToRequest)
-    console.log(state)
+    console.log(numberOfUsersToRequest);
+    console.log(state);
 
     ref
       .startAfter(lastUser)
@@ -175,60 +187,60 @@ const PokemonTrainers = props => {
       .get()
       .then(documentSnapshots => {
         let lastVisible =
-          documentSnapshots.docs[documentSnapshots.docs.length - 1]
+          documentSnapshots.docs[documentSnapshots.docs.length - 1];
         documentSnapshots.forEach(doc => {
-          let { username, avatar, level, statute } = doc.data()
-          addNextUsers.push({ key: doc.id, username, avatar, level, statute })
-        })
+          let { username, avatar, level, statute } = doc.data();
+          addNextUsers.push({ key: doc.id, username, avatar, level, statute });
+        });
 
         if (filterType === 'username') {
           addNextUsers.sort((a, b) =>
             a.toLowerCase().localeCompare(b.toLowerCase())
-          )
+          );
         }
 
         setState({
           ...state,
           list: state.list.concat(addNextUsers),
           lastUser: lastVisible
-        })
+        });
       })
-      .catch(err => setState({ ...state, error: err }))
-  }
+      .catch(err => setState({ ...state, error: err }));
+  };
 
   const updateFilter = (ev, { action }, filter) => {
     if (action === 'clear' && filter === 'filterMethod') {
-      setState({ ...state, [filter]: null })
-      getUsers()
+      setState({ ...state, [filter]: null });
+      getUsers();
     } else if (filter === 'filterType' && state.filterMethod !== '') {
-      setState({ ...state, filterType: ev?.value, filterMethod: '' })
+      setState({ ...state, filterType: ev?.value, filterMethod: '' });
     } else {
-      setState({ ...state, [filter]: ev?.value ? ev?.value : '' })
+      setState({ ...state, [filter]: ev?.value ? ev?.value : '' });
     }
-  }
+  };
 
   const typeOptions = [
     { value: 'createdAt', label: 'Creation date' },
     { value: 'username', label: 'Username' },
     { value: 'triviaPokemon', label: 'Minigames score' }
-  ]
+  ];
 
   const methodOptions = [
     { value: 'asc', label: 'Ascendant' },
     { value: 'desc', label: 'Descendant' }
-  ]
+  ];
 
   const methodNameOptions = [
     { value: 'asc', label: 'Ascendant' },
     { value: 'desc', label: 'Descendant' }
-  ]
+  ];
 
   const methodTriviaOptions = [
     { value: 'asc', label: 'Ascendant' },
     { value: 'desc', label: 'Descendant' },
     { value: 'asc', label: 'Ascendant' },
     { value: 'desc', label: 'Descendant' }
-  ]
+  ];
 
   const handleSearchChange = event => {
     /* const { value } = event.target
@@ -260,13 +272,13 @@ const PokemonTrainers = props => {
         searchPokemon: ''
       })
     } */
-  }
+  };
 
   const handleSelectChange = async (value, action) => {
     setState({
       ...state,
       isLoading: true
-    })
+    });
 
     /* if (action.name === 'typeSearch') {
       if (value.value === 'region') {
@@ -341,18 +353,19 @@ const PokemonTrainers = props => {
         isLoading: false
       })
     }*/
-  }
+  };
 
-  let optionsSelectSpecifics = []
+  let optionsSelectSpecifics = [];
 
   for (let item of state.selectList) {
     optionsSelectSpecifics.push({
       value: item.name,
       label: _.startCase(item.name)
-    })
+    });
   }
 
-  console.log('condition to more =>', list.length >= totalUsers ? false : true)
+  console.log('condition to more =>', list.length >= totalUsers ? false : true);
+  console.log(list.length, totalUsers);
 
   return (
     <>
@@ -384,15 +397,12 @@ const PokemonTrainers = props => {
       {isLoading ? (
         <Loading />
       ) : error ? (
-        <Error
-          message="Ocorreu um erro no pedido dos utilizadores à base de dados, tente
-        novamente atualizando a página via <i>browser</i>!"
-        />
+        <Error message="An error occurred" />
       ) : (
         <InfiniteScroll
           dataLength={list.length}
           next={fetchMoreData}
-          hasMore={list.length >= totalUsers ? false : true}
+          hasMore={list.length <= totalUsers}
           endMessage={
             <Text>You have seen all the PokéTrainers in PokéFav</Text>
           }
@@ -508,7 +518,7 @@ const PokemonTrainers = props => {
                   aria-label="Menu de métodos de filtragem"
                   aria-labelledby="Método de filtragem"
                   onChange={(ev, { action }) => {
-                    updateFilter(ev, { action }, 'filterMethod')
+                    updateFilter(ev, { action }, 'filterMethod');
                   }}
                 />
               </Stack>
@@ -517,7 +527,7 @@ const PokemonTrainers = props => {
         </DrawerOverlay>
       </Drawer>
     </>
-  )
-}
+  );
+};
 
-export default PokemonTrainers
+export default PokemonTrainers;

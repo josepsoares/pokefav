@@ -125,13 +125,19 @@ export const updateFavoritePokeList = updatedPokeFavList => {
     const firestore = getFirestore();
     const uid = getState().firebase.auth.uid;
 
+    console.log('TESTE =>', updatedPokeFavList);
+
     try {
-      await firestore.collection('users').doc(uid).update({
-        addFavoriteAction: false,
-        favoritePokemons: updatedPokeFavList
-      });
+      await firestore
+        .collection('users')
+        .doc(uid)
+        .update({
+          addFavoriteAction: false,
+          favoritePokemons: updatedPokeFavList.filter(i => !i?.isEmpty && i)
+        });
       dispatch({ type: UPDATE_FAVORITE_SUCCESS });
     } catch (err) {
+      console.log(err.message);
       dispatch({ type: UPDATE_FAVORITE_ERROR, error: err.message });
     }
   };
@@ -191,10 +197,13 @@ export const updatePokeTeamList = updatedPokeTeam => {
     const uid = getState().firebase.auth.uid;
 
     try {
-      await firestore.collection('users').doc(uid).update({
-        addFavoriteAction: false,
-        favoriteTeam: updatedPokeTeam
-      });
+      await firestore
+        .collection('users')
+        .doc(uid)
+        .update({
+          addFavoriteAction: false,
+          favoriteTeam: updatedPokeTeam.filter(i => !i?.isEmpty && i)
+        });
       dispatch({ type: UPDATE_POKEMON_TEAM_SUCCESS });
     } catch (err) {
       dispatch({ type: UPDATE_POKEMON_TEAM_ERROR, error: err.message });

@@ -24,10 +24,12 @@ import getStatsMessages from 'utils/getMessageFavoritesTeam';
 
 class UserHome extends Component {
   render() {
-    const { profileContent, notifications, getUser, reactionIsLoading } =
+    const { profileContent, notifications, getUser, reactionIsLoading, auth } =
       this.props;
     const { username, favoritePokemons, favoriteTeam, minigames } =
       profileContent;
+
+    console.log(profileContent, auth);
 
     const getFavoritesMessage = getStatsMessages(favoritePokemons, 'favorites');
     const getTeamMessage = getStatsMessages(favoriteTeam, 'team');

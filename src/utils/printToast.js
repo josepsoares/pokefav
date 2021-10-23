@@ -20,7 +20,7 @@ const PrintToast = (type, message) => {
     case 'error':
       return toast.error(
         <Flex flexDir="row" align="center">
-          <Icon as={FiXCircle} />
+          <Icon mr={4} as={FiXCircle} />
           <Text>{message}</Text>
         </Flex>
       );

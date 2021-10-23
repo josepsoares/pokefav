@@ -48,7 +48,7 @@ const ScrollingWrapper = () => {
         onClick={scrollToTop}
         aria-label="Scroll Top"
         boxShadow="md"
-        left={['90%', null, null, null, '94%']}
+        left={['80%', '85%', '90%', null, '94%']}
         top={['85%', null, null, null, '90%']}
         boxSize={['2.5rem', null, '3rem', '3.25rem']}
         icon={<Icon as={FaArrowUp} boxSize={6} />}

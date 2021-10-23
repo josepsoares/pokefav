@@ -13,7 +13,6 @@ import { signOut } from 'redux/actions/authActions';
 
 import { Link, useRouteMatch } from 'react-router-dom';
 import moment from 'moment';
-import _ from 'lodash';
 
 import {
   Box,
@@ -29,7 +28,6 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  ButtonGroup,
   IconButton,
   AlertDialog,
   AlertDialogOverlay,
@@ -37,7 +35,6 @@ import {
   AlertDialogBody,
   AlertDialogHeader,
   AlertDialogFooter,
-  Select,
   Icon,
   Grid,
   Wrap,
@@ -45,12 +42,10 @@ import {
 } from '@chakra-ui/react';
 import {
   FaArrowRight,
-  FaCheck,
   FaEdit,
   FaMinus,
   FaPlus,
   FaSignOutAlt,
-  FaTimes,
   FaTrashAlt
 } from 'react-icons/fa';
 import { CgPokemon } from 'react-icons/cg';
@@ -58,107 +53,13 @@ import { CgPokemon } from 'react-icons/cg';
 import SEO from 'components/Seo';
 import avatarsList from 'assets/content/avatarsList';
 import getStatsMessages from 'utils/getMessageFavoritesTeam';
+import scrollToRef from 'utils/scrollToRef';
 import Button from 'components/layout/Button';
 import PokemonImage from 'components/layout/PokemonImage';
-import DragGridList from 'components/layout/DragGridList';
 import PokeballMinigameStat from 'components/layout/PokeballMinigameStat';
 import Loading from 'components/feedback/Loading';
-
-// import { motion } from 'framer-motion'
-
-const EditableSelect = ({ initialValue, selectList, fieldType }) => {
-  const dispatch = useDispatch();
-  const [state, setState] = useState({
-    isEditing: false,
-    value: initialValue
-  });
-
-  return (
-    <Flex
-      gridGap={4}
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      textAlign="center"
-    >
-      <>
-        {state.isEditing ? (
-          <Select
-            color="#3c3c3b"
-            bgColor="#ebebd3"
-            defaultValue={state.value}
-            onChange={ev => setState({ ...state, value: ev.target.value })}
-          >
-            {selectList.map((item, index) => (
-              <option value={_.startCase(item.name)} key={index}>
-                {_.startCase(item.name)}
-              </option>
-            ))}
-          </Select>
-        ) : (
-          <Text>{state.value}</Text>
-        )}
-        <EditableControls
-          onEdit={() => setState({ ...state, isEditing: true })}
-          onCancel={() => setState({ ...state, isEditing: false })}
-          isEditing={state.isEditing}
-          onSubmit={() => {
-            console.log(fieldType, state.value);
-            dispatch(editProfileField(fieldType, state.value));
-            setState({ ...state, isEditing: false });
-          }}
-        />
-      </>
-    </Flex>
-  );
-};
-
-function EditableControls({ onEdit, isEditing, onSubmit, onCancel }) {
-  return isEditing ? (
-    <ButtonGroup justifyContent="center" size="sm">
-      <IconButton
-        isRound={true}
-        colorScheme="green"
-        icon={<FaCheck />}
-        onClick={onSubmit}
-      />
-      <IconButton
-        isRound={true}
-        colorScheme="red"
-        icon={<FaTimes />}
-        onClick={onCancel}
-      />
-    </ButtonGroup>
-  ) : (
-    <Flex justifyContent="center">
-      <IconButton
-        transitionProperty="all"
-        transition="ease-in-out"
-        transitionDuration="0.3s"
-        bgColor="secondary"
-        color="primary"
-        borderRadius="50%"
-        size="md"
-        icon={<FaEdit />}
-        onClick={onEdit}
-        fontSize={14}
-        opacity="0.9"
-        _hover={{
-          opacity: 1,
-          fontSize: 18
-        }}
-        _active={{
-          opacity: 1,
-          fontSize: 18
-        }}
-      />
-    </Flex>
-  );
-}
-
-const scrollToRef = ref => {
-  ref.current.scrollIntoView({ behavior: 'smooth' });
-};
+import DragGridList from 'components/pages/Profile/DragGridList';
+import EditableSelect from 'components/pages/Profile/EditableSelect';
 
 const Profile = props => {
   useEffect(() => {
@@ -192,6 +93,8 @@ const Profile = props => {
       };
 
       getRegionsAndGames();
+    } else {
+      setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -217,14 +120,23 @@ const Profile = props => {
 
   let findOccupiedPokeSlotsInPokeFavorites;
 
-  if (favoritePokemons?.length !== 0) {
-    for (let index = 0; index <= 20 - favoritePokemons.length; index++) {
-      favoritePokemons.push({ isEmpty: true });
-    }
+  console.log('fav pok =>', favoritePokemons, favoritePokemons.length);
+  console.log('fav team =>', favoriteTeam, favoriteTeam.length);
 
-    findOccupiedPokeSlotsInPokeFavorites = favoritePokemons.filter(item =>
-      !item.isEmpty ? true : false
-    );
+  if (favoritePokemons?.length !== 0) {
+    for (let index = 0; index < 20; index++) {
+      if (!favoritePokemons[index]) {
+        favoritePokemons.push({ isEmpty: true });
+      }
+    }
+  }
+
+  if (favoriteTeam?.length !== 0) {
+    for (let index = 0; index < 6; index++) {
+      if (!favoriteTeam[index]) {
+        favoriteTeam.push({ isEmpty: true });
+      }
+    }
   }
 
   const messageFavorites = getStatsMessages(favoritePokemons, 'favorites');
@@ -248,6 +160,11 @@ const Profile = props => {
 
   const [pokeFavoriteList, setPokeFavoriteList] = useState(favoritePokemons);
   const [pokeTeamList, setPokeTeamList] = useState(favoriteTeam);
+
+  const [originalPokeFavoriteList, setOriginalPokeFavoriteList] =
+    useState(favoritePokemons);
+  const [originalPokeTeamList, setOriginalPokeTeamList] =
+    useState(favoriteTeam);
 
   const [editOrder, setEditOrder] = useState({
     isEditingOrderFavPoke: false,
@@ -376,22 +293,22 @@ const Profile = props => {
               boxShadow="md"
               boxSize={32}
               alt={avatar}
-              src={`/img/avatars/avatar-${profile.avatar}.png`}
+              src={`/img/avatars/avatar-${avatar}.png`}
             />
             <Heading pb={[6, null, 0]} as="h1">
               {username}
             </Heading>
           </Flex>
 
-          <SimpleGrid
+          <Flex
+            flexDir="row"
+            flexWrap="wrap"
             pb={16}
-            gridGap={[8, 6]}
-            columns={[1, 2, null, 4]}
+            gridGap={[8, null, 6]}
             textAlign="center"
-            justify="center"
-            align="center"
+            justify="space-around"
           >
-            <Box>
+            <Box gridColumnEnd={2}>
               <Heading as="h5" fontSize={20}>
                 Signed up at
               </Heading>
@@ -451,6 +368,29 @@ const Profile = props => {
             </Box>
             <Box>
               <Heading as="h5" fontSize={20}>
+                Pokémon IQ
+              </Heading>
+
+              <Text
+                color="blue.400"
+                fontWeight="600"
+                pb={1}
+                transition="all ease-in-out 0.3s"
+                onClick={() => scrollToRef(pokeCarerPerRef)}
+                _hover={{
+                  color: 'blue.300',
+                  cursor: 'pointer'
+                }}
+                _active={{
+                  color: 'blue.300',
+                  cursor: 'pointer'
+                }}
+              >
+                {favoriteGame}
+              </Text>
+            </Box>
+            <Box>
+              <Heading as="h5" fontSize={20}>
                 Favorite Game
               </Heading>
               {isUserLoggedInProfile ? (
@@ -477,7 +417,7 @@ const Profile = props => {
                 <Text>{favoriteRegion}</Text>
               )}
             </Box>
-          </SimpleGrid>
+          </Flex>
 
           <Box ref={pokeFavoriteListRef} w="100%" pb={[20]} textAlign="center">
             <Heading as="h3" pb={favoritePokemons.length !== 0 ? 4 : 10}>
@@ -487,19 +427,25 @@ const Profile = props => {
             {favoritePokemons.length !== 0 && (
               <Text fontSize={14} color="grey" fontStyle="italic" pb={10}>
                 {isUserLoggedInProfile ? 'You' : 'They'} have{' '}
-                <b>{findOccupiedPokeSlotsInPokeFavorites.length} out of 20</b>{' '}
+                <b>{pokeFavoriteList.filter(i => i.name).length} out of 20</b>{' '}
                 possible Pokémons in {isUserLoggedInProfile ? 'your' : 'their'}{' '}
                 Favorite Pokémon List
               </Text>
             )}
 
             {!favoritePokemons.length ? (
-              <SimpleGrid
-                columns={[1, null, null, 2]}
+              <Flex
+                gridGap={[4, null, null, 10]}
+                wrap="wrap"
+                flexDir="row"
                 justify="center"
-                gridGap={6}
+                align="center"
               >
-                <Box order={[2, null, null, 1]} textAlign="left">
+                <Box
+                  textAlign="left"
+                  order={[2, null, null, 1]}
+                  w={['85%', null, null, '50%']}
+                >
                   <Text pb={2}>
                     {isUserLoggedInProfile
                       ? "You don't"
@@ -507,33 +453,36 @@ const Profile = props => {
                     have any Pokémon in their Favorite Pokémons List!
                   </Text>
                   {isUserLoggedInProfile ? (
-                    <Text pb={6}>
-                      It seems like you lack the caring and sharing spirit of a
-                      Chansey! Let it help you filling your Favorite Pokémon
-                      List!
-                    </Text>
+                    <>
+                      <Text pb={6}>
+                        It seems like you lack the caring and sharing spirit of
+                        a Chansey! Let it help you filling your Favorite Pokémon
+                        List!
+                      </Text>
+                      <Flex justify="center" flexDir="row">
+                        <Link to="pokemon-list">
+                          <Button
+                            rightIcon={<FaArrowRight />}
+                            colorScheme="blue"
+                          >
+                            Go to PokéList
+                          </Button>
+                        </Link>
+                      </Flex>
+                    </>
                   ) : (
-                    <Text pb={6}>
+                    <Text>
                       It seems like {username} lacks the caring and sharing
                       spirit of a Chansey!! Hopefully they will get it
                       eventually when they've some Pokémons in their Favorite
                       Pokémon List...
                     </Text>
                   )}
-                  {isUserLoggedInProfile && (
-                    <Flex justify="center" flexDir="row">
-                      <Link to="/pokemon-list">
-                        <Button rightIcon={<FaArrowRight />} colorScheme="blue">
-                          Go to PokéList
-                        </Button>
-                      </Link>
-                    </Flex>
-                  )}
                 </Box>
                 <Flex
+                  order={[1, null, null, 2]}
                   justify="center"
                   align="center"
-                  order={[1, null, null, 2]}
                 >
                   <Image
                     h="120px"
@@ -544,7 +493,7 @@ const Profile = props => {
                     objectPosition="center"
                   />
                 </Flex>
-              </SimpleGrid>
+              </Flex>
             ) : (
               <>
                 {isUserLoggedInProfile && editOrder.isEditingOrderFavPoke ? (
@@ -670,7 +619,7 @@ const Profile = props => {
                           setShowAllFavorites({
                             isOpen: !showAllFavorites.isOpen,
                             pokemons:
-                              findOccupiedPokeSlotsInPokeFavorites.length <=
+                              pokeFavoriteList.filter(i => i.name).length <=
                                 12 && !showAllFavorites.isOpen
                                 ? favoritePokemons
                                 : favoritePokemons.slice(0, 12)
@@ -707,11 +656,12 @@ const Profile = props => {
                           <WrapItem>
                             <Button
                               colorScheme="red"
-                              onClick={() =>
+                              onClick={() => {
                                 setEditOrder({
                                   isEditingOrderFavPoke: false
-                                })
-                              }
+                                });
+                                setPokeFavoriteList(originalPokeFavoriteList);
+                              }}
                             >
                               Cancel
                             </Button>
@@ -724,6 +674,8 @@ const Profile = props => {
                                 setEditOrder({
                                   isEditingOrderFavPoke: false
                                 });
+                                setOriginalPokeFavoriteList(pokeFavoriteList);
+                                console.log(pokeFavoriteList);
                                 dispatch(
                                   updateFavoritePokeList(pokeFavoriteList)
                                 );
@@ -748,28 +700,25 @@ const Profile = props => {
             {favoriteTeam.length !== 0 && (
               <Text fontSize={14} color="grey" fontStyle="italic" pb={10}>
                 {isUserLoggedInProfile ? 'You' : 'They'} have{' '}
-                <b>{favoriteTeam.length} out of 6</b> possible Pokémons in{' '}
-                {isUserLoggedInProfile ? 'your' : 'their'} Pokémon Team
+                <b>{pokeTeamList.filter(i => i.name).length} out of 6</b>{' '}
+                possible Pokémons in {isUserLoggedInProfile ? 'your' : 'their'}{' '}
+                Pokémon Team
               </Text>
             )}
 
             {!favoriteTeam.length ? (
-              <SimpleGrid
-                columns={[1, null, null, 2]}
+              <Flex
+                gridGap={[4, null, null, 10]}
+                wrap="wrap"
+                flexDir="row"
                 justify="center"
-                gridGap={6}
+                align="center"
               >
-                <Flex justify="center" align="center">
-                  <Image
-                    h="120px"
-                    w="120px"
-                    alt="Tyrogue Pokémon Team"
-                    objectFit="contain"
-                    objectPosition="center"
-                    src="/img/tyroge.png"
-                  />
-                </Flex>
-                <Box textAlign="left">
+                <Box
+                  textAlign="left"
+                  order={[2, null, null, 1]}
+                  w={['85%', null, null, '50%']}
+                >
                   <Text pb={2}>
                     {isUserLoggedInProfile
                       ? "You don't"
@@ -777,28 +726,45 @@ const Profile = props => {
                     have any Pokémon in their Pokémon Team!
                   </Text>
                   {isUserLoggedInProfile ? (
-                    <Text pb={6}>
-                      It seems like you lack the fighting spirit of a Tyrogue!
-                      Let it help you choosing your ideal Pokémon Team!
-                    </Text>
+                    <>
+                      <Text pb={6}>
+                        It seems like you lack the fighting spirit of a Tyrogue!
+                        Let it help you choosing your ideal Pokémon Team!
+                      </Text>
+                      <Flex justify="center" flexDir="row">
+                        <Link to="pokemon-list">
+                          <Button
+                            rightIcon={<FaArrowRight />}
+                            colorScheme="blue"
+                          >
+                            Go to PokéList
+                          </Button>
+                        </Link>
+                      </Flex>
+                    </>
                   ) : (
-                    <Text pb={6}>
+                    <Text>
                       It seems like {username} lacks the fighting spirit of a
                       Tyrogue! Hopefully they will get it eventually when
                       they've got a Pokémon Team...
                     </Text>
                   )}
-                  {isUserLoggedInProfile && (
-                    <Flex justify="center" flexDir="row">
-                      <Link to="pokemon-list">
-                        <Button rightIcon={<FaArrowRight />} colorScheme="blue">
-                          Go to PokéList
-                        </Button>
-                      </Link>
-                    </Flex>
-                  )}
                 </Box>
-              </SimpleGrid>
+                <Flex
+                  order={[1, null, null, 2]}
+                  justify="center"
+                  align="center"
+                >
+                  <Image
+                    h="200px"
+                    w="200px"
+                    alt="Tyrogue Pokémon Team"
+                    objectFit="contain"
+                    objectPosition="center"
+                    src="/img/tyroge.png"
+                  />
+                </Flex>
+              </Flex>
             ) : (
               <>
                 {isUserLoggedInProfile && editOrder.isEditingOrderFavTeam ? (
@@ -824,83 +790,81 @@ const Profile = props => {
                       'repeat(6, 1fr)'
                     ]}
                   >
-                    {favoriteTeam.map((item, key) => (
-                      <Flex key={key} justify="center" position="relative">
-                        <Box
-                          as={Link}
+                    {favoriteTeam.map((item, index) =>
+                      item?.isEmpty ? (
+                        <Flex
+                          key={index}
+                          flexDir="column"
+                          align="center"
                           position="relative"
-                          to={`/pokemon-list/pokemon-page/${item.name}`}
-                          onClick={() => {
-                            dispatch(getInfoPokemonPage(item.id, item.name));
-                          }}
+                          opacity="0.25"
+                          p="1rem 0"
                         >
-                          <PokemonImage
-                            pokemonName={item.name}
-                            pokemonNumber={item.id}
-                          />
-                        </Box>
-                        {isUserLoggedInProfile && (
-                          <IconButton
-                            zIndex="3"
-                            left="70%"
-                            top="0"
-                            transitionProperty="all"
-                            transition="ease-in-out"
-                            transitionDuration="0.5s"
-                            fontSize={14}
-                            bgColor="secondary"
-                            color="primary"
+                          <Box boxSize="110px" position="relative" />
+                          <Icon
                             position="absolute"
-                            borderRadius="50%"
-                            icon={<FaTrashAlt />}
-                            _hover={{
-                              fontSize: 20
-                            }}
-                            _active={{
-                              fontSize: 20
-                            }}
-                            onClick={() =>
-                              setRemovePokemonAlert({
-                                isOpen: true,
-                                pokemon: item.name,
-                                type: 'Pokémon Team'
-                              })
-                            }
+                            boxSize="10rem"
+                            top="39%"
+                            left="50%"
+                            opacity="0.5"
+                            transform="translate(-50%, -50%)"
+                            as={CgPokemon}
                           />
-                        )}
-                      </Flex>
-                    ))}
-                    {favoriteTeam.length !== 6 &&
-                      [...Array(6 - favoriteTeam.length).keys()].map(
-                        (_, index) => (
-                          <Flex
-                            key={index}
-                            flexDir="column"
-                            align="center"
-                            position="relative"
-                            opacity="0.25"
-                            p="1rem 0"
+                          <Text
+                            letterSpacing="0.1em"
+                            fontFamily="'Rubick', sans-serif"
+                            pt={6}
                           >
-                            <Box boxSize="110px" position="relative" />
-                            <Icon
-                              position="absolute"
-                              boxSize="10rem"
-                              top="39%"
-                              left="50%"
-                              opacity="0.5"
-                              transform="translate(-50%, -50%)"
-                              as={CgPokemon}
+                            ---
+                          </Text>
+                        </Flex>
+                      ) : (
+                        <Flex key={index} justify="center" position="relative">
+                          <Box
+                            as={Link}
+                            position="relative"
+                            to={`/pokemon-list/pokemon-page/${item.name}`}
+                            onClick={() => {
+                              dispatch(getInfoPokemonPage(item.id, item.name));
+                            }}
+                          >
+                            <PokemonImage
+                              pokemonName={item.name}
+                              pokemonNumber={item.id}
                             />
-                            <Text
-                              letterSpacing="0.1em"
-                              fontFamily="'Rubick', sans-serif"
-                              pt={6}
-                            >
-                              ---
-                            </Text>
-                          </Flex>
-                        )
-                      )}
+                          </Box>
+                          {isUserLoggedInProfile && (
+                            <IconButton
+                              zIndex="3"
+                              left="70%"
+                              top="0"
+                              transitionProperty="all"
+                              transition="ease-in-out"
+                              transitionDuration="0.5s"
+                              fontSize={14}
+                              bgColor="secondary"
+                              color="primary"
+                              position="absolute"
+                              borderRadius="50%"
+                              icon={<FaTrashAlt />}
+                              _hover={{
+                                fontSize: 20
+                              }}
+                              _active={{
+                                fontSize: 20
+                              }}
+                              onClick={() =>
+                                setRemovePokemonAlert({
+                                  isOpen: true,
+                                  pokemon: item.name,
+                                  type: 'Pokémon Team'
+                                })
+                              }
+                            />
+                          )}
+                        </Flex>
+                      )
+                    )}
                   </Grid>
                 )}
 
@@ -934,11 +898,12 @@ const Profile = props => {
                           <WrapItem>
                             <Button
                               colorScheme="red"
-                              onClick={() =>
+                              onClick={() => {
                                 setEditOrder({
                                   isEditingOrderFavTeam: false
-                                })
-                              }
+                                });
+                                setPokeTeamList(originalPokeTeamList);
+                              }}
                             >
                               Cancel
                             </Button>
@@ -951,7 +916,8 @@ const Profile = props => {
                                 setEditOrder({
                                   isEditingOrderFavTeam: false
                                 });
-                                dispatch(updateFavoritePokeList(pokeTeamList));
+                                setOriginalPokeTeamList(pokeTeamList);
+                                dispatch(updatePokeTeamList(pokeTeamList));
                               }}
                             >
                               Update Pokémon order in Pokémon Team
@@ -982,46 +948,54 @@ const Profile = props => {
 
             {minigames.played <= 3 ? (
               <Flex
-                gridGap={12}
+                gridGap={[4, null, null, 10]}
                 wrap="wrap"
                 flexDir="row"
                 justify="center"
                 align="center"
               >
-                <Box w={['85%', null, null, '50%']}>
+                <Box order={[2, null, null, 1]} w={['85%', null, null, '50%']}>
                   {isUserLoggedInProfile ? (
-                    <Text pb={4}>
-                      You still haven't played any PokéTrivia to calculte your
-                      Pokémon IQ... Don't be lazy like Slakoth and start playing
-                      PokéTrivia to find out the Pokémon that represents your
-                      intelligence!
-                    </Text>
+                    <>
+                      <Text pb={6}>
+                        You still haven't played at least 5 PokéMinigames to
+                        calculte your Pokémon IQ... Don't be lazy like Slakoth
+                        and start playing some PokéMinigames to find out the
+                        Pokémon that represents your intelligence!
+                      </Text>
+                      <Flex justify="center">
+                        <Link to="/minigames">
+                          <Button
+                            rightIcon={<FaArrowRight />}
+                            colorScheme="blue"
+                          >
+                            Go to PokéMinigames
+                          </Button>
+                        </Link>
+                      </Flex>
+                    </>
                   ) : (
-                    <Text pb={4}>
-                      {username} still hasn't played any PokéTrivia to calculte
-                      their Pokémon IQ... It seems they're a little bit like
-                      Slakoth, you know, in the lazy department. Because of that
-                      don't know which Pokémon represents the best their
-                      intelligence...
+                    <Text>
+                      {username} still hasn't played at least 5 PokéMinigames to
+                      calculte their Pokémon IQ... It seems they're a little bit
+                      like Slakoth, you know, in the lazy department. Because of
+                      that they don't know which Pokémon represents the best
+                      their intelligence...
                     </Text>
                   )}
-
-                  <Flex justify="center">
-                    <Link to="/pokemon-trivia">
-                      <Button rightIcon={<FaArrowRight />} colorScheme="blue">
-                        Go to PokéTrivia
-                      </Button>
-                    </Link>
-                  </Flex>
                 </Box>
-                <Flex justify="center" align="center">
+                <Flex
+                  order={[1, null, null, 2]}
+                  justify="center"
+                  align="center"
+                >
                   <Link
                     to={`/pokemon-list/pokemon-page/slakoth`}
                     onClick={() => getInfoPokemonPage('slakoth')}
                   >
                     <Image
-                      maxH="250px"
-                      maxW="250px"
+                      maxH="200px"
+                      maxW="200px"
                       alt="Slakoth"
                       src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/287.png`}
                     />

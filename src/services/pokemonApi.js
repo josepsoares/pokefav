@@ -20,8 +20,6 @@ class PokemonApiService {
       })
     );
 
-    console.log(pokemonData);
-
     let pokemonAlternateForms = null;
     const arrayAlternateForms = [];
     for (let item of pokemonData[1].varieties) {
@@ -84,7 +82,18 @@ class PokemonApiService {
   };
 
   getPokedex = async pokedex => {
-    return fetch(`${this.API_URL}/pokedex/${pokedex}`);
+    const fetchPokedex = await fetch(`${this.API_URL}/pokedex/${pokedex}`);
+    return await fetchPokedex.json();
+  };
+
+  getPokemonTypes = async () => {
+    const fetchPokemonTypes = await fetch(`${this.API_URL}/type/`);
+    return await fetchPokemonTypes.json();
+  };
+
+  getType = async name => {
+    const fetchType = await fetch(`${this.API_URL}/type/${name}`);
+    return await fetchType.json();
   };
 }
 

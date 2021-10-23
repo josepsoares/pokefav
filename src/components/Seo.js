@@ -1,5 +1,5 @@
-import React from 'react'
-import { Helmet } from 'react-helmet'
+import React from 'react';
+import { Helmet } from 'react-helmet';
 
 const SEO = ({ description, title }) => {
   return (
@@ -26,11 +26,11 @@ const SEO = ({ description, title }) => {
         }
       ]}
     />
-  )
-}
+  );
+};
 
 SEO.defaultProps = {
-  description: `Pokéfav is a small hub where you can create your own favorite Pokémon list, your favorite Pokémon Team or your predilect Pokémon Cards`
-}
+  description: `Pokéfav is a small hub where you can create your own favorite Pokémon list, your favorite Pokémon Team and play a variety of PokéMinigames`
+};
 
-export default SEO
+export default SEO;

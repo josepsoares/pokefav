@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { getUser } from 'redux/actions/userActions'
-import { signOut } from 'redux/actions/authActions'
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUser } from 'redux/actions/userActions';
+import { signOut } from 'redux/actions/authActions';
 
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom';
 import {
   Flex,
   Drawer,
@@ -19,22 +19,22 @@ import {
   Avatar,
   Divider,
   Box
-} from '@chakra-ui/react'
-import { BiMenu } from 'react-icons/bi'
-import { FaSignOutAlt, FaUser } from 'react-icons/fa'
+} from '@chakra-ui/react';
+import { BiMenu } from 'react-icons/bi';
+import { FaSignOutAlt, FaUser } from 'react-icons/fa';
 
-import useWindowSize from 'utils/hooks/useWindowSize'
-import NavbarLinks from 'components/layout/navbar/NavbarLinks'
+import useWindowSize from 'utils/hooks/useWindowSize';
+import NavbarLinks from 'components/layout/navbar/NavbarLinks';
 
 const NavBar = () => {
-  const dispatch = useDispatch()
-  const [isOpen, setOpen] = useState(false)
-  const profile = useSelector(state => state.firebase.profile)
-  const { width } = useWindowSize()
+  const dispatch = useDispatch();
+  const [isOpen, setOpen] = useState(false);
+  const profile = useSelector(state => state.firebase.profile);
+  const { width } = useWindowSize();
 
   const toggleOpen = () => {
-    setOpen(!isOpen)
-  }
+    setOpen(!isOpen);
+  };
 
   return width > 1024 ? (
     <Flex
@@ -70,7 +70,7 @@ const NavBar = () => {
         variant="unstyled"
         icon={<Icon boxSize={10} as={BiMenu} />}
         onClick={() => toggleOpen()}
-        mr={6}
+        mr={[2, 4, 6]}
         sx={{ padding: '0 0.5rem' }}
       />
       <Link to="/">
@@ -135,7 +135,7 @@ const NavBar = () => {
         </DrawerContent>
       </Drawer>
     </Flex>
-  )
-}
+  );
+};
 
-export default NavBar
+export default NavBar;

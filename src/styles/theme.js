@@ -1,18 +1,18 @@
-import { extendTheme } from '@chakra-ui/react'
-import globalStyles from 'styles/globalStyles'
+import { extendTheme } from '@chakra-ui/react';
+import globalStyles from 'styles/globalStyles';
 
-import { createBreakpoints } from '@chakra-ui/theme-tools'
+import { createBreakpoints } from '@chakra-ui/theme-tools';
 
 const breakpoints = createBreakpoints({
   sm: '600px',
   md: '768px',
   lg: '1080px',
   xl: '1920px'
-})
+});
 
 const themeProps = {
   config: {
-    initialColorMode: 'dark',
+    initialColorMode: 'light',
     useSystemColorMode: false
   },
   breakpoints,
@@ -58,7 +58,25 @@ const themeProps = {
     tertiary: '#1688b9',
     transparent: 'transparent',
     black: '#000',
-    white: '#fff'
+    white: '#fff',
+    electric: '#fc3',
+    fairy: '#e9e',
+    water: '#39f',
+    grass: '#7c5',
+    dragon: '#76e',
+    rock: '#ba6',
+    ground: '#db5',
+    flying: '#89f',
+    poison: '#a59',
+    dark: '#754',
+    steel: '#aab',
+    fire: '#f42',
+    normal: '#aa9',
+    fighting: '#b54',
+    ghost: '#66b',
+    ice: '#f59',
+    psychic: '#f59',
+    bug: '#ab2'
   },
   fonts: {
     heading: '"Rubik", sans-serif',
@@ -89,10 +107,8 @@ const themeProps = {
   shadows: {
     sm: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
     md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-    lg:
-      '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-    xl:
-      '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+    lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
     '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
     outline: '0 0 0 3px rgba(66, 153, 225, 0.6)',
     inner: 'inset 0 2px 4px 0 rgba(0,0,0,0.06)',
@@ -106,8 +122,8 @@ const themeProps = {
     100: '1'
   },
   globalStyles
-}
+};
 
-const pokeFavTheme = extendTheme(themeProps)
+const pokeFavTheme = extendTheme(themeProps);
 
-export default pokeFavTheme
+export default pokeFavTheme;

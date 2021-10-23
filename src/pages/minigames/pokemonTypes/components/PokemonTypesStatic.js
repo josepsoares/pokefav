@@ -26,14 +26,12 @@ import Button from 'components/layout/Button';
 import SEO from 'components/Seo';
 import { IconButton } from '@chakra-ui/button';
 
-const contentsAvailableForGame = ['Pokémons', 'Moves', 'Pokémons and Moves'];
-
-const PokemonTypesStatic = ({ startPokeTypes }) => {
+const PokemonTypesStatic = ({ startMinigame }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [tutorial, setTutorial] = useState(null);
-  const [contentInGame, setContentInGame] = useState('Pokémons');
+  // const [tutorial, setTutorial] = useState(null);
 
   const profile = useSelector(state => state.firebase.profile);
+  /*
   const {
     pokeTypes,
     pokemonIQ,
@@ -47,7 +45,7 @@ const PokemonTypesStatic = ({ startPokeTypes }) => {
     incorrectTypesChosen,
     score: pokeTypesScore
   } = pokeTypes;
-  /*   const {
+    const {
     realizedTrivias,
     correctAnswers,
     wrongAnswers,
@@ -123,7 +121,7 @@ const PokemonTypesStatic = ({ startPokeTypes }) => {
 
             <Button
               colorScheme="green"
-              onClick={startPokeTypes}
+              onClick={startMinigame}
               rightIcon={<FaArrowRight />}
             >
               Start PokéTypes Now

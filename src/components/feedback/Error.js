@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Flex, Heading, Image } from '@chakra-ui/react';
+import { Flex, Heading, Image } from '@chakra-ui/react';
 import { FaRedoAlt } from 'react-icons/fa';
 import Button from 'components/layout/Button';
 
@@ -17,11 +17,11 @@ const Error = ({
         objectPosition="center"
         src="/img/psyduck.png"
       />
-      <Box>
+      <Flex align="center" flexDir="column">
         <Heading pb={4} as="h2">
           {message}
         </Heading>
-        <Heading as="h2" pb={8}>
+        <Heading as="h4" pb={6}>
           {/* {props.error} */}
         </Heading>
 
@@ -32,7 +32,7 @@ const Error = ({
         >
           Refresh the page
         </Button>
-      </Box>
+      </Flex>
     </Flex>
   );
 };
