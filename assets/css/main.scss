@@ -1,0 +1,72 @@
+@font-face {
+  font-family: "Rubik";
+  src: url("~/assets/fonts/rubik-variable.ttf") format("truetype");
+  font-weight: 100 1000;
+}
+
+@font-face {
+  font-family: "Rubik";
+  src: url("~/assets/fonts/rubik-italic-variable.ttf") format("truetype");
+  font-style: italic;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Rubik", sans-serif;
+  font-weight: 500;
+}
+
+h1 {
+  @apply text-main-yellow;
+  font-size: 2.8rem;
+}
+
+h2 {
+  @apply text-main-red;
+}
+
+h3 {
+  @apply text-main-blue;
+  padding-bottom: 1.25rem;
+}
+
+h4,
+h5 {
+  @apply text-main-red;
+  padding-bottom: 1rem;
+}
+
+a.basic-link {
+  @apply text-main-blue border-main-red;
+  border-bottom: solid 1.5px;
+
+  &:hover,
+  &:active {
+    @apply text-main-red border-b-main-blue;
+    text-decoration: none;
+  }
+}
+
+a.container-link {
+  @apply text-main-red;
+  display: block;
+  text-decoration: none;
+
+  &:hover,
+  &:active {
+    @apply bg-main-blue;
+    text-decoration: none;
+    border-radius: 0.25rem;
+    & > p,
+    & > div > p,
+    & > div > div > p,
+    & > h5 {
+      @apply text-main-yellow;
+    }
+  }
+}
+
